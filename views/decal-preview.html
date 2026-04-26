@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Decal Preview | RenegadeMade Graphix</title>
+
+  <title>Decal Preview Tool | RenegadeMade Graphix</title>
+  <meta name="description" content="Preview custom decals on your own car before you buy. Upload your car photo, place your decal, adjust the look, and order the exact preview." />
+
   <link rel="stylesheet" href="/assets/css/style.css" />
 
 <style>
@@ -16,6 +19,7 @@
   --accent: #39ff14;
   --danger: #ff5c5c;
   --line: #444;
+  --gold: #c98536;
 }
 
 * { box-sizing: border-box; }
@@ -29,7 +33,7 @@ body {
 
 .app {
   display: grid;
-  grid-template-columns: 360px 1fr;
+  grid-template-columns: 380px 1fr;
   min-height: calc(100vh - 74px);
 }
 
@@ -87,6 +91,10 @@ button {
   cursor: pointer;
 }
 
+button:hover {
+  filter: brightness(1.08);
+}
+
 button.secondary {
   background: #333;
   color: white;
@@ -109,6 +117,68 @@ button.danger {
   font-size: 12px;
   margin-top: 4px;
   line-height: 1.35;
+}
+
+.sales-box {
+  border: 1px solid var(--accent);
+  background: rgba(57, 255, 20, 0.08);
+}
+
+.sales-box p {
+  margin: 0 0 8px;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.sales-box ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.quick-note {
+  background: rgba(201, 133, 54, 0.12);
+  border: 1px solid rgba(201, 133, 54, 0.7);
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 13px;
+  color: #f0d1aa;
+  line-height: 1.4;
+  margin-top: 10px;
+}
+
+.buy-btn {
+  margin-top: 14px;
+  font-size: 17px;
+  padding: 15px;
+}
+
+.preview-buy-note {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 8px;
+  line-height: 1.4;
+}
+
+.status {
+  font-size: 13px;
+  color: var(--muted);
+  padding: 10px;
+  background: #111;
+  border-radius: 6px;
+  border: 1px solid #444;
+}
+
+.status.success {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.status.warn {
+  border-color: var(--gold);
+  color: #f0d1aa;
 }
 
 #canvasBox {
@@ -152,15 +222,6 @@ button.danger {
   white-space: nowrap;
 }
 
-.status {
-  font-size: 13px;
-  color: var(--muted);
-  padding: 10px;
-  background: #111;
-  border-radius: 6px;
-  border: 1px solid #444;
-}
-
 .small {
   font-size: 12px;
   color: var(--muted);
@@ -171,10 +232,32 @@ button.danger {
   font-weight: bold;
 }
 
-.buy-btn {
-  margin-top: 14px;
-  font-size: 16px;
+.stage-card {
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
   padding: 14px;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.stage-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.stage-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.stage-header p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
 }
 
 @media (max-width: 900px) {
@@ -183,6 +266,10 @@ button.danger {
   .sidebar {
     border-right: none;
     border-bottom: 1px solid var(--line);
+  }
+
+  .stage-header {
+    display: block;
   }
 }
 </style>
@@ -214,9 +301,9 @@ button.danger {
 <main class="page-main">
   <section class="page-hero compact">
     <div class="container">
-      <p class="eyebrow">Tools</p>
-      <h1>RMG Decal Preview Tool</h1>
-      <p>Upload a car photo, upload a decal, place it on the vehicle, blend it, and send it to checkout.</p>
+      <p class="eyebrow">Preview Before You Buy</p>
+      <h1>See your decal on your car first.</h1>
+      <p>Upload a car photo, upload or test a decal, place it on the vehicle, adjust the look, and send the exact preview to checkout.</p>
     </div>
   </section>
 
@@ -224,6 +311,17 @@ button.danger {
     <div class="app">
 
       <aside class="sidebar">
+
+        <div class="box sales-box">
+          <h2>Preview → Adjust → Order</h2>
+          <p>Stop guessing what a decal will look like. Build the preview first, then order the exact setup.</p>
+          <ul>
+            <li>Upload your own vehicle photo</li>
+            <li>Upload a decal image or SVG</li>
+            <li>Drag the corners to match the panel angle</li>
+            <li>Send the preview and settings to checkout</li>
+          </ul>
+        </div>
 
         <div class="box">
           <h2>1. Upload Images</h2>
@@ -234,7 +332,11 @@ button.danger {
           <label>Decal Image PNG / SVG</label>
           <input id="decalInput" type="file" accept=".png,.jpg,.jpeg,.webp,.svg,image/*">
 
-          <div class="help">Transparent PNG or SVG decals work best.</div>
+          <div class="help">Best results: use a clear side-angle car photo and a transparent PNG/SVG decal.</div>
+
+          <div class="quick-note">
+            Tip: A clean side shot works best for doors, fenders, quarter panels, and rocker decals.
+          </div>
         </div>
 
         <div class="box">
@@ -244,7 +346,7 @@ button.danger {
           <input id="decalNameInput" type="text" value="Custom Decal Preview">
 
           <label>Selected Size</label>
-          <select id="decalSizeInput">
+          <select id="decalSizeInput" onchange="updatePriceFromSize()">
             <option value="12 inch">12 inch</option>
             <option value="24 inch">24 inch</option>
             <option value="36 inch" selected>36 inch</option>
@@ -254,6 +356,8 @@ button.danger {
 
           <label>Price</label>
           <input id="decalPriceInput" type="number" value="39.99" step="0.01">
+
+          <div class="help">This is the price sent to checkout. You can adjust it for custom jobs.</div>
         </div>
 
         <div class="box">
@@ -272,7 +376,7 @@ button.danger {
           </select>
 
           <button onclick="applyPlacementPreset()">Apply Preset</button>
-          <div class="help">Drag the green corner handles to fit the car angle and panel shape.</div>
+          <div class="help">This gives you a starting position. Drag the green corner handles to fit the vehicle.</div>
         </div>
 
         <div class="box">
@@ -344,12 +448,19 @@ button.danger {
 
           <label>Decal Color</label>
           <input id="decalColor" type="color" value="#000000" onchange="render()">
+
+          <div class="help">Works best with simple black/white decals or transparent PNG/SVG files.</div>
         </div>
 
-        <div class="box">
+        <div class="box sales-box">
           <h2>7. Buy / Export</h2>
 
-          <button class="buy-btn" onclick="buyDecal()">Buy This Decal</button>
+          <button class="buy-btn" onclick="buyDecal()">Buy This Previewed Decal</button>
+
+          <div class="preview-buy-note">
+            Your preview image, placement, size, color, and settings will be sent to checkout with your order.
+          </div>
+
           <button class="secondary" onclick="downloadPreview()">Download Preview PNG</button>
           <button class="secondary" onclick="copySettings()">Copy Placement Settings</button>
           <button class="secondary" onclick="downloadSettings()">Download JSON Settings</button>
@@ -360,18 +471,27 @@ button.danger {
       </aside>
 
       <main class="stage-wrap">
-        <div id="canvasBox">
-          <canvas id="mainCanvas"></canvas>
+        <div class="stage-card">
+          <div class="stage-header">
+            <div>
+              <h2>Live Vehicle Preview</h2>
+              <p>Drag each green corner to match the vehicle body panel.</p>
+            </div>
+          </div>
 
-          <div id="h0" class="handle" data-label="top-left"></div>
-          <div id="h1" class="handle" data-label="top-right"></div>
-          <div id="h2" class="handle" data-label="bottom-right"></div>
-          <div id="h3" class="handle" data-label="bottom-left"></div>
+          <div id="canvasBox">
+            <canvas id="mainCanvas"></canvas>
+
+            <div id="h0" class="handle" data-label="top-left"></div>
+            <div id="h1" class="handle" data-label="top-right"></div>
+            <div id="h2" class="handle" data-label="bottom-right"></div>
+            <div id="h3" class="handle" data-label="bottom-left"></div>
+          </div>
+
+          <p class="small">
+            The preview sent to checkout is compressed so it does not overload browser storage.
+          </p>
         </div>
-
-        <p class="small">
-          Drag the corner handles to match the vehicle panel perspective. The checkout will save your placement settings and preview.
-        </p>
       </main>
 
     </div>
@@ -439,6 +559,21 @@ handles.forEach((h, i) => {
   });
 });
 
+function updatePriceFromSize() {
+  const size = document.getElementById("decalSizeInput").value;
+  const priceInput = document.getElementById("decalPriceInput");
+
+  const prices = {
+    "12 inch": 19.99,
+    "24 inch": 29.99,
+    "36 inch": 39.99,
+    "48 inch": 49.99,
+    "Custom Size": 59.99
+  };
+
+  priceInput.value = prices[size] || 39.99;
+}
+
 function loadCar(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -456,7 +591,7 @@ function loadCar(e) {
     canvas.height = Math.round(img.height * scale);
 
     applyPlacementPreset();
-    setStatus("Car image loaded. Now upload a decal.");
+    setStatus("Car image loaded. Now upload a decal.", "success");
     URL.revokeObjectURL(url);
   };
 
@@ -489,7 +624,7 @@ function loadDecalImageFromUrl(url, revoke) {
   img.onload = () => {
     decalImage = img;
     if (carImage) applyPlacementPreset();
-    setStatus("Decal loaded. Drag handles to fit the panel.");
+    setStatus("Decal loaded. Drag handles to fit the panel, then click Buy This Previewed Decal.", "success");
     if (revoke) URL.revokeObjectURL(url);
     render();
   };
@@ -821,6 +956,16 @@ function buyDecal() {
   const decalSize = document.getElementById("decalSizeInput").value;
   const decalPrice = Number(document.getElementById("decalPriceInput").value || 39.99);
 
+  if (!canvas.width || !canvas.height || !carImage) {
+    alert("Upload a car photo first so your preview can be sent to checkout.");
+    return;
+  }
+
+  if (!decalImage) {
+    alert("Upload a decal image first.");
+    return;
+  }
+
   const previewImage = createSmallPreview();
 
   const checkoutData = {
@@ -836,6 +981,7 @@ function buyDecal() {
   };
 
   sessionStorage.setItem("checkout_data", JSON.stringify(checkoutData));
+
   localStorage.setItem("checkout_data", JSON.stringify({
     ...checkoutData,
     previewImage: null
@@ -895,6 +1041,9 @@ function downloadSettings() {
 function getSettings() {
   return {
     decalFileName,
+    decalName: document.getElementById("decalNameInput").value,
+    decalSize: document.getElementById("decalSizeInput").value,
+    decalPrice: Number(document.getElementById("decalPriceInput").value || 0),
     placementPreset: document.getElementById("placementPreset").value,
     quad,
     blendMode: document.getElementById("blendMode").value,
@@ -920,8 +1069,11 @@ function updateValues() {
   document.getElementById("curveWarpVal").textContent = document.getElementById("curveWarp").value;
 }
 
-function setStatus(msg) {
-  document.getElementById("status").textContent = msg;
+function setStatus(msg, type = "") {
+  const status = document.getElementById("status");
+  status.textContent = msg;
+  status.className = "status";
+  if (type) status.classList.add(type);
 }
 
 function lerpPoint(a, b, t) {
