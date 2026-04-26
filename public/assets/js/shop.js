@@ -23,36 +23,39 @@ const CATEGORY_HIERARCHY = {
 };
 
 const CATEGORY_IMAGES = {
-  Decals: "/assets/imgs/product-cards/decals.png",
-  "Window Tint": "/assets/imgs/product-cards/window_tint.png",
-  Lettering: "/assets/imgs/product-cards/lettering.png",
-  Wraps: "/assets/imgs/product-cards/wraps.png"
+  Decals: "/assets/imgs/decal-cats/graphics.png",
+  "Window Tint": "/assets/imgs/main.PNG",
+  Lettering: "/assets/imgs/decal-cats/brands.png",
+  Wraps: "/assets/imgs/main.PNG"
 };
 
 const SUBCATEGORY_IMAGES = {
-  Custom: "/assets/imgs/product-cards/custom.png",
-  Fender: "/assets/imgs/product-cards/fender.png",
-  "Full Body/Half Body": "/assets/imgs/product-cards/full_body_half_body.png",
-  "Platform Specific": "/assets/imgs/product-cards/platform_specific.png",
-  "Rear Quarter Panel": "/assets/imgs/product-cards/rear_quarter_panel.png",
-  "Rocker Panel/Side": "/assets/imgs/product-cards/rocker_panel_side.png",
-  "Windshield/Rear Window Banners": "/assets/imgs/product-cards/windshield_banner.png",
-  "Full Rolls": "/assets/imgs/product-cards/full_rolls.png",
-  "Precut Kits": "/assets/imgs/product-cards/precut_kits.png",
-  "Business Info": "/assets/imgs/product-cards/business_info.png",
-  "Business Name": "/assets/imgs/product-cards/business_name.png",
-  "By The Foot": "/assets/imgs/product-cards/by_the_foot.png"
+  Custom: "/assets/imgs/decal-cats/custom.png",
+  Fender: "/assets/imgs/decal-cats/fender.png",
+  "Full Body/Half Body": "/assets/imgs/decal-cats/full_body_half_body.png",
+  "Platform Specific": "/assets/imgs/decal-cats/platform_specific.png",
+  "Rear Quarter Panel": "/assets/imgs/decal-cats/rear_window_banners.png",
+  "Rocker Panel/Side": "/assets/imgs/decal-cats/rocker_panel_side.png",
+  "Windshield/Rear Window Banners": "/assets/imgs/decal-cats/windshield.png",
+  "Full Rolls": "/assets/imgs/main.PNG",
+  "Precut Kits": "/assets/imgs/main.PNG",
+  "Business Info": "/assets/imgs/decal-cats/brands.png",
+  "Business Name": "/assets/imgs/decal-cats/brands.png",
+  "By The Foot": "/assets/imgs/main.PNG"
 };
 
 const DETAIL_IMAGES = {
-  "Sponsor Stacks": "/assets/imgs/product-cards/sponsor_stacks.png",
-  "Racing Stripes": "/assets/imgs/product-cards/racing_stripes.png",
-  Graphics: "/assets/imgs/product-cards/graphics.png",
-  "Geometrical Patterns": "/assets/imgs/product-cards/geometrical_patterns.png",
-  "Rips/Scratches/Tears": "/assets/imgs/product-cards/rips_scratches_tears.png",
-  Brands: "/assets/imgs/product-cards/brands.png",
-  "Sponsor Rows": "/assets/imgs/product-cards/sponsor_rows.png"
+  "Sponsor Stacks": "/assets/imgs/decal-cats/sponsor_stacks.png",
+  "Racing Stripes": "/assets/imgs/decal-sub-cats/racing_Stripes.png",
+  Graphics: "/assets/imgs/decal-cats/graphics.png",
+  "Geometrical Patterns": "/assets/imgs/product-cards/quarter_panel_kit.png",
+  "Rips/Scratches/Tears": "/assets/imgs/product-cards/quarter_panel_kit.png",
+  Brands: "/assets/imgs/decal-cats/brands.png",
+  "Sponsor Rows": "/assets/imgs/decal-cats/sponsor_stacks.png"
 };
+
+const FALLBACK_IMAGE = "/assets/imgs/main.PNG";
+
 
 const FALLBACK_IMAGE = "/assets/imgs/main.PNG";
 
