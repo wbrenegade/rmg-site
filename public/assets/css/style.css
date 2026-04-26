@@ -872,6 +872,12 @@ textarea { resize: vertical; }
   background: transparent;
 }
 
+.decal-filter-card-grid.is-placement-grid .taxonomy-card img {
+  height: 240px;
+  object-fit: contain;
+  background: transparent;
+}
+
 .decal-filter-card-grid.is-type-grid .taxonomy-card img {
   object-fit: fill;
   background: transparent;
