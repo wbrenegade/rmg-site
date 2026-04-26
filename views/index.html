@@ -3,95 +3,139 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RenegadeMade Graphix | Custom Decals, Wrap Graphics & Business Lettering</title>
-  <meta name="description" content="RenegadeMade Graphix offers custom decals, windshield banners, business lettering, wrap graphics, and custom vinyl design services." />
-  <link rel="stylesheet" href="assets/css/style.css" />
-  <link rel="icon" type="image/png" href="/favicon.png">
+  <title>RenegadeMade Graphix | Preview Custom Decals Before You Buy</title>
+  <link rel="stylesheet" href="/assets/css/style.css" />
 </head>
+
 <body>
-  <header class="site-header">
-    <div class="container nav-wrap">
-      <a class="brand" href="index.html"><img class="brand-mark" src="assets/imgs/rmg_logo.png" alt="RMG logo" /></a>
-      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
-      <nav class="site-nav" id="siteNav">
-        <a class="active" href="index.html">Home</a>
-        <a href="shop.html">Shop</a>
-        <a href="/tools">Tools</a>
-        <a href="contact.html">Contact</a>
-        <a href="faq.html">FAQ</a>
-        <a href="account.html">My Account</a>
-        <a href="cart.html" class="cart-link">Cart <span id="cartCount">0</span></a>
-      </nav>
-    </div>
-  </header>
+<header class="site-header">
+  <div class="container nav-wrap">
+    <a class="brand" href="/">
+      <img class="brand-mark" src="/assets/imgs/rmg_logo.png" alt="RMG logo" />
+    </a>
 
-  <main>
-    <section class="hero">
-      <div class="container hero-grid">
-        <div class="video-wrap">
-          <video id="heroVideo" class="hero-video" autoplay muted loop playsinline webkit-playsinline preload="auto">
-            <source src="assets/vids/rmg_anim.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-        </div>
-        <div>
-          <p class="eyebrow" id="homeEyebrow">Custom Vinyl That Fits Your Build</p>
-          <h1 id="homeTitle">Decals and kits built for real cars and real brands.</h1>
-          <p class="hero-copy" id="homePhrase">We sell decals, car-specific decal kits, pre-cut window tint kits, and fully custom decals/graphics made to match your exact style.</p>
-          <div class="hero-actions">
-            <a href="shop.html" class="btn">Shop Graphics</a>
-            <a href="contact.html" class="btn btn-outline">Request Custom Work</a>
-          </div>
-        </div>
-      </div>
-    </section>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
 
-    <section class="section section-dark home-products-section">
-      <div class="container">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">Shop By Category</p>
-            <h2>Pick a category and add what you need.</h2>
-          </div>
-        </div>
-        <div class="home-tabs" id="homeCategoryTabs" role="tablist" aria-label="Product categories"></div>
-        <div class="product-grid" id="homeCategoryProducts"></div>
-      </div>
-    </section>
-  </main>
+    <nav class="site-nav" id="siteNav">
+      <a href="/">Home</a>
+      <a href="/shop">Shop</a>
+      <a href="/tools">Tools</a>
+      <a href="/contact">Contact</a>
+      <a href="/faq">FAQ</a>
+      <a href="/account">My Account</a>
+      <a href="/cart" class="cart-link">Cart <span id="cartCount">0</span></a>
+    </nav>
+  </div>
+</header>
 
-  <footer class="site-footer">
-    <div class="container footer-grid">
+<main class="page-main">
+
+  <section class="hero section">
+    <div class="container hero-grid">
       <div>
-        <h3>RenegadeMade Graphix</h3>
-        <p>Custom vinyl decals, graphics, and branding for vehicles, businesses, and creative projects.</p>
+        <p class="eyebrow">Custom decals without the guesswork</p>
+
+        <h1>See your decal on your car before you buy it.</h1>
+
+        <p class="hero-copy">
+          Upload a photo of your vehicle, place your decal, adjust the fit, and order the exact look you previewed.
+        </p>
+
+        <div class="hero-actions">
+          <a href="/tools/decal-preview" class="btn">Start Free Preview</a>
+          <a href="/shop" class="btn btn-outline">Shop Decals</a>
+        </div>
+
+        <div class="trust-row">
+          <span>✓ Preview first</span>
+          <span>✓ Custom sizing</span>
+          <span>✓ Built for real vehicles</span>
+        </div>
       </div>
-      <div>
-        <h4>Shop</h4>
-        <a href="shop.html">All Products</a>
-        <a href="cart.html">Cart</a>
-        <a href="checkout.html">Checkout</a>
-      </div>
-      <div>
-        <h4>Account</h4>
-        <a href="login.html">Login</a>
-        <a href="signup.html">Sign Up</a>
-        <a href="account.html">My Account</a>
-      </div>
-      <div>
-        <h4>Legal</h4>
-        <a href="privacy.html">Privacy Policy</a>
-        <a href="terms.html">Terms & Conditions</a>
-        <a href="contact.html">Contact Us</a>
+
+      <div class="card hero-card">
+        <h3>How it works</h3>
+
+        <div class="steps">
+          <div><strong>1.</strong> Upload your car photo</div>
+          <div><strong>2.</strong> Upload or choose a decal</div>
+          <div><strong>3.</strong> Drag it into place</div>
+          <div><strong>4.</strong> Order the previewed design</div>
+        </div>
+
+        <a href="/tools/decal-preview" class="btn full-width">Try The Preview Tool</a>
       </div>
     </div>
-    <div class="container footer-bottom">
-      <p>© <span id="year"></span> RenegadeMade Graphix. All rights reserved.</p>
-    </div>
-  </footer>
+  </section>
 
-  <script src="assets/js/products.js"></script>
-  <script src="assets/js/app.js"></script>
-  <script src="assets/js/home.js"></script>
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow">Why RMG?</p>
+      <h2>Stop guessing what a decal will look like.</h2>
+
+      <div class="feature-grid">
+        <div class="card">
+          <h3>Preview Before Buying</h3>
+          <p>See placement, scale, color, and angle before you spend money.</p>
+        </div>
+
+        <div class="card">
+          <h3>Built For Cars</h3>
+          <p>Door decals, fenders, quarter panels, rockers, hood graphics, banners, and more.</p>
+        </div>
+
+        <div class="card">
+          <h3>Custom Orders</h3>
+          <p>Upload your own idea and turn it into a decal order.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section dark-section">
+    <div class="container cta-card">
+      <h2>Ready to see your idea on your car?</h2>
+      <p>Use the preview tool now and order the exact decal setup you create.</p>
+      <a href="/tools/decal-preview" class="btn">Start Preview</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <h3>RenegadeMade Graphix</h3>
+      <p>Custom vinyl decals, graphics, and branding for vehicles, businesses, and creators.</p>
+    </div>
+
+    <div>
+      <h4>Shop</h4>
+      <a href="/shop">All Products</a>
+      <a href="/tools/decal-preview">Preview Tool</a>
+      <a href="/cart">Cart</a>
+    </div>
+
+    <div>
+      <h4>Account</h4>
+      <a href="/login">Login</a>
+      <a href="/signup">Sign Up</a>
+      <a href="/account">My Account</a>
+    </div>
+
+    <div>
+      <h4>Legal</h4>
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms</a>
+      <a href="/contact">Contact</a>
+    </div>
+  </div>
+
+  <div class="container footer-bottom">
+    <p>© <span id="year"></span> RenegadeMade Graphix. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="/assets/js/app.js"></script>
 </body>
 </html>

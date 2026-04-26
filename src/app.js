@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path");
 const apiRoutes = require("./routes/apiRoutes");
+const stripeRoutes = require("./routes/stripeRoutes");
 const webRoutes = require("./routes/webRoutes");
 const { ensureDbFile } = require("./models/dbModel");
 const { serveNotFound } = require("./controllers/pageController");
@@ -24,6 +25,7 @@ app.use((req, res, next) => {
 
 app.use(express.static(publicDir));
 app.use("/api", apiRoutes);
+app.use("/api/stripe", stripeRoutes);
 app.use(webRoutes);
 app.use(serveNotFound);
 app.use(errorHandler);
