@@ -242,8 +242,12 @@ function imageWithFallback(src, alt) {
 }
 
 function createTaxonomyButton({ label, image, datasetName, datasetValue, active = false }) {
+  const dataAttribute = String(datasetName || "")
+    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+    .toLowerCase();
+
   return `
-    <button type="button" class="decal-chip taxonomy-card${active ? " active" : ""}" data-${datasetName}="${datasetValue}">
+    <button type="button" class="decal-chip taxonomy-card${active ? " active" : ""}" data-${dataAttribute}="${datasetValue}">
       ${imageWithFallback(image, label)}
       <span>${label}</span>
     </button>
@@ -894,7 +898,7 @@ async function initShop() {
 
     if (category === "Decals" && activeDecalTab !== "Custom" && activeDecalFilter !== "all") {
       const folderProducts = filtered.filter((product) => product.source === "decal-product-folder");
-      if (folderProducts.length) filtered = folderProducts;
+      filtered = folderProducts;
     }
 
     if (vehicleKits.length) {
@@ -928,7 +932,7 @@ async function initShop() {
 
     productsEl.innerHTML = filtered.length
       ? filtered.map(renderProductCard).join("")
-      : '<div class="card empty-state">No matching products found.</div>';
+      : '<div class="card empty-state">Nothing found.</div>';
   }
 
   if (categoryFilter) {
