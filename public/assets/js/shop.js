@@ -396,9 +396,9 @@ async function initShop() {
 
     const selectedCategory = categoryFilter?.value || "all";
 
-    categoryPicks.innerHTML = ["all", ...getCategories()].map((category) => {
-      const label = category === "all" ? "All Products" : category;
-      const image = category === "all" ? FALLBACK_IMAGE : CATEGORY_IMAGES[category] || FALLBACK_IMAGE;
+    categoryPicks.innerHTML = getCategories().map((category) => {
+      const label = category;
+      const image = CATEGORY_IMAGES[category] || FALLBACK_IMAGE;
 
       return createTaxonomyButton({
         label,
