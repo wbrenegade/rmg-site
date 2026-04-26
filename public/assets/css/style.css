@@ -746,7 +746,8 @@ textarea { resize: vertical; }
 }
 
 .taxonomy-grid > .decal-filter-card-grid,
-.taxonomy-grid > .decal-text-filter-row {
+.taxonomy-grid > .decal-text-filter-row,
+.taxonomy-grid > .decal-compact-filter-row {
   grid-column: 1 / -1;
 }
 
@@ -772,6 +773,34 @@ textarea { resize: vertical; }
 }
 
 .decal-text-filter.active {
+  color: #091108;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--accent), #b2ff8c);
+}
+
+.decal-compact-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.decal-compact-filter {
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.02);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 8px 11px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.decal-compact-filter:hover {
+  color: var(--text);
+  border-color: rgba(255,255,255,0.25);
+}
+
+.decal-compact-filter.active {
   color: #091108;
   border-color: transparent;
   background: linear-gradient(135deg, var(--accent), #b2ff8c);
