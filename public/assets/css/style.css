@@ -640,8 +640,8 @@ textarea { resize: vertical; }
 .shop-page-layout,
 .shop-grid-layout {
   display: grid;
-  grid-template-columns: 200px minmax(0, 1fr);
-  gap: 1.5rem;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 1rem;
   align-items: start;
 }
 
@@ -655,8 +655,15 @@ textarea { resize: vertical; }
   top: 90px;
   max-height: calc(100vh - 110px);
   overflow-y: auto;
-  padding-right: 8px;
+  padding-right: 0;
   scrollbar-width: thin;
+}
+
+.shop-sidebar .card,
+.shop-filters .card,
+.filters-panel .card,
+.filter-panel .card {
+  padding: 14px;
 }
 
 .decal-nav {
