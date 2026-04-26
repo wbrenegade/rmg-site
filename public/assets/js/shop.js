@@ -72,6 +72,10 @@ function normalizeText(value) {
   return String(value || "").trim().toLowerCase();
 }
 
+function normalizeFilterValue(value) {
+  return slugify(value || "");
+}
+
 function normalizeCategory(value) {
   const normalized = normalizeText(value);
 
@@ -825,20 +829,28 @@ async function initShop() {
     if (activeDecalFilter === "all") return true;
 
     if (activeDecalTab === "By Placement") {
-      return product.placement === activeDecalFilter;
+      return normalizeFilterValue(product.placement || product.subcategory) === normalizeFilterValue(activeDecalFilter);
     }
 
     if (activeDecalTab === "By Type") {
-      return product.decalType === activeDecalFilter ||
-        product.type === activeDecalFilter ||
-        product.style === activeDecalFilter;
+      const activeType = normalizeFilterValue(activeDecalFilter);
+      const productTypes = [
+        product.decalType,
+        product.type,
+        product.style,
+        product.subSubcategory
+      ].map(normalizeFilterValue);
+
+      return productTypes.includes(activeType);
     }
 
     return true;
   }
 
   function render() {
-    const productsSource = window.PRODUCTS || PRODUCTS || [];
+    const productsSource = typeof window.getProductsList === "function"
+      ? window.getProductsList()
+      : (window.PRODUCTS || PRODUCTS || []);
     const search = searchInput?.value.trim().toLowerCase() || "";
     const category = categoryFilter?.value || "all";
     const subcategory = subcategoryFilter?.value || "all";
@@ -879,6 +891,11 @@ async function initShop() {
 
       return true;
     });
+
+    if (category === "Decals" && activeDecalTab !== "Custom" && activeDecalFilter !== "all") {
+      const folderProducts = filtered.filter((product) => product.source === "decal-product-folder");
+      if (folderProducts.length) filtered = folderProducts;
+    }
 
     if (vehicleKits.length) {
       const kitProducts = vehicleKits.map(toDisplayProduct).filter((product) => {

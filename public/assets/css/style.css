@@ -823,6 +823,7 @@ textarea { resize: vertical; }
   padding: 0;
   overflow: hidden;
   border-radius: 10px;
+  width: 100%;
 }
 
 .decal-chip.taxonomy-card {
@@ -832,7 +833,8 @@ textarea { resize: vertical; }
 
 .taxonomy-card img {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  height: auto;
+  aspect-ratio: auto;
   object-fit: contain;
   border-radius: 0;
   background: #111;
