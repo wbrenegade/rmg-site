@@ -865,8 +865,10 @@ textarea { resize: vertical; }
 }
 
 .decal-filter-card-grid .taxonomy-card img {
-  height: 150px;
-  aspect-ratio: auto;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  background: transparent;
 }
 
 .taxonomy-card span {
