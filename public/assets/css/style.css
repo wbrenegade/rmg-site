@@ -1042,3 +1042,49 @@ textarea { resize: vertical; }
 .taxonomy-card.active {
   outline: 2px solid #39ff14;
 }
+
+.shop-page-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.shop-content {
+  min-width: 0;
+}
+
+.shop-toolbar,
+.shop-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.taxonomy-section {
+  margin-bottom: 1.5rem;
+}
+
+.taxonomy-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .shop-page-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .shop-toolbar,
+  .shop-results-header {
+    display: block;
+  }
+}

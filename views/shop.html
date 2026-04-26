@@ -4,155 +4,196 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Shop | RenegadeMade Graphix</title>
-  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/style.css" />
 </head>
+
 <body>
-  <header class="site-header">
-    <div class="container nav-wrap">
-      <a class="brand" href="index.html"><img class="brand-mark" src="assets/imgs/rmg_logo.png" alt="RMG logo" /></a>
-      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
-      <nav class="site-nav" id="siteNav">
-        <a href="index.html">Home</a>
-        <a href="shop.html" class="active">Shop</a>
-        <a href="/tools">Tools</a>
-        <a href="contact.html">Contact</a>
-        <a href="faq.html">FAQ</a>
-        <a href="login.html">Login</a>
-        <a href="signup.html" class="btn btn-sm">Sign Up</a>
-        <a href="cart.html" class="cart-link">Cart <span id="cartCount">0</span></a>
-      </nav>
-    </div>
-  </header>
+<header class="site-header">
+  <div class="container nav-wrap">
+    <a class="brand" href="/">
+      <img class="brand-mark" src="/assets/imgs/rmg_logo.png" alt="RMG logo" />
+    </a>
 
-  <main class="page-main">
-    <section class="page-hero compact">
-      <div class="container">
-        <p class="eyebrow">Shop</p>
-        <h1>Shop RenegadeMade Graphix</h1>
-        <p>Browse decals, banners, business lettering, and custom graphic products.</p>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
+
+    <nav class="site-nav" id="siteNav">
+      <a href="/">Home</a>
+      <a href="/shop" class="active">Shop</a>
+      <a href="/tools">Tools</a>
+      <a href="/contact">Contact</a>
+      <a href="/faq">FAQ</a>
+      <a href="/login">Login</a>
+      <a href="/signup" class="btn btn-sm">Sign Up</a>
+      <a href="/cart" class="cart-link">Cart <span id="cartCount">0</span></a>
+    </nav>
+  </div>
+</header>
+
+<main class="page-main">
+
+  <section class="page-hero compact">
+    <div class="container">
+      <p class="eyebrow">RenegadeMade Graphix Shop</p>
+      <h1>Shop decals, wraps, tint, and lettering.</h1>
+      <p>
+        Choose decals by placement or by type. Find the look you want, preview it on your car, then order it.
+      </p>
+      <div class="hero-actions">
+        <a href="/tools/decal-preview" class="btn">Preview A Decal</a>
+        <a href="/tools/svg-converter" class="btn btn-outline">SVG Converter</a>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="section">
-      <div class="container shop-layout">
-        <aside class="filter-panel card">
-          <h3>Filter Products</h3>
-          <div class="filter-group">
-            <h4>Core Filters</h4>
-            <label>Search
-              <input type="text" id="searchInput" placeholder="Search graphics..." />
-            </label>
-            <label>Category
-              <select id="categoryFilter">
-                <option value="all">All Categories</option>
-              </select>
-            </label>
-          </div>
+  <section class="section">
+    <div class="container shop-page-layout">
 
-          <button class="btn btn-outline btn-sm btn-block filter-toggle" id="toggleAdvancedFilters" type="button" aria-expanded="true" hidden>
+      <aside class="shop-sidebar filters-panel">
+
+        <div class="card">
+          <h2>Shop Filters</h2>
+
+          <label for="searchInput">Search Products</label>
+          <input id="searchInput" type="search" placeholder="Search decals, stripes, banners..." />
+
+          <label for="categoryFilter">Category</label>
+          <select id="categoryFilter">
+            <option value="all">All Categories</option>
+          </select>
+
+          <label for="subcategoryFilter">Decal Filter</label>
+          <select id="subcategoryFilter">
+            <option value="all">All</option>
+          </select>
+
+          <label for="subcategoryDetailFilter">Detail Filter</label>
+          <select id="subcategoryDetailFilter">
+            <option value="all">All</option>
+          </select>
+
+          <label for="sortFilter">Sort</label>
+          <select id="sortFilter">
+            <option value="default">Default</option>
+            <option value="name-asc">Name A-Z</option>
+            <option value="price-asc">Price Low-High</option>
+            <option value="price-desc">Price High-Low</option>
+          </select>
+
+          <button id="clearFilters" type="button" class="btn full-width">Clear Filters</button>
+        </div>
+
+        <div class="card">
+          <button id="toggleAdvancedFilters" type="button" class="btn btn-outline" aria-expanded="false">
             Show Advanced Filters
           </button>
 
-          <div id="advancedFilters" class="filter-advanced">
-            <div class="filter-group">
-              <h4>Vehicle Fitment</h4>
-              <label>Search By Vehicle
-                <input type="search" id="vehicleSearchInput" list="vehicleSearchOptions" placeholder="Start with year, make, or model" autocomplete="off" />
-                <datalist id="vehicleSearchOptions"></datalist>
-              </label>
-              <label>Year
-                <select id="yearFilter">
-                  <option value="">Select Year</option>
-                </select>
-              </label>
-              <label>Make
-                <select id="makeFilter" disabled>
-                  <option value="">Select Make</option>
-                </select>
-              </label>
-              <label>Model
-                <select id="modelFilter" disabled>
-                  <option value="">Select Model</option>
-                </select>
-              </label>
-              <label>Trim
-                <select id="trimFilter" disabled>
-                  <option value="">Select Trim</option>
-                </select>
-              </label>
-              <p class="form-note">Search by vehicle or use Year, Make, Model, and Trim to show tint-kit fitment found in the catalog.</p>
-            </div>
+          <div id="advancedFilters">
+            <h3>Vehicle Search</h3>
 
-            <div class="filter-group">
-              <h4>Category Hierarchy</h4>
-              <label>Subcategory
-                <select id="subcategoryFilter">
-                  <option value="all">All Subcategories</option>
-                </select>
-              </label>
-              <label>Subcategory Detail
-                <select id="subcategoryDetailFilter">
-                  <option value="all">All Details</option>
-                </select>
-              </label>
-            </div>
-          </div>
+            <label for="vehicleSearchInput">Search Vehicle</label>
+            <input id="vehicleSearchInput" type="text" list="vehicleSearchOptions" placeholder="2020 Ford Mustang GT" />
+            <datalist id="vehicleSearchOptions"></datalist>
 
-          <label>Sort By
-            <select id="sortFilter">
-              <option value="default">Featured</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-              <option value="name-asc">Name: A to Z</option>
+            <label for="yearFilter">Year</label>
+            <select id="yearFilter">
+              <option value="">Select Year</option>
             </select>
-          </label>
-          <button class="btn btn-block" id="clearFilters">Clear Filters</button>
-        </aside>
 
-        <div>
-          <section class="decal-nav card" aria-label="Category hierarchy navigation">
-            <p class="eyebrow">Shop Hierarchy</p>
-            <h3>Step 1: Pick a Category</h3>
-            <div class="decal-nav-grid" id="categoryPicks">
-              <button type="button" class="decal-chip active" data-category="all">All Categories</button>
-              <button type="button" class="decal-chip" data-category="Decals">Decals</button>
-              <button type="button" class="decal-chip" data-category="Window Tint">Window Tint</button>
-              <button type="button" class="decal-chip" data-category="Lettering">Lettering</button>
-              <button type="button" class="decal-chip" data-category="Wraps">Wraps</button>
-            </div>
+            <label for="makeFilter">Make</label>
+            <select id="makeFilter" disabled>
+              <option value="">Select Make</option>
+            </select>
 
-            <div id="subcategoryWrap" class="decal-step-wrap" hidden>
-              <h3>Step 2: Pick a Subcategory</h3>
-              <p class="form-note">Choose one subcategory to view products.</p>
-              <div class="decal-nav-grid" id="subcategoryPicks"></div>
-            </div>
+            <label for="modelFilter">Model</label>
+            <select id="modelFilter" disabled>
+              <option value="">Select Model</option>
+            </select>
 
-            <div id="subcategoryDetailWrap" class="decal-step-wrap" hidden>
-              <h3>Step 3: Pick a Detail</h3>
-              <p class="form-note">Some subcategories include one more level.</p>
-              <div class="decal-nav-grid" id="subcategoryDetailPicks"></div>
-            </div>
-          </section>
-          <div class="results-meta" id="resultsMeta"></div>
-          <div class="product-grid" id="shopProducts"></div>
+            <label for="trimFilter">Trim</label>
+            <select id="trimFilter" disabled>
+              <option value="">Select Trim</option>
+            </select>
+          </div>
         </div>
-      </div>
-    </section>
-  </main>
 
-  <footer class="site-footer">
-    <div class="container footer-grid">
-      <div><h3>RenegadeMade Graphix</h3><p>Custom vinyl graphics and branding.</p></div>
-      <div><h4>Shop</h4><a href="shop.html">All Products</a><a href="cart.html">Cart</a></div>
-      <div><h4>Account</h4><a href="login.html">Login</a><a href="account.html">My Account</a></div>
-      <div><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms</a></div>
+      </aside>
+
+      <section class="shop-content">
+
+        <div class="shop-toolbar">
+          <div>
+            <p class="eyebrow">Browse</p>
+            <h2>Product Categories</h2>
+          </div>
+          <p id="resultsMeta" class="inline-note">Loading products...</p>
+        </div>
+
+        <div class="taxonomy-section">
+          <h3>Choose A Category</h3>
+          <div id="categoryPicks" class="taxonomy-grid"></div>
+        </div>
+
+        <div id="subcategoryWrap" class="taxonomy-section" hidden>
+          <h3>For Decals: Choose By Placement Or By Type</h3>
+          <div id="subcategoryPicks" class="taxonomy-grid"></div>
+        </div>
+
+        <div id="subcategoryDetailWrap" class="taxonomy-section" hidden>
+          <h3>More Options</h3>
+          <div id="subcategoryDetailPicks" class="taxonomy-grid"></div>
+        </div>
+
+        <div class="shop-results-header">
+          <h2>Products</h2>
+        </div>
+
+        <div id="shopProducts" class="product-grid">
+          <div class="card empty-state">Loading products...</div>
+        </div>
+
+      </section>
+
     </div>
-    <div class="container footer-bottom"><p>© <span id="year"></span> RenegadeMade Graphix</p></div>
-  </footer>
+  </section>
 
-  <script src="assets/js/products.js"></script>
-  <script src="assets/js/app.js"></script>
-  <script src="assets/js/shop.js"></script>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <h3>RenegadeMade Graphix</h3>
+      <p>Custom vinyl decals, graphics, wraps, tint, and lettering.</p>
+    </div>
+
+    <div>
+      <h4>Shop</h4>
+      <a href="/shop">All Products</a>
+      <a href="/tools/decal-preview">Preview Tool</a>
+      <a href="/cart">Cart</a>
+    </div>
+
+    <div>
+      <h4>Account</h4>
+      <a href="/login">Login</a>
+      <a href="/signup">Sign Up</a>
+      <a href="/account">My Account</a>
+    </div>
+
+    <div>
+      <h4>Legal</h4>
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms</a>
+      <a href="/contact">Contact</a>
+    </div>
+  </div>
+
+  <div class="container footer-bottom">
+    <p>© <span id="year"></span> RenegadeMade Graphix. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="/assets/js/products.js"></script>
+<script src="/assets/js/app.js"></script>
+<script src="/assets/js/shop.js"></script>
 </body>
 </html>
-
