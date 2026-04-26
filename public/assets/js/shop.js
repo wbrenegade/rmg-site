@@ -23,6 +23,12 @@ const DECAL_FILTERS = {
   "Custom": []
 };
 
+const GRAPHICS_FILTERS = [
+  "All Graphics",
+  "Geometrical Patterns",
+  "Rips/Scratches/Tears"
+];
+
 const PLACEMENT_IMAGES = {
   "Fender": `${DECAL_IMAGE_BASE}/placements/fender.png`,
   "Full Body/Half Body": `${DECAL_IMAGE_BASE}/placements/full-body-half-body.png`,
@@ -38,6 +44,12 @@ const TYPE_IMAGES = {
   "Platform Specific": `${DECAL_IMAGE_BASE}/types/platform-specific.png`,
   "Racing Stripes": `${DECAL_IMAGE_BASE}/types/racing-stripes.png`,
   "Sponsor Stacks/Rows": `${DECAL_IMAGE_BASE}/types/sponsor-stacks-rows.png`
+};
+
+const GRAPHICS_IMAGES = {
+  "All Graphics": TYPE_IMAGES.Graphics,
+  "Geometrical Patterns": TYPE_IMAGES.Graphics,
+  "Rips/Scratches/Tears": TYPE_IMAGES.Graphics
 };
 
 const CATEGORY_IMAGES = {
@@ -119,6 +131,15 @@ function normalizeType(value) {
   return "";
 }
 
+function normalizeGraphicsSubtype(value) {
+  const text = normalizeText(value);
+
+  if (text.includes("geometrical") || text.includes("geometric") || text.includes("pattern")) return "Geometrical Patterns";
+  if (text.includes("rip") || text.includes("scratch") || text.includes("tear")) return "Rips/Scratches/Tears";
+
+  return "";
+}
+
 function getProductPlacement(product) {
   return (
     product.placement ||
@@ -139,6 +160,17 @@ function getProductType(product) {
     normalizeType(product.subcategory) ||
     normalizeType(product.name) ||
     normalizeType(product.description) ||
+    ""
+  );
+}
+
+function getProductGraphicsSubtype(product) {
+  return (
+    product.graphicsSubtype ||
+    normalizeGraphicsSubtype(product.subSubcategory) ||
+    normalizeGraphicsSubtype(product.subcategory) ||
+    normalizeGraphicsSubtype(product.name) ||
+    normalizeGraphicsSubtype(product.description) ||
     ""
   );
 }
@@ -200,6 +232,7 @@ function toDisplayProduct(product) {
   const category = normalizeCategory(product.category);
   const placement = getProductPlacement(product);
   const decalType = getProductType(product);
+  const graphicsSubtype = getProductGraphicsSubtype(product);
 
   let subcategory = product.subcategory || "";
   let subSubcategory = product.subSubcategory || "";
@@ -214,6 +247,7 @@ function toDisplayProduct(product) {
     category,
     placement,
     decalType,
+    graphicsSubtype,
     type: decalType,
     style: decalType,
     subcategory,
@@ -285,6 +319,7 @@ async function initShop() {
 
   let activeDecalTab = "By Placement";
   let activeDecalFilter = "all";
+  let activeGraphicsFilter = "All Graphics";
 
   function setShopFiltersVisibility(expanded) {
     if (!shopFiltersToggle || !shopFiltersCard) return;
@@ -512,6 +547,22 @@ async function initShop() {
           });
         }).join("")}
       </div>
+      ${activeDecalTab === "By Type" && activeDecalFilter === "Graphics" ? `
+        <div class="decal-text-filter-row decal-subfilter-heading">
+          <strong>Graphics Type</strong>
+        </div>
+        <div class="decal-filter-card-grid is-compact${activeGraphicsFilter !== "All Graphics" ? " has-selection" : ""}">
+          ${GRAPHICS_FILTERS.map((value) => {
+            return createTaxonomyButton({
+              label: value,
+              image: GRAPHICS_IMAGES[value],
+              datasetName: "graphicsFilter",
+              datasetValue: value,
+              active: activeGraphicsFilter === value
+            });
+          }).join("")}
+        </div>
+      ` : ""}
     `;
   }
 
@@ -841,7 +892,14 @@ async function initShop() {
         product.subSubcategory
       ].map(normalizeFilterValue);
 
-      return productTypes.includes(activeType);
+      const matchesType = productTypes.includes(activeType);
+      if (!matchesType) return false;
+
+      if (activeType === "graphics" && activeGraphicsFilter !== "All Graphics") {
+        return normalizeFilterValue(product.graphicsSubtype) === normalizeFilterValue(activeGraphicsFilter);
+      }
+
+      return true;
     }
 
     return true;
@@ -936,6 +994,7 @@ async function initShop() {
       if (categoryFilter.value === "Decals") {
         activeDecalTab = "By Placement";
         activeDecalFilter = "all";
+        activeGraphicsFilter = "All Graphics";
       }
 
       syncAllHierarchyUI();
@@ -948,6 +1007,7 @@ async function initShop() {
       if (categoryFilter?.value === "Decals") {
         activeDecalTab = DECAL_GROUPS.includes(subcategoryFilter.value) ? subcategoryFilter.value : "By Placement";
         activeDecalFilter = "all";
+        activeGraphicsFilter = "All Graphics";
       }
 
       syncAllHierarchyUI();
@@ -959,6 +1019,7 @@ async function initShop() {
     subcategoryDetailFilter.addEventListener("change", () => {
       if (categoryFilter?.value === "Decals") {
         activeDecalFilter = subcategoryDetailFilter.value || "all";
+        activeGraphicsFilter = "All Graphics";
       }
 
       renderSubcategoryDetailPicks();
@@ -997,6 +1058,7 @@ async function initShop() {
       if (group) {
         activeDecalTab = group.dataset.decalGroup;
         activeDecalFilter = "all";
+        activeGraphicsFilter = "All Graphics";
 
         if (subcategoryFilter) subcategoryFilter.value = activeDecalTab;
         if (subcategoryDetailFilter) subcategoryDetailFilter.value = "all";
@@ -1009,6 +1071,7 @@ async function initShop() {
       const decalFilter = event.target.closest("[data-decal-filter]");
       if (decalFilter) {
         activeDecalFilter = decalFilter.dataset.decalFilter || "all";
+        activeGraphicsFilter = "All Graphics";
 
         if (subcategoryDetailFilter) {
           subcategoryDetailFilter.value = activeDecalFilter;
@@ -1044,6 +1107,19 @@ async function initShop() {
     });
   }
 
+  if (subcategoryDetailPicks) {
+    subcategoryDetailPicks.addEventListener("click", (event) => {
+      const graphicsFilter = event.target.closest("[data-graphics-filter]");
+      if (!graphicsFilter) return;
+
+      activeGraphicsFilter = graphicsFilter.dataset.graphicsFilter || "All Graphics";
+
+      renderSubcategoryDetailPicks();
+      render();
+      productsEl?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
   if (clearFilters) {
     clearFilters.addEventListener("click", () => {
       if (vehicleSearchInput) vehicleSearchInput.value = "";
@@ -1055,6 +1131,7 @@ async function initShop() {
 
       activeDecalTab = "By Placement";
       activeDecalFilter = "all";
+      activeGraphicsFilter = "All Graphics";
 
       if (yearFilter && makeFilter && modelFilter && trimFilter) {
         yearFilter.value = "";

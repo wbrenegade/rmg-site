@@ -28,6 +28,11 @@ const typeLabels = {
   "sponsor-rows": "Sponsor Stacks/Rows"
 };
 
+const graphicsSubtypeLabels = {
+  "geometrical-patterns": "Geometrical Patterns",
+  "rips-scratches-tears": "Rips/Scratches/Tears"
+};
+
 function titleCaseSlug(value) {
   return String(value || "")
     .replace(/\.[^.]+$/, "")
@@ -56,6 +61,7 @@ function listDecalAssetProducts() {
       const [placementSlug, typeSlug] = folder.name.split("__");
       const placement = placementLabels[placementSlug] || titleCaseSlug(placementSlug);
       const decalType = typeLabels[typeSlug] || titleCaseSlug(typeSlug);
+      const graphicsSubtype = graphicsSubtypeLabels[typeSlug] || "";
       const folderPath = path.join(decalProductsDir, folder.name);
 
       return fs.readdirSync(folderPath, { withFileTypes: true })
@@ -73,6 +79,7 @@ function listDecalAssetProducts() {
             subSubcategory: decalType,
             placement,
             decalType,
+            graphicsSubtype,
             type: decalType,
             style: decalType,
             price: 49.99,
