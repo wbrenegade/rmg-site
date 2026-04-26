@@ -821,11 +821,7 @@ function buyDecal() {
   const decalSize = document.getElementById("decalSizeInput").value;
   const decalPrice = Number(document.getElementById("decalPriceInput").value || 39.99);
 
-  let previewImage = null;
-
-  if (canvas.width && canvas.height) {
-    previewImage = canvas.toDataURL("image/png");
-  }
+  const previewImage = createSmallPreview();
 
   const checkoutData = {
     source: "decal-preview-tool",
@@ -839,23 +835,29 @@ function buyDecal() {
     settings: getSettings()
   };
 
-  localStorage.setItem("checkout_data", JSON.stringify(checkoutData));
-
-  const cartItem = {
-    id: "custom-preview-decal-" + Date.now(),
-    name: decalName,
-    title: decalName,
-    size: decalSize,
-    price: decalPrice,
-    quantity: 1,
-    image: previewImage,
-    previewImage,
-    customization: checkoutData.settings
-  };
-
-  localStorage.setItem("rmg_cart", JSON.stringify([cartItem]));
+  sessionStorage.setItem("checkout_data", JSON.stringify(checkoutData));
+  localStorage.setItem("checkout_data", JSON.stringify({
+    ...checkoutData,
+    previewImage: null
+  }));
 
   window.location.href = "/checkout";
+}
+
+function createSmallPreview() {
+  if (!canvas.width || !canvas.height) return null;
+
+  const maxWidth = 500;
+  const scale = Math.min(1, maxWidth / canvas.width);
+
+  const smallCanvas = document.createElement("canvas");
+  smallCanvas.width = Math.round(canvas.width * scale);
+  smallCanvas.height = Math.round(canvas.height * scale);
+
+  const smallCtx = smallCanvas.getContext("2d");
+  smallCtx.drawImage(canvas, 0, 0, smallCanvas.width, smallCanvas.height);
+
+  return smallCanvas.toDataURL("image/jpeg", 0.65);
 }
 
 function downloadPreview() {

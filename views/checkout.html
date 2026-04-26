@@ -88,8 +88,9 @@
   <script src="assets/js/app.js"></script>
     <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const checkoutData = JSON.parse(localStorage.getItem("checkout_data") || "null");
-      const cart = JSON.parse(localStorage.getItem("rmg_cart") || "[]");
+const checkoutData =
+  JSON.parse(sessionStorage.getItem("checkout_data") || "null") ||
+  JSON.parse(localStorage.getItem("checkout_data") || "null");      const cart = JSON.parse(localStorage.getItem("rmg_cart") || "[]");
 
       if (!checkoutData && !cart.length) return;
 
