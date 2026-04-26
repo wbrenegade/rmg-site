@@ -86,6 +86,49 @@
 
   <script src="assets/js/products.js"></script>
   <script src="assets/js/app.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const checkoutData = JSON.parse(localStorage.getItem("checkout_data") || "null");
+      const cart = JSON.parse(localStorage.getItem("rmg_cart") || "[]");
+
+      if (!checkoutData && !cart.length) return;
+
+      const item = checkoutData || cart[0];
+
+      const summary = document.getElementById("checkoutSummary");
+      const subtotalEl = document.getElementById("checkoutSubtotal");
+      const taxEl = document.getElementById("checkoutTax");
+      const totalEl = document.getElementById("checkoutTotal");
+      const customEl = document.getElementById("checkoutCustomizationContext");
+
+      const price = Number(item.price || 0);
+      const quantity = Number(item.quantity || 1);
+      const subtotal = price * quantity;
+      const tax = subtotal * 0.08;
+      const total = subtotal + tax;
+
+      summary.innerHTML = `
+        <div class="summary-item">
+          ${item.previewImage ? `<img src="${item.previewImage}" style="width:100%;border-radius:10px;margin-bottom:12px;">` : ""}
+          <strong>${item.name || item.title || "Custom Decal"}</strong>
+          <p>Size: ${item.size || "Custom"}</p>
+          <p>Quantity: ${quantity}</p>
+          <p>Price: $${price.toFixed(2)}</p>
+        </div>
+      `;
+
+      customEl.innerHTML = `
+        <strong>Custom Preview Order</strong><br>
+        Placement: ${item.settings?.placementPreset || "Custom"}<br>
+        Blend: ${item.settings?.blendMode || "Normal"}<br>
+        Opacity: ${item.settings?.opacity || 100}%
+      `;
+
+      subtotalEl.textContent = "$" + subtotal.toFixed(2);
+      taxEl.textContent = "$" + tax.toFixed(2);
+      totalEl.textContent = "$" + total.toFixed(2);
+    });
+  </script>
   <script src="assets/js/checkout.js"></script>
 </body>
 </html>
