@@ -580,7 +580,9 @@ async function initShop() {
       ? subcategoryWrap
       : productsEl;
 
-    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.setTimeout(() => {
+      target?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
   }
 
   function scrollToProductsGrid() {
@@ -1061,10 +1063,12 @@ async function initShop() {
       if (categoryFilter.value === "Decals") {
         activeDecalTab = "By Placement";
         activeDecalFilter = "all";
+        activeGraphicsFilter = "All Graphics";
       }
 
       syncAllHierarchyUI();
       render();
+      scrollToActiveSubcategories();
     });
   }
 
