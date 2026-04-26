@@ -868,13 +868,13 @@ textarea { resize: vertical; }
   width: 100%;
   height: 190px;
   aspect-ratio: auto;
-  object-fit: cover;
+  object-fit: fill;
   background: transparent;
 }
 
 .decal-filter-card-grid.is-type-grid .taxonomy-card img {
-  object-fit: contain;
-  background: #111;
+  object-fit: fill;
+  background: transparent;
 }
 
 #shopProducts {
