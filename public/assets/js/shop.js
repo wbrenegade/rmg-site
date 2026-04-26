@@ -22,6 +22,49 @@ const CATEGORY_HIERARCHY = {
   }
 };
 
+const CATEGORY_IMAGES = {
+  Decals: "/assets/imgs/product-cards/decals.png",
+  "Window Tint": "/assets/imgs/product-cards/window_tint.png",
+  Lettering: "/assets/imgs/product-cards/lettering.png",
+  Wraps: "/assets/imgs/product-cards/wraps.png"
+};
+
+const SUBCATEGORY_IMAGES = {
+  Custom: "/assets/imgs/product-cards/custom.png",
+  Fender: "/assets/imgs/product-cards/fender.png",
+  "Full Body/Half Body": "/assets/imgs/product-cards/full_body_half_body.png",
+  "Platform Specific": "/assets/imgs/product-cards/platform_specific.png",
+  "Rear Quarter Panel": "/assets/imgs/product-cards/rear_quarter_panel.png",
+  "Rocker Panel/Side": "/assets/imgs/product-cards/rocker_panel_side.png",
+  "Windshield/Rear Window Banners": "/assets/imgs/product-cards/windshield_banner.png",
+  "Full Rolls": "/assets/imgs/product-cards/full_rolls.png",
+  "Precut Kits": "/assets/imgs/product-cards/precut_kits.png",
+  "Business Info": "/assets/imgs/product-cards/business_info.png",
+  "Business Name": "/assets/imgs/product-cards/business_name.png",
+  "By The Foot": "/assets/imgs/product-cards/by_the_foot.png"
+};
+
+const DETAIL_IMAGES = {
+  "Sponsor Stacks": "/assets/imgs/product-cards/sponsor_stacks.png",
+  "Racing Stripes": "/assets/imgs/product-cards/racing_stripes.png",
+  Graphics: "/assets/imgs/product-cards/graphics.png",
+  "Geometrical Patterns": "/assets/imgs/product-cards/geometrical_patterns.png",
+  "Rips/Scratches/Tears": "/assets/imgs/product-cards/rips_scratches_tears.png",
+  Brands: "/assets/imgs/product-cards/brands.png",
+  "Sponsor Rows": "/assets/imgs/product-cards/sponsor_rows.png"
+};
+
+const FALLBACK_IMAGE = "/assets/imgs/main.PNG";
+
+function getTaxonomyImage(category, subcategory, subSubcategory) {
+  return (
+    DETAIL_IMAGES[subSubcategory] ||
+    SUBCATEGORY_IMAGES[subcategory] ||
+    CATEGORY_IMAGES[category] ||
+    FALLBACK_IMAGE
+  );
+}
+
 async function initShop() {
   const productsEl = document.getElementById('shopProducts');
   const resultsMeta = document.getElementById('resultsMeta');
@@ -158,15 +201,35 @@ async function initShop() {
     };
   }
 
-  function toDisplayProduct(product) {
-    const taxonomy = normalizeProductTaxonomy(product);
-    return {
-      ...product,
-      category: taxonomy.category || product.category,
-      subcategory: taxonomy.subcategory,
-      subSubcategory: taxonomy.subSubcategory
-    };
-  }
+ function toDisplayProduct(product) {
+  const taxonomy = normalizeProductTaxonomy(product);
+
+  const category = taxonomy.category || product.category;
+  const subcategory = taxonomy.subcategory;
+  const subSubcategory = taxonomy.subSubcategory;
+
+  const currentImage = product.imagePath || "";
+  const isGenericImage =
+    !currentImage ||
+    currentImage.includes("main.PNG") ||
+    currentImage.includes("main.png");
+
+  return {
+    ...product,
+    category,
+    subcategory,
+    subSubcategory,
+    imagePath: isGenericImage
+      ? getTaxonomyImage(category, subcategory, subSubcategory)
+      : currentImage,
+    imageLabel:
+      product.imageLabel ||
+      subSubcategory ||
+      subcategory ||
+      category ||
+      product.name
+  };
+}
 
   function syncHierarchyPickState() {
     const selectedCategory = categoryFilter?.value || 'all';
@@ -207,44 +270,65 @@ async function initShop() {
   }
 
   function renderSubcategoryPicks() {
-    if (!subcategoryPicks || !categoryFilter) return;
+  if (!subcategoryPicks || !categoryFilter) return;
 
-    const selectedCategory = categoryFilter.value;
-    if (selectedCategory === 'all') {
-      subcategoryPicks.innerHTML = '';
-      return;
-    }
+  const selectedCategory = categoryFilter.value;
 
-    const subcategories = getValidSubcategories(selectedCategory);
-    const selectedSubcategory = subcategoryFilter?.value || 'all';
-
-    subcategoryPicks.innerHTML = ['all', ...subcategories].map((value) => {
-      const label = value === 'all' ? 'All Subcategories' : value;
-      const activeClass = value === selectedSubcategory ? ' active' : '';
-      return `<button type="button" class="decal-chip${activeClass}" data-subcategory="${value}">${label}</button>`;
-    }).join('');
+  if (selectedCategory === "all") {
+    subcategoryPicks.innerHTML = "";
+    return;
   }
+
+  const subcategories = getValidSubcategories(selectedCategory);
+  const selectedSubcategory = subcategoryFilter?.value || "all";
+
+  subcategoryPicks.innerHTML = ["all", ...subcategories].map((value) => {
+    const label = value === "all" ? "All Subcategories" : value;
+    const activeClass = value === selectedSubcategory ? " active" : "";
+    const img =
+      value === "all"
+        ? CATEGORY_IMAGES[selectedCategory] || FALLBACK_IMAGE
+        : SUBCATEGORY_IMAGES[value] || CATEGORY_IMAGES[selectedCategory] || FALLBACK_IMAGE;
+
+    return `
+      <button type="button" class="decal-chip taxonomy-card${activeClass}" data-subcategory="${value}">
+        <img src="${img}" alt="${label}" onerror="this.src='${FALLBACK_IMAGE}'">
+        <span>${label}</span>
+      </button>
+    `;
+  }).join("");
+}
 
   function renderSubcategoryDetailPicks() {
-    if (!subcategoryDetailPicks || !categoryFilter || !subcategoryFilter) return;
+  if (!subcategoryDetailPicks || !categoryFilter || !subcategoryFilter) return;
 
-    const selectedCategory = categoryFilter.value;
-    const selectedSubcategory = subcategoryFilter.value;
+  const selectedCategory = categoryFilter.value;
+  const selectedSubcategory = subcategoryFilter.value;
 
-    if (selectedCategory === 'all' || selectedSubcategory === 'all') {
-      subcategoryDetailPicks.innerHTML = '';
-      return;
-    }
-
-    const details = getValidSubcategoryDetails(selectedCategory, selectedSubcategory);
-    const selectedDetail = subcategoryDetailFilter?.value || 'all';
-
-    subcategoryDetailPicks.innerHTML = ['all', ...details].map((value) => {
-      const label = value === 'all' ? 'All Details' : value;
-      const activeClass = value === selectedDetail ? ' active' : '';
-      return `<button type="button" class="decal-chip${activeClass}" data-subsubcategory="${value}">${label}</button>`;
-    }).join('');
+  if (selectedCategory === "all" || selectedSubcategory === "all") {
+    subcategoryDetailPicks.innerHTML = "";
+    return;
   }
+
+  const details = getValidSubcategoryDetails(selectedCategory, selectedSubcategory);
+  const selectedDetail = subcategoryDetailFilter?.value || "all";
+
+  subcategoryDetailPicks.innerHTML = ["all", ...details].map((value) => {
+    const label = value === "all" ? "All Details" : value;
+    const activeClass = value === selectedDetail ? " active" : "";
+    const img =
+      value === "all"
+        ? SUBCATEGORY_IMAGES[selectedSubcategory] || CATEGORY_IMAGES[selectedCategory] || FALLBACK_IMAGE
+        : DETAIL_IMAGES[value] || SUBCATEGORY_IMAGES[selectedSubcategory] || FALLBACK_IMAGE;
+
+    return `
+      <button type="button" class="decal-chip taxonomy-card${activeClass}" data-subsubcategory="${value}">
+        <img src="${img}" alt="${label}" onerror="this.src='${FALLBACK_IMAGE}'">
+        <span>${label}</span>
+      </button>
+    `;
+  }).join("");
+}
 
   function syncHierarchyFiltersFromCategory() {
     if (!categoryFilter || !subcategoryFilter || !subcategoryDetailFilter) return;
