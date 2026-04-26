@@ -640,7 +640,7 @@ textarea { resize: vertical; }
 .shop-page-layout,
 .shop-grid-layout {
   display: grid;
-  grid-template-columns: 320px minmax(0, 1fr);
+  grid-template-columns: 250px minmax(0, 1fr);
   gap: 1.5rem;
   align-items: start;
 }
@@ -748,6 +748,7 @@ textarea { resize: vertical; }
 
 .taxonomy-grid {
   display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
 }
 
@@ -1012,6 +1013,10 @@ textarea { resize: vertical; }
   .filters-panel {
     padding-bottom: 14px;
   }
+
+  .taxonomy-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* Mobile */
@@ -1080,6 +1085,10 @@ textarea { resize: vertical; }
   }
 
   .decal-tab-row {
+    grid-template-columns: 1fr;
+  }
+
+  .taxonomy-grid {
     grid-template-columns: 1fr;
   }
 
