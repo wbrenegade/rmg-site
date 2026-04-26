@@ -51,11 +51,6 @@
           <label>ZIP Code<input type="text" name="zip" required /></label>
           <label>Country<input type="text" name="country" value="United States" required /></label>
 
-          <div class="form-section full-width"><h3>Payment</h3></div>
-          <label class="full-width">Name on Card<input type="text" name="cardName" required /></label>
-          <label>Card Number<input type="text" name="cardNumber" inputmode="numeric" maxlength="19" placeholder="4242 4242 4242 4242" required /></label>
-          <label>Expiry<input type="text" name="expiry" placeholder="MM/YY" maxlength="5" required /></label>
-          <label>CVV<input type="text" name="cvv" maxlength="4" required /></label>
           <label>Order Notes<textarea name="notes" rows="4" placeholder="Vehicle year/make/model, preferred sizing, custom notes..."></textarea></label>
 
           <label class="full-width checkbox-row">
@@ -63,8 +58,8 @@
             <span>I agree to the <a href="terms.html">Terms & Conditions</a> and <a href="privacy.html">Privacy Policy</a>.</span>
           </label>
 
-          <button type="submit" class="btn full-width">Place Order</button>
-          <p class="form-note full-width">This demo checkout stores orders locally in the browser. Replace this with Stripe, Square, PayPal, or Shopify checkout for live payments.</p>
+        <button type="submit" class="btn full-width">Continue to Secure Payment</button>          
+        <p class="form-note full-width">Payment is securely processed by Stripe. We do not store your card information.</p>
         </form>
 
         <aside class="card summary-card">
@@ -130,7 +125,130 @@ const checkoutData =
       totalEl.textContent = "$" + total.toFixed(2);
     });
   </script>
-  <script src="assets/js/checkout.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("checkoutForm");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const checkoutData =
+      JSON.parse(sessionStorage.getItem("checkout_data") || "null") ||
+      JSON.parse(localStorage.getItem("checkout_data") || "null");
+
+    const cart = JSON.parse(localStorage.getItem("rmg_cart") || "[]");
+    const item = checkoutData || cart[0];
+
+    if (!item) {
+      alert("No checkout item found.");
+      return;
+    }
+
+    const formData = new FormData(form);
+
+    const customer = {
+      firstName: formData.get("firstName"),
+      lastName: formData.get("lastName"),
+      email: formData.get("email"),
+      phone: formData.get("phone"),
+      address: formData.get("address"),
+      city: formData.get("city"),
+      state: formData.get("state"),
+      zip: formData.get("zip"),
+      country: formData.get("country"),
+      notes: formData.get("notes"),
+    };
+
+    const button = form.querySelector("button[type='submit']");
+    button.disabled = true;
+    button.textContent = "Redirecting to Stripe...";
+
+    try {
+      const response = await fetch("/api/stripe/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ item, customer })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Stripe checkout failed.");
+      }
+
+      window.location.href = data.url;
+    } catch (err) {
+      alert(err.message);
+      button.disabled = false;
+      button.textContent = "Place Order";
+    }
+  });
+});
+</script>1~<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("checkoutForm");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const checkoutData =
+      JSON.parse(sessionStorage.getItem("checkout_data") || "null") ||
+      JSON.parse(localStorage.getItem("checkout_data") || "null");
+
+    const cart = JSON.parse(localStorage.getItem("rmg_cart") || "[]");
+    const item = checkoutData || cart[0];
+
+    if (!item) {
+      alert("No checkout item found.");
+      return;
+    }
+
+    const formData = new FormData(form);
+
+    const customer = {
+      firstName: formData.get("firstName"),
+      lastName: formData.get("lastName"),
+      email: formData.get("email"),
+      phone: formData.get("phone"),
+      address: formData.get("address"),
+      city: formData.get("city"),
+      state: formData.get("state"),
+      zip: formData.get("zip"),
+      country: formData.get("country"),
+      notes: formData.get("notes"),
+    };
+
+    const button = form.querySelector("button[type='submit']");
+    button.disabled = true;
+    button.textContent = "Redirecting to Stripe...";
+
+    try {
+      const response = await fetch("/api/stripe/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ item, customer })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Stripe checkout failed.");
+      }
+
+      window.location.href = data.url;
+    } catch (err) {
+      alert(err.message);
+      button.disabled = false;
+      button.textContent = "Place Order";
+    }
+  });
+});
+</script>  
+<!--<script src="assets/js/checkout.js"></script>-->
 </body>
 </html>
 
