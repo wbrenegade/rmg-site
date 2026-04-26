@@ -1,49 +1,50 @@
 const DECAL_IMAGE_BASE = "/assets/imgs/decals";
 const FALLBACK_IMAGE = "/assets/imgs/main.PNG";
 
+const DECAL_GROUPS = ["By Placement", "By Type", "Custom"];
+
 const DECAL_FILTERS = {
   "By Placement": [
     "Fender",
+    "Full Body/Half Body",
+    "Hood",
     "Rear Quarter Panel",
     "Rocker Panel/Side",
-    "Windshield/Rear Window",
-    "Hood",
-    "Custom"
+    "Windshield/Rear Window"
   ],
   "By Type": [
-    "Racing Stripes",
-    "Graphics",
     "Brands",
-    "Sponsor Stacks",
-    "Sponsor Rows",
+    "Geometrical Patterns",
+    "Graphics",
+    "Platform Specific",
+    "Racing Stripes",
     "Rips/Scratches/Tears",
-    "Banners",
-    "Lettering"
-  ]
+    "Sponsor Stacks/Rows"
+  ],
+  "Custom": []
 };
 
 const PLACEMENT_IMAGES = {
   "Fender": `${DECAL_IMAGE_BASE}/placements/fender.png`,
+  "Full Body/Half Body": `${DECAL_IMAGE_BASE}/placements/full-body-half-body.png`,
+  "Hood": `${DECAL_IMAGE_BASE}/placements/hood.png`,
   "Rear Quarter Panel": `${DECAL_IMAGE_BASE}/placements/rear-quarter-panel.png`,
   "Rocker Panel/Side": `${DECAL_IMAGE_BASE}/placements/rocker-panel-side.png`,
-  "Windshield/Rear Window": `${DECAL_IMAGE_BASE}/placements/windshield-rear-window.png`,
-  "Hood": `${DECAL_IMAGE_BASE}/placements/hood.png`,
-  "Custom": `${DECAL_IMAGE_BASE}/placements/custom.png`
+  "Windshield/Rear Window": `${DECAL_IMAGE_BASE}/placements/windhsield-rear-window.png`
 };
 
 const TYPE_IMAGES = {
-  "Racing Stripes": `${DECAL_IMAGE_BASE}/type/racing-stripes.png`,
-  "Graphics": `${DECAL_IMAGE_BASE}/type/graphics.png`,
-  "Brands": `${DECAL_IMAGE_BASE}/type/brands.png`,
-  "Sponsor Stacks": `${DECAL_IMAGE_BASE}/type/sponsor-stacks.png`,
-  "Sponsor Rows": `${DECAL_IMAGE_BASE}/type/sponsor-rows.png`,
-  "Rips/Scratches/Tears": `${DECAL_IMAGE_BASE}/type/rips-scratches-tears.png`,
-  "Banners": `${DECAL_IMAGE_BASE}/type/banners.png`,
-  "Lettering": `${DECAL_IMAGE_BASE}/type/lettering.png`
+  "Brands": `${DECAL_IMAGE_BASE}/types/brands.png`,
+  "Geometrical Patterns": `${DECAL_IMAGE_BASE}/types/geometrical-patterns.png`,
+  "Graphics": `${DECAL_IMAGE_BASE}/types/graphics.png`,
+  "Platform Specific": `${DECAL_IMAGE_BASE}/types/platform-specific.png`,
+  "Racing Stripes": `${DECAL_IMAGE_BASE}/types/racing-stripes.png`,
+  "Rips/Scratches/Tears": `${DECAL_IMAGE_BASE}/types/rips-scratches-tears.png`,
+  "Sponsor Stacks/Rows": `${DECAL_IMAGE_BASE}/types/sponsor-stacks-rows.png`
 };
 
 const CATEGORY_IMAGES = {
-  "Decals": `${DECAL_IMAGE_BASE}/type/graphics.png`,
+  "Decals": `${DECAL_IMAGE_BASE}/placements/fender.png`,
   "Window Tint": FALLBACK_IMAGE,
   "Lettering": `${DECAL_IMAGE_BASE}/type/lettering.png`,
   "Wraps": FALLBACK_IMAGE
@@ -95,11 +96,11 @@ function normalizePlacement(value) {
   if (!text) return "";
 
   if (text.includes("fender")) return "Fender";
+  if (text.includes("full body") || text.includes("half body")) return "Full Body/Half Body";
+  if (text.includes("hood")) return "Hood";
   if (text.includes("quarter")) return "Rear Quarter Panel";
   if (text.includes("rocker") || text.includes("side skirt") || text.includes("side")) return "Rocker Panel/Side";
   if (text.includes("windshield") || text.includes("rear window") || text.includes("banner")) return "Windshield/Rear Window";
-  if (text.includes("hood")) return "Hood";
-  if (text.includes("custom")) return "Custom";
 
   return "";
 }
@@ -110,13 +111,12 @@ function normalizeType(value) {
   if (!text) return "";
 
   if (text.includes("racing stripe") || text.includes("stripe")) return "Racing Stripes";
-  if (text.includes("sponsor stack")) return "Sponsor Stacks";
-  if (text.includes("sponsor row")) return "Sponsor Rows";
+  if (text.includes("sponsor stack") || text.includes("sponsor row")) return "Sponsor Stacks/Rows";
+  if (text.includes("geometrical") || text.includes("geometric") || text.includes("pattern")) return "Geometrical Patterns";
+  if (text.includes("platform")) return "Platform Specific";
   if (text.includes("brand") || text.includes("trd") || text.includes("mopar") || text.includes("coyote") || text.includes("nismo")) return "Brands";
   if (text.includes("rip") || text.includes("scratch") || text.includes("tear")) return "Rips/Scratches/Tears";
-  if (text.includes("banner")) return "Banners";
-  if (text.includes("letter")) return "Lettering";
-  if (text.includes("graphic") || text.includes("geometric") || text.includes("pattern")) return "Graphics";
+  if (text.includes("graphic") || text.includes("banner") || text.includes("letter")) return "Graphics";
 
   return "";
 }
@@ -155,14 +155,34 @@ function isGenericImage(path) {
 }
 
 function buildDecalProductImagePath(product) {
-  const placement = slugify(product.placement || "custom");
-  const type = slugify(product.decalType || product.type || product.style || "graphics");
+  const placement = getProductFolderSlug(product.placement || "custom", "placement");
+  const type = getProductFolderSlug(product.decalType || product.type || product.style || "graphics", "type");
   const productSlug = product.slug || slugify(product.name || "product");
 
   return `${DECAL_IMAGE_BASE}/products/${placement}__${type}/${productSlug}.png`;
 }
 
+function getProductFolderSlug(value, group) {
+  const label = String(value || "").trim();
+
+  if (group === "type" && label === "Racing Stripes") return "stripes";
+  if (group === "type" && label === "Sponsor Stacks/Rows") return "sponsor-stacks-rows";
+
+  return slugify(label);
+}
+
+function getLegacyDecalImagePath(product) {
+  const path = String(product.imagePath || "");
+  if (!path.includes("/rocker_panel_side_stripes/")) return "";
+
+  const fileName = path.split("/").pop();
+  return `${DECAL_IMAGE_BASE}/products/rocker-panel-side__stripes/${fileName}`;
+}
+
 function getProductImage(product) {
+  const legacyPath = getLegacyDecalImagePath(product);
+  if (legacyPath) return legacyPath;
+
   if (!isGenericImage(product.imagePath)) {
     return product.imagePath;
   }
@@ -338,7 +358,7 @@ async function initShop() {
     const category = categoryFilter.value;
 
     if (category === "Decals") {
-      setSelectOptions(subcategoryFilter, Object.keys(DECAL_FILTERS), "All Decal Filters");
+      setSelectOptions(subcategoryFilter, DECAL_GROUPS, "All Decal Groups");
       subcategoryFilter.value = activeDecalTab;
 
       setSelectOptions(subcategoryDetailFilter, DECAL_FILTERS[activeDecalTab], "All");
@@ -370,13 +390,14 @@ async function initShop() {
 
   function syncHierarchyVisibility() {
     const category = categoryFilter?.value || "all";
+    const hasDecalDetails = category === "Decals" && (DECAL_FILTERS[activeDecalTab] || []).length > 0;
 
     if (subcategoryWrap) {
       subcategoryWrap.hidden = category === "all";
     }
 
     if (subcategoryDetailWrap) {
-      subcategoryDetailWrap.hidden = true;
+      subcategoryDetailWrap.hidden = !hasDecalDetails;
     }
   }
 
@@ -399,6 +420,12 @@ async function initShop() {
     }).join("");
   }
 
+  function getDecalGroupImage(group) {
+    if (group === "By Placement") return PLACEMENT_IMAGES["Fender"] || CATEGORY_IMAGES.Decals;
+    if (group === "By Type") return TYPE_IMAGES["Graphics"] || CATEGORY_IMAGES.Decals;
+    return CATEGORY_IMAGES.Decals;
+  }
+
   function renderDecalTabs() {
     if (!subcategoryPicks || !categoryFilter) return;
 
@@ -409,34 +436,15 @@ async function initShop() {
       return;
     }
 
-    const filters = DECAL_FILTERS[activeDecalTab] || [];
-
     subcategoryPicks.innerHTML = `
-      <div class="decal-tab-row">
-        <button type="button" class="decal-tab${activeDecalTab === "By Placement" ? " active" : ""}" data-decal-tab="By Placement">
-          By Placement
-        </button>
-        <button type="button" class="decal-tab${activeDecalTab === "By Type" ? " active" : ""}" data-decal-tab="By Type">
-          By Type
-        </button>
-      </div>
-
       <div class="decal-filter-card-grid">
-        ${["all", ...filters].map((value) => {
-          const label = value === "all" ? `All ${activeDecalTab.replace("By ", "")}` : value;
-
-          const image = value === "all"
-            ? CATEGORY_IMAGES.Decals
-            : activeDecalTab === "By Placement"
-              ? PLACEMENT_IMAGES[value]
-              : TYPE_IMAGES[value];
-
+        ${DECAL_GROUPS.map((value) => {
           return createTaxonomyButton({
-            label,
-            image,
-            datasetName: "decalFilter",
+            label: value,
+            image: getDecalGroupImage(value),
+            datasetName: "decalGroup",
             datasetValue: value,
-            active: activeDecalFilter === value
+            active: activeDecalTab === value
           });
         }).join("")}
       </div>
@@ -482,9 +490,36 @@ async function initShop() {
   }
 
   function renderSubcategoryDetailPicks() {
-    if (subcategoryDetailPicks) {
+    if (!subcategoryDetailPicks || !categoryFilter) return;
+
+    const category = categoryFilter.value;
+    const filters = DECAL_FILTERS[activeDecalTab] || [];
+
+    if (category !== "Decals" || !filters.length) {
       subcategoryDetailPicks.innerHTML = "";
+      return;
     }
+
+    subcategoryDetailPicks.innerHTML = `
+      <div class="decal-filter-card-grid">
+        ${["all", ...filters].map((value) => {
+          const label = value === "all" ? `All ${activeDecalTab.replace("By ", "")}` : value;
+          const image = value === "all"
+            ? getDecalGroupImage(activeDecalTab)
+            : activeDecalTab === "By Placement"
+              ? PLACEMENT_IMAGES[value]
+              : TYPE_IMAGES[value];
+
+          return createTaxonomyButton({
+            label,
+            image,
+            datasetName: "decalFilter",
+            datasetValue: value,
+            active: activeDecalFilter === value
+          });
+        }).join("")}
+      </div>
+    `;
   }
 
   function syncAllHierarchyUI() {
@@ -813,6 +848,12 @@ async function initShop() {
   }
 
   function matchesDecalFilter(product) {
+    if (activeDecalTab === "Custom") {
+      return Boolean(product.custom) ||
+        normalizeText(product.subcategory) === "custom" ||
+        normalizeText(product.subSubcategory) === "custom";
+    }
+
     if (activeDecalFilter === "all") return true;
 
     if (activeDecalTab === "By Placement") {
@@ -919,11 +960,11 @@ async function initShop() {
   if (subcategoryFilter) {
     subcategoryFilter.addEventListener("change", () => {
       if (categoryFilter?.value === "Decals") {
-        activeDecalTab = subcategoryFilter.value === "By Type" ? "By Type" : "By Placement";
+        activeDecalTab = DECAL_GROUPS.includes(subcategoryFilter.value) ? subcategoryFilter.value : "By Placement";
         activeDecalFilter = "all";
       }
 
-      renderDecalTabs();
+      syncAllHierarchyUI();
       render();
     });
   }
@@ -934,7 +975,7 @@ async function initShop() {
         activeDecalFilter = subcategoryDetailFilter.value || "all";
       }
 
-      renderDecalTabs();
+      renderSubcategoryDetailPicks();
       render();
     });
   }
@@ -962,15 +1003,15 @@ async function initShop() {
 
   if (subcategoryPicks) {
     subcategoryPicks.addEventListener("click", (event) => {
-      const tab = event.target.closest("[data-decal-tab]");
-      if (tab) {
-        activeDecalTab = tab.dataset.decalTab;
+      const group = event.target.closest("[data-decal-group]");
+      if (group) {
+        activeDecalTab = group.dataset.decalGroup;
         activeDecalFilter = "all";
 
         if (subcategoryFilter) subcategoryFilter.value = activeDecalTab;
         if (subcategoryDetailFilter) subcategoryDetailFilter.value = "all";
 
-        renderDecalTabs();
+        syncAllHierarchyUI();
         render();
         return;
       }
@@ -983,7 +1024,7 @@ async function initShop() {
           subcategoryDetailFilter.value = activeDecalFilter;
         }
 
-        renderDecalTabs();
+        renderSubcategoryDetailPicks();
         render();
         return;
       }
@@ -994,6 +1035,22 @@ async function initShop() {
         renderNonDecalSubcategoryPicks();
         render();
       }
+    });
+  }
+
+  if (subcategoryDetailPicks) {
+    subcategoryDetailPicks.addEventListener("click", (event) => {
+      const decalFilter = event.target.closest("[data-decal-filter]");
+      if (!decalFilter) return;
+
+      activeDecalFilter = decalFilter.dataset.decalFilter || "all";
+
+      if (subcategoryDetailFilter) {
+        subcategoryDetailFilter.value = activeDecalFilter;
+      }
+
+      renderSubcategoryDetailPicks();
+      render();
     });
   }
 

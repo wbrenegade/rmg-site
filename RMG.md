@@ -14,23 +14,22 @@
   - By Type
   - Custom
 
-- Placements
-  - Fender
-  - Full Body/Half Body
-  - Hood
-  - Rear Quarter Panel
-  - Rocker Panel/Side
-  - Windshield/Rear Window
+  - Placements
+    - Fender
+    - Full Body/Half Body
+    - Hood
+    - Rear Quarter Panel
+    - Rocker Panel/Side
+    - Windshield/Rear Window
 
-- By Type
-  - Brands
-  - Funny
-  - Geometrical Patterns
-  - Graphics
-  - Platform Specific
-  - Racing Stripes
-  - Rips/Scratches/Tears
-  - Sponsor Stacks/Rows
+  - By Type
+    - Brands
+    - Geometrical Patterns
+    - Graphics
+    - Platform Specific
+    - Racing Stripes
+    - Rips/Scratches/Tears
+    - Sponsor Stacks/Rows
 
 - Window Tint
     - Full Rolls
