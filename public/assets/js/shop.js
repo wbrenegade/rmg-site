@@ -56,9 +56,6 @@ const DETAIL_IMAGES = {
 
 const FALLBACK_IMAGE = "/assets/imgs/main.PNG";
 
-
-const FALLBACK_IMAGE = "/assets/imgs/main.PNG";
-
 function getTaxonomyImage(category, subcategory, subSubcategory) {
   return (
     DETAIL_IMAGES[subSubcategory] ||
