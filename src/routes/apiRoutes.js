@@ -1,0 +1,46 @@
+const express = require("express");
+const { getHealth } = require("../controllers/healthController");
+const { listProducts } = require("../controllers/productController");
+const { listCategories } = require("../controllers/categoryController");
+const { listVehicleCatalog } = require("../controllers/vehicleController");
+const { signup, login } = require("../controllers/authController");
+const { listOrders, createNewOrder } = require("../controllers/orderController");
+const { createNewMessage } = require("../controllers/messageController");
+const {
+	cmsLogin,
+	listCmsProducts,
+	createCmsProduct,
+	updateCmsProduct,
+	deleteCmsProduct,
+	listCmsOrders,
+	listCmsMessages,
+	getPublicSettings,
+	getCmsSettings,
+	updateCmsSettings
+} = require("../controllers/cmsController");
+const { requireCmsAuth } = require("../middleware/requireCmsAuth");
+
+const router = express.Router();
+
+router.get("/health", getHealth);
+router.get("/products", listProducts);
+router.get("/categories", listCategories);
+router.get("/vehicles/catalog", listVehicleCatalog);
+router.get("/settings/public", getPublicSettings);
+router.post("/auth/signup", signup);
+router.post("/auth/login", login);
+router.get("/orders", listOrders);
+router.post("/orders", createNewOrder);
+router.post("/messages", createNewMessage);
+
+router.post("/cms/login", cmsLogin);
+router.get("/cms/products", requireCmsAuth, listCmsProducts);
+router.post("/cms/products", requireCmsAuth, createCmsProduct);
+router.put("/cms/products/:id", requireCmsAuth, updateCmsProduct);
+router.delete("/cms/products/:id", requireCmsAuth, deleteCmsProduct);
+router.get("/cms/orders", requireCmsAuth, listCmsOrders);
+router.get("/cms/messages", requireCmsAuth, listCmsMessages);
+router.get("/cms/settings", requireCmsAuth, getCmsSettings);
+router.put("/cms/settings", requireCmsAuth, updateCmsSettings);
+
+module.exports = router;

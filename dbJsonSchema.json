@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RMG Database Schema",
+  "type": "object",
+  "properties": {
+    "users": {
+      "type": "array"
+    },
+    "orders": {
+      "type": "array"
+    },
+    "messages": {
+      "type": "array"
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/category"
+      }
+    },
+    "products": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/product"
+      }
+    },
+    "siteSettings": {
+      "type": "object"
+    }
+  },
+  "$defs": {
+    "subcategory": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "hasSubcategories": {
+          "type": "boolean"
+        },
+        "subcategoryCount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "imagePath": {
+          "type": "string"
+        },
+        "subcategories": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/subcategory"
+          }
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": true
+    },
+    "category": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "hasSubcategories": {
+          "type": "boolean"
+        },
+        "subcategoryCount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "subcategories": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/subcategory"
+          }
+        },
+        "imagePath": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": true
+    },
+    "product": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        },
+        "subcategory": {
+          "type": "string"
+        },
+        "subSubcategory": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "price": {
+          "type": "number"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "imagePath": {
+          "type": "string"
+        },
+        "imageLabel": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "featured": {
+          "type": "boolean"
+        },
+        "custom": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "slug",
+        "category",
+        "subcategory",
+        "subSubcategory",
+        "price",
+        "tags",
+        "imagePath",
+        "imageLabel",
+        "description",
+        "featured",
+        "custom"
+      ],
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

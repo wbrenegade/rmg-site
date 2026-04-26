@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up | RenegadeMade Graphix</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html"><img class="brand-mark" src="assets/imgs/rmg_logo.png" alt="RMG logo" /></a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
+      <nav class="site-nav" id="siteNav">
+        <a href="index.html">Home</a>
+        <a href="shop.html">Shop</a>
+        <a href="contact.html">Contact</a>
+        <a href="faq.html">FAQ</a>
+        <a href="login.html">Login</a>
+        <a href="signup.html" class="btn btn-sm active">Sign Up</a>
+        <a href="cart.html" class="cart-link">Cart <span id="cartCount">0</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="auth-main">
+    <div class="container auth-wrap">
+      <form class="card auth-card" id="signupForm">
+        <p class="eyebrow">Create Your Account</p>
+        <h1>Sign Up</h1>
+        <label>Full Name<input type="text" name="name" required /></label>
+        <label>Email<input type="email" name="email" required /></label>
+        <label>Password<input type="password" name="password" minlength="6" required /></label>
+        <label>Confirm Password<input type="password" name="confirmPassword" minlength="6" required /></label>
+        <button type="submit" class="btn">Create Account</button>
+        <p class="form-note">Already have an account? <a href="login.html">Login</a>.</p>
+      </form>
+    </div>
+  </main>
+
+  <footer class="site-footer"><div class="container footer-bottom"><p>© <span id="year"></span> RenegadeMade Graphix</p></div></footer>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/auth.js"></script>
+</body>
+</html>
+

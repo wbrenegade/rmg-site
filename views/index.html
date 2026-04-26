@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RenegadeMade Graphix | Custom Decals, Wrap Graphics & Business Lettering</title>
+  <meta name="description" content="RenegadeMade Graphix offers custom decals, windshield banners, business lettering, wrap graphics, and custom vinyl design services." />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="icon" type="image/png" href="/favicon.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html"><img class="brand-mark" src="assets/imgs/rmg_logo.png" alt="RMG logo" /></a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
+      <nav class="site-nav" id="siteNav">
+        <a class="active" href="index.html">Home</a>
+        <a href="shop.html">Shop</a>
+        <a href="contact.html">Contact</a>
+        <a href="faq.html">FAQ</a>
+        <a href="account.html">My Account</a>
+        <a href="cart.html" class="cart-link">Cart <span id="cartCount">0</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="video-wrap">
+          <video id="heroVideo" class="hero-video" autoplay muted loop playsinline webkit-playsinline preload="auto">
+            <source src="assets/vids/rmg_anim.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <div>
+          <p class="eyebrow" id="homeEyebrow">Custom Vinyl That Fits Your Build</p>
+          <h1 id="homeTitle">Decals and kits built for real cars and real brands.</h1>
+          <p class="hero-copy" id="homePhrase">We sell decals, car-specific decal kits, pre-cut window tint kits, and fully custom decals/graphics made to match your exact style.</p>
+          <div class="hero-actions">
+            <a href="shop.html" class="btn">Shop Graphics</a>
+            <a href="contact.html" class="btn btn-outline">Request Custom Work</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-dark home-products-section">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Shop By Category</p>
+            <h2>Pick a category and add what you need.</h2>
+          </div>
+        </div>
+        <div class="home-tabs" id="homeCategoryTabs" role="tablist" aria-label="Product categories"></div>
+        <div class="product-grid" id="homeCategoryProducts"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <h3>RenegadeMade Graphix</h3>
+        <p>Custom vinyl decals, graphics, and branding for vehicles, businesses, and creative projects.</p>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <a href="shop.html">All Products</a>
+        <a href="cart.html">Cart</a>
+        <a href="checkout.html">Checkout</a>
+      </div>
+      <div>
+        <h4>Account</h4>
+        <a href="login.html">Login</a>
+        <a href="signup.html">Sign Up</a>
+        <a href="account.html">My Account</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms & Conditions</a>
+        <a href="contact.html">Contact Us</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>© <span id="year"></span> RenegadeMade Graphix. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/home.js"></script>
+</body>
+</html>

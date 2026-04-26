@@ -1,0 +1,975 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Windshield Banner Calculator | RenegadeMade Graphix</title>
+
+<style>
+:root {
+  --bg: #0b0d12;
+  --panel: #141922;
+  --panel-2: #1a2130;
+  --text: #f2f5fb;
+  --muted: #aab3c5;
+  --line: rgba(255,255,255,0.08);
+  --accent: #7dff5a;
+  --accent-2: #4ec6ff;
+  --danger: #ff6b6b;
+  --shadow: 0 20px 50px rgba(0,0,0,0.35);
+  --radius: 18px;
+  --radius-sm: 12px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top right, rgba(78,198,255,0.12), transparent 30%),
+    radial-gradient(circle at left center, rgba(125,255,90,0.08), transparent 28%),
+    var(--bg);
+  min-height: 100vh;
+}
+
+a { color: inherit; text-decoration: none; }
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+img { max-width: 100%; display: block; }
+
+.container {
+  width: min(1040px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+/* Header */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(14px);
+  background: rgba(11,13,18,0.82);
+  border-bottom: 1px solid var(--line);
+}
+.nav-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 72px;
+  gap: 16px;
+}
+.brand-mark {
+  height: 60px;
+  width: auto;
+  border-radius: 8px;
+  object-fit: contain;
+}
+.site-nav { display: flex; align-items: center; gap: 18px; }
+.site-nav a { color: var(--muted); transition: color 0.2s; }
+.site-nav a:hover { color: var(--text); }
+
+/* Page hero */
+.page-hero {
+  padding: 44px 0 26px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255,255,255,0.015);
+}
+.eyebrow {
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.page-hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  line-height: 1.05;
+  margin-bottom: 10px;
+}
+.page-hero p { color: var(--muted); }
+
+/* Cards */
+.card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+.card h2 { font-size: 1.1rem; margin-bottom: 18px; }
+
+/* Forms */
+label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 14px;
+}
+.label-row { display: flex; align-items: center; gap: 6px; }
+
+input, select, textarea {
+  width: 100%;
+  padding: 13px 14px;
+  border-radius: var(--radius-sm);
+  background: #0f141e;
+  color: var(--text);
+  border: 1px solid var(--line);
+  transition: border-color 0.2s;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: rgba(125,255,90,0.4);
+}
+textarea { resize: vertical; }
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23aab3c5' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 38px;
+}
+
+.form-row { display: grid; gap: 0 18px; grid-template-columns: 1fr 1fr; }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 20px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, var(--accent), #b2ff8c);
+  color: #091108;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: transform 0.15s;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-outline {
+  background: transparent;
+  border-color: var(--line);
+  color: var(--text);
+}
+.btn-sm { padding: 9px 14px; font-size: 0.88rem; }
+.btn-block { width: 100%; }
+
+/* Help tooltip */
+.help {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: rgba(125,255,90,0.12);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: help;
+  position: relative;
+  flex-shrink: 0;
+  border: 1px solid rgba(125,255,90,0.25);
+}
+.help::after {
+  content: attr(data-tip);
+  display: none;
+  position: absolute;
+  left: 50%;
+  bottom: 130%;
+  transform: translateX(-50%);
+  width: 230px;
+  background: #0d1220;
+  color: var(--text);
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  z-index: 999;
+  pointer-events: none;
+}
+.help:hover::after, .help:focus::after { display: block; }
+
+/* Mode pills */
+.mode-pills { display: flex; gap: 8px; margin-bottom: 22px; }
+.mode-pill {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: 0.2s;
+}
+.mode-pill.active {
+  background: linear-gradient(135deg, var(--accent), #b2ff8c);
+  color: #091108;
+  border-color: transparent;
+}
+.mode-pill:hover:not(.active) { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+.section-divider { border: none; border-top: 1px solid var(--line); margin: 18px 0; }
+
+.adv-badge {
+  display: inline-block;
+  background: rgba(78,198,255,0.1);
+  color: var(--accent-2);
+  border: 1px solid rgba(78,198,255,0.22);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* Results */
+.results-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.result-stat {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}
+.result-stat .stat-label {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 4px;
+}
+.result-stat .stat-value { font-size: 1.2rem; font-weight: 800; color: var(--accent); }
+
+.letter-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.letter-table th {
+  text-align: left;
+  padding: 9px 12px;
+  color: var(--muted);
+  font-size: 0.73rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  border-bottom: 1px solid var(--line);
+}
+.letter-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-variant-numeric: tabular-nums;
+}
+.letter-table tr:last-child td { border-bottom: none; }
+.letter-table .char-cell { font-weight: 800; font-size: 1.05rem; color: var(--accent); }
+
+/* Preview */
+.preview-wrap {
+  background: #0a0e17;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: auto;
+  padding: 10px;
+}
+#previewCanvas { display: block; max-width: 100%; }
+#measureCanvas { display: none; }
+
+/* Export */
+.export-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+
+/* Error */
+.error-box {
+  background: rgba(255,107,107,0.08);
+  border: 1px solid rgba(255,107,107,0.25);
+  border-radius: var(--radius-sm);
+  padding: 16px 18px;
+  color: var(--danger);
+}
+.error-box strong { display: block; margin-bottom: 6px; }
+
+/* Layout */
+.calc-layout {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 22px;
+  align-items: start;
+  padding: 30px 0 64px;
+}
+.inputs-col { position: sticky; top: 84px; }
+.results-col { display: grid; gap: 18px; }
+
+/* Footer */
+.site-footer { border-top: 1px solid var(--line); background: rgba(255,255,255,0.02); }
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 22px;
+  padding: 34px 0;
+}
+.footer-grid h4 { margin-bottom: 10px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+.footer-grid a, .footer-grid p { color: var(--muted); display: block; margin-bottom: 8px; font-size: 0.88rem; }
+.footer-bottom { border-top: 1px solid var(--line); padding: 14px 0; color: var(--muted); font-size: 0.83rem; }
+
+/* Responsive */
+@media (max-width: 880px) {
+  .calc-layout { grid-template-columns: 1fr; }
+  .inputs-col { position: static; }
+  .form-row { grid-template-columns: 1fr; }
+  .export-grid { grid-template-columns: 1fr 1fr; }
+  .results-summary { grid-template-columns: 1fr 1fr; }
+  .footer-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 540px) {
+  .export-grid { grid-template-columns: 1fr; }
+  .results-summary { grid-template-columns: 1fr 1fr; }
+  .mode-pills { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav-wrap">
+    <a href="../views/index.html">
+      <img class="brand-mark" src="../public/assets/imgs/rmg_logo.png" alt="RenegadeMade Graphix" />
+    </a>
+    <nav class="site-nav">
+      <a href="../views/shop.html">Shop</a>
+      <a href="../views/contact.html">Contact</a>
+      <a href="../views/faq.html">FAQ</a>
+      <a href="../views/account.html">My Account</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <div class="page-hero">
+    <div class="container">
+      <p class="eyebrow">Tools</p>
+      <h1>Windshield Banner Calculator</h1>
+      <p>Enter your banner dimensions and text — get exact letter positions and spacing ready to cut.</p>
+    </div>
+  </div>
+
+  <div class="container calc-layout">
+
+    <!-- Inputs -->
+    <div class="inputs-col">
+      <div class="card">
+
+        <div class="mode-pills">
+          <button class="mode-pill active" id="pillRegular" onclick="setMode('regular')">Regular</button>
+          <button class="mode-pill" id="pillAdvanced" onclick="setMode('advanced')">Advanced</button>
+        </div>
+
+        <label>
+          <span class="label-row">
+            Banner Text
+            <span class="help" tabindex="0" data-tip="Enter the exact text for your banner, e.g. GREEN GOBLIN. Spaces count as word gaps.">?</span>
+          </span>
+          <input id="bannerText" value="GREEN GOBLIN" placeholder="e.g. GREEN GOBLIN" />
+        </label>
+
+        <label>
+          <span class="label-row">
+            Font
+            <span class="help" tabindex="0" data-tip="Choose the font used to measure letter widths. Match this to the font you will cut.">?</span>
+          </span>
+          <select id="fontFamily">
+            <option value="Arial Black">Arial Black</option>
+            <option value="Impact">Impact</option>
+            <option value="Arial">Arial</option>
+            <option value="Verdana">Verdana</option>
+          </select>
+        </label>
+
+        <hr class="section-divider" />
+
+        <div class="form-row">
+          <label>
+            <span class="label-row">
+              Banner Length (in)
+              <span class="help" tabindex="0" data-tip="Full length of the banner strip in inches.">?</span>
+            </span>
+            <input id="bannerLength" type="number" value="38" min="1" />
+          </label>
+
+          <label>
+            <span class="label-row">
+              Letter Height (in)
+              <span class="help" tabindex="0" data-tip="How tall each letter should be cut, in inches.">?</span>
+            </span>
+            <input id="letterHeight" type="number" value="4" min="0.1" step="0.1" />
+          </label>
+        </div>
+
+        <label>
+          <span class="label-row">
+            Layout Mode
+            <span class="help" tabindex="0" data-tip="Fixed margin: uses the margin you enter. Centered: auto-calculates equal margins on each side.">?</span>
+          </span>
+          <select id="layoutMode" onchange="toggleMargin()">
+            <option value="fixed">Fixed Start/End Margin</option>
+            <option value="centered">Centered Automatically</option>
+          </select>
+        </label>
+
+        <div id="marginBox">
+          <label>
+            <span class="label-row">
+              Margin Each Side (in)
+              <span class="help" tabindex="0" data-tip="Empty space before the first letter and after the last letter.">?</span>
+            </span>
+            <input id="sideMargin" type="number" value="1" min="0" step="0.25" />
+          </label>
+        </div>
+
+        <label>
+          <span class="label-row">
+            Word Spacing Multiplier
+            <span class="help" tabindex="0" data-tip="How much bigger word gaps are vs letter gaps. 2 = word gap is twice the letter gap.">?</span>
+          </span>
+          <input id="wordMultiplier" type="number" value="2" min="1" step="0.25" />
+        </label>
+
+        <hr class="section-divider" />
+
+        <div id="advancedOptions">
+          <p style="color:var(--muted);font-size:0.82rem;margin-bottom:14px;">
+            Advanced options <span class="adv-badge">Advanced Mode</span>
+          </p>
+
+          <label>
+            <span class="label-row">
+              Placement / Direction
+              <span class="help" tabindex="0" data-tip="Where the banner goes and which direction the letters run.">?</span>
+            </span>
+            <select id="placement">
+              <option value="top-lr">Top of windshield — Left to Right</option>
+              <option value="bottom-lr">Bottom of windshield — Left to Right</option>
+              <option value="left-ttb">Left side — Top to Bottom</option>
+              <option value="right-ttb">Right side — Top to Bottom</option>
+            </select>
+          </label>
+
+          <div class="form-row">
+            <label>
+              <span class="label-row">
+                Strip Depth (in)
+                <span class="help" tabindex="0" data-tip="Height of the top/bottom strip, or width of a side strip.">?</span>
+              </span>
+              <input id="bannerDepth" type="number" value="6" min="0.1" step="0.25" />
+            </label>
+
+            <label>
+              <span class="label-row">
+                Curve Amount
+                <span class="help" tabindex="0" data-tip="0 = straight. Positive arches one way, negative the other.">?</span>
+              </span>
+              <input id="curveAmount" type="number" value="0" step="0.25" />
+            </label>
+          </div>
+        </div>
+
+        <button class="btn btn-block" onclick="calculateBanner()" style="margin-top:4px;">
+          Calculate Layout
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="results-col" id="resultsCol">
+
+      <div class="card" id="emptyState">
+        <p style="color:var(--muted);text-align:center;padding:36px 0;">
+          Fill in the fields and click <strong style="color:var(--text);">Calculate Layout</strong> to see your results here.
+        </p>
+      </div>
+
+      <div class="error-box" id="errorBox" style="display:none;"></div>
+
+      <div class="card" id="summaryCard" style="display:none;">
+        <h2>Results</h2>
+        <div class="results-summary" id="statGrid"></div>
+        <div id="resultMeta" style="color:var(--muted);font-size:0.83rem;line-height:1.8;"></div>
+      </div>
+
+      <div class="card" id="letterCard" style="display:none;">
+        <h2>Letter Positions</h2>
+        <div style="overflow-x:auto;">
+          <table class="letter-table" id="letterTable">
+            <thead id="letterTableHead"></thead>
+            <tbody id="letterTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" id="previewCard" style="display:none;">
+        <h2>Preview</h2>
+        <div class="preview-wrap">
+          <canvas id="previewCanvas"></canvas>
+        </div>
+      </div>
+
+      <div class="card" id="exportCard" style="display:none;">
+        <h2>Save / Share</h2>
+        <div class="export-grid">
+          <button class="btn btn-sm" onclick="downloadTXT()">Save TXT</button>
+          <button class="btn btn-sm" onclick="downloadJSON()">Save JSON</button>
+          <button class="btn btn-sm" onclick="downloadCSV()">Save CSV</button>
+          <button class="btn btn-sm btn-outline" onclick="copyResults()">Copy Results</button>
+          <button class="btn btn-sm btn-outline" onclick="emailResults()">Email</button>
+          <button class="btn btn-sm btn-outline" onclick="shareResults()">Share</button>
+        </div>
+        <label style="margin-bottom:0;">
+          Plain Text Output
+          <textarea id="plainTextOutput" rows="10" readonly></textarea>
+        </label>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<canvas id="measureCanvas"></canvas>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h4>RenegadeMade Graphix</h4>
+        <p>Custom vinyl decals, graphics, and branding for vehicles, businesses, and creative projects.</p>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <a href="../views/shop.html">All Products</a>
+        <a href="../views/cart.html">Cart</a>
+      </div>
+      <div>
+        <h4>Info</h4>
+        <a href="../views/faq.html">FAQ</a>
+        <a href="../views/contact.html">Contact</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 RenegadeMade Graphix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+let latestResult = null;
+let currentMode = "regular";
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById("pillRegular").classList.toggle("active", mode === "regular");
+  document.getElementById("pillAdvanced").classList.toggle("active", mode === "advanced");
+  document.getElementById("advancedOptions").style.display = mode === "advanced" ? "block" : "none";
+  showEmpty();
+}
+
+function toggleMargin() {
+  const mode = document.getElementById("layoutMode").value;
+  document.getElementById("marginBox").style.display = mode === "centered" ? "none" : "block";
+}
+
+function showEmpty() {
+  document.getElementById("emptyState").style.display = "block";
+  document.getElementById("errorBox").style.display = "none";
+  document.getElementById("summaryCard").style.display = "none";
+  document.getElementById("letterCard").style.display = "none";
+  document.getElementById("previewCard").style.display = "none";
+  document.getElementById("exportCard").style.display = "none";
+}
+
+function showError(html) {
+  document.getElementById("emptyState").style.display = "none";
+  document.getElementById("errorBox").innerHTML = html;
+  document.getElementById("errorBox").style.display = "block";
+  document.getElementById("summaryCard").style.display = "none";
+  document.getElementById("letterCard").style.display = "none";
+  document.getElementById("previewCard").style.display = "none";
+  document.getElementById("exportCard").style.display = "none";
+}
+
+function calculateBanner() {
+  const isAdvanced = currentMode === "advanced";
+  const text = document.getElementById("bannerText").value.trim().toUpperCase();
+  const placement = isAdvanced ? document.getElementById("placement").value : "top-lr";
+  const bannerLength = parseFloat(document.getElementById("bannerLength").value);
+  const bannerDepth = isAdvanced ? parseFloat(document.getElementById("bannerDepth").value) : 0;
+  const letterHeight = parseFloat(document.getElementById("letterHeight").value);
+  const layoutMode = document.getElementById("layoutMode").value;
+  const wordMultiplier = parseFloat(document.getElementById("wordMultiplier").value);
+  const curveAmount = isAdvanced ? parseFloat(document.getElementById("curveAmount").value) : 0;
+  const fontFamily = document.getElementById("fontFamily").value;
+  let sideMargin = parseFloat(document.getElementById("sideMargin").value) || 0;
+
+  if (!text || bannerLength <= 0 || letterHeight <= 0 || wordMultiplier <= 0 || isNaN(curveAmount) || (isAdvanced && bannerDepth <= 0)) {
+    showError("<strong>Invalid input</strong>Please check all fields are filled in with valid values.");
+    return;
+  }
+
+  const measureCanvas = document.getElementById("measureCanvas");
+  const ctx = measureCanvas.getContext("2d");
+  const fontPx = 100;
+  ctx.font = `${fontPx}px "${fontFamily}"`;
+
+  let letters = [];
+  for (let char of text) {
+    if (char !== " ") {
+      letters.push({ char, type: "letter", widthPx: ctx.measureText(char).width });
+    } else {
+      letters.push({ char: "SPACE", type: "space" });
+    }
+  }
+
+  const pxToInch = letterHeight / fontPx;
+  let rawLetterLength = 0;
+  letters.forEach(item => {
+    if (item.type === "letter") {
+      item.length = item.widthPx * pxToInch;
+      rawLetterLength += item.length;
+    }
+  });
+
+  const letterCount = letters.filter(i => i.type === "letter").length;
+  const spaceCount  = letters.filter(i => i.type === "space").length;
+  const gapCount    = Math.max(letterCount - 1, 0);
+
+  let usableLength;
+  if (layoutMode === "centered") {
+    usableLength = bannerLength;
+    sideMargin = 0;
+  } else {
+    usableLength = bannerLength - (sideMargin * 2);
+  }
+
+  const remaining = usableLength - rawLetterLength;
+
+  if (remaining < 0) {
+    showError(`<strong>Text Too Large</strong>Your letters (${rawLetterLength.toFixed(2)}") are longer than the available space (${usableLength.toFixed(2)}"). Try reducing the letter height, increasing the banner length, or using a narrower font.`);
+    return;
+  }
+
+  const totalGapUnits = gapCount + (spaceCount * (wordMultiplier - 1));
+  const baseSpacing   = totalGapUnits > 0 ? remaining / totalGapUnits : 0;
+  const wordSpacing   = baseSpacing * wordMultiplier;
+
+  let calculatedStartMargin = sideMargin;
+  if (layoutMode === "centered") {
+    const totalTextLength = rawLetterLength + (baseSpacing * gapCount) + ((wordSpacing - baseSpacing) * spaceCount);
+    calculatedStartMargin = (bannerLength - totalTextLength) / 2;
+  }
+
+  let currentPos = calculatedStartMargin;
+  let layout = [];
+
+  for (let i = 0; i < letters.length; i++) {
+    const item = letters[i];
+    if (item.type === "space") continue;
+
+    const start = currentPos;
+    const length = item.length;
+    const end = start + length;
+    const centerAlong = start + (length / 2);
+
+    let x = centerAlong, y = 0, curveOffset = 0, rotationAngle = 0;
+
+    if (isAdvanced) {
+      const normalizedDistance = (centerAlong - (bannerLength / 2)) / (bannerLength / 2);
+      curveOffset   = curveAmount * (1 - Math.pow(normalizedDistance, 2));
+      rotationAngle = -normalizedDistance * curveAmount * 4;
+      const point   = convertPlacementToXY(placement, centerAlong, curveOffset, bannerLength, bannerDepth);
+      x = point.x; y = point.y; rotationAngle += point.baseRotation;
+    }
+
+    const row = {
+      letterNumber: layout.length + 1,
+      char: item.char,
+      startAlongBanner:  round(start),
+      lengthAlongBanner: round(length),
+      endAlongBanner:    round(end)
+    };
+    if (isAdvanced) {
+      row.centerAlongBanner = round(centerAlong);
+      row.x = round(x); row.y = round(y);
+      row.curveOffset = round(curveOffset);
+      row.rotationAngle = round(rotationAngle);
+    }
+    layout.push(row);
+
+    currentPos = end;
+    const next = letters[i + 1];
+    if (next) {
+      if (next.type === "space") { currentPos += wordSpacing; i++; }
+      else { currentPos += baseSpacing; }
+    }
+  }
+
+  const endMargin = bannerLength - currentPos;
+
+  latestResult = {
+    project: "Windshield Banner Layout",
+    createdAt: new Date().toISOString(),
+    mode: currentMode,
+    input: {
+      text, placement: isAdvanced ? placement : null,
+      bannerLengthInches: bannerLength,
+      bannerDepthInches:  isAdvanced ? bannerDepth : null,
+      letterHeightInches: letterHeight,
+      layoutMode,
+      fixedMarginInches:     layoutMode === "fixed" ? sideMargin : null,
+      wordSpacingMultiplier: wordMultiplier,
+      curveAmountInches:     isAdvanced ? curveAmount : null,
+      fontFamily
+    },
+    results: {
+      startMarginInches:         round(calculatedStartMargin),
+      endMarginInches:           round(endMargin),
+      normalLetterSpacingInches: round(baseSpacing),
+      wordSpacingInches:         round(wordSpacing),
+      textStartsAtInches:        round(calculatedStartMargin),
+      textEndsAtInches:          round(currentPos),
+      rawLetterLengthInches:     round(rawLetterLength),
+      usableLengthInches:        round(usableLength)
+    },
+    letterPositions: layout
+  };
+
+  renderResults();
+  renderLetterTable();
+
+  if (isAdvanced) {
+    renderPreview();
+    document.getElementById("previewCard").style.display = "block";
+  } else {
+    document.getElementById("previewCard").style.display = "none";
+  }
+
+  document.getElementById("emptyState").style.display = "none";
+  document.getElementById("errorBox").style.display = "none";
+  document.getElementById("summaryCard").style.display = "block";
+  document.getElementById("letterCard").style.display = "block";
+  document.getElementById("exportCard").style.display = "block";
+  document.getElementById("plainTextOutput").value = resultToText(latestResult);
+}
+
+function convertPlacementToXY(placement, along, curveOffset, length, depth) {
+  const centerDepth = depth / 2;
+  if (placement === "top-lr")    return { x: along, y: centerDepth - curveOffset, baseRotation: 0 };
+  if (placement === "bottom-lr") return { x: along, y: centerDepth + curveOffset, baseRotation: 0 };
+  if (placement === "left-ttb")  return { x: centerDepth - curveOffset, y: along, baseRotation: 90 };
+  if (placement === "right-ttb") return { x: centerDepth + curveOffset, y: along, baseRotation: 90 };
+  return { x: along, y: centerDepth, baseRotation: 0 };
+}
+
+function getPlacementName(value) {
+  const names = {
+    "top-lr":    "Top of windshield — Left to Right",
+    "bottom-lr": "Bottom of windshield — Left to Right",
+    "left-ttb":  "Left side — Top to Bottom",
+    "right-ttb": "Right side — Top to Bottom"
+  };
+  return names[value] || value;
+}
+
+function renderResults() {
+  const r = latestResult;
+  const isAdvanced = r.mode === "advanced";
+
+  const metaLines = [
+    `Mode: ${isAdvanced ? "Advanced" : "Regular"}`,
+    `Text: ${escapeHTML(r.input.text)}`,
+    `Font: ${r.input.fontFamily}`,
+    `Letter Height: ${r.input.letterHeightInches}"`,
+    `Banner Length: ${r.input.bannerLengthInches}"`
+  ];
+  if (isAdvanced) {
+    metaLines.push(`Placement: ${getPlacementName(r.input.placement)}`);
+    metaLines.push(`Strip Depth: ${r.input.bannerDepthInches}"`);
+    metaLines.push(`Curve: ${r.input.curveAmountInches}"`);
+  }
+  document.getElementById("resultMeta").innerHTML = metaLines.map(l => `<span>${escapeHTML(l)}</span>`).join(" &nbsp;&middot;&nbsp; ");
+
+  const stats = [
+    { label: "Start Margin",   value: r.results.startMarginInches.toFixed(3) + '"' },
+    { label: "End Margin",     value: r.results.endMarginInches.toFixed(3) + '"' },
+    { label: "Letter Spacing", value: r.results.normalLetterSpacingInches.toFixed(3) + '"' },
+    { label: "Word Spacing",   value: r.results.wordSpacingInches.toFixed(3) + '"' },
+    { label: "Text Starts At", value: r.results.textStartsAtInches.toFixed(3) + '"' },
+    { label: "Text Ends At",   value: r.results.textEndsAtInches.toFixed(3) + '"' }
+  ];
+  document.getElementById("statGrid").innerHTML = stats.map(s => `
+    <div class="result-stat">
+      <div class="stat-label">${s.label}</div>
+      <div class="stat-value">${s.value}</div>
+    </div>
+  `).join("");
+}
+
+function renderLetterTable() {
+  const r = latestResult;
+  const isAdvanced = r.mode === "advanced";
+  const baseCols = ["#", "Letter", "Start", "Width", "End"];
+  const advCols  = ["Center", "X", "Y", "Curve", "Rotation"];
+  const cols = isAdvanced ? [...baseCols, ...advCols] : baseCols;
+
+  document.getElementById("letterTableHead").innerHTML = `<tr>${cols.map(c => `<th>${c}</th>`).join("")}</tr>`;
+  document.getElementById("letterTableBody").innerHTML = r.letterPositions.map(item => {
+    let cells = `
+      <td>${item.letterNumber}</td>
+      <td class="char-cell">${escapeHTML(item.char)}</td>
+      <td>${item.startAlongBanner.toFixed(3)}"</td>
+      <td>${item.lengthAlongBanner.toFixed(3)}"</td>
+      <td>${item.endAlongBanner.toFixed(3)}"</td>
+    `;
+    if (isAdvanced) {
+      cells += `
+        <td>${item.centerAlongBanner.toFixed(3)}"</td>
+        <td>${item.x.toFixed(3)}"</td>
+        <td>${item.y.toFixed(3)}"</td>
+        <td>${item.curveOffset.toFixed(3)}"</td>
+        <td>${item.rotationAngle.toFixed(2)}&deg;</td>
+      `;
+    }
+    return `<tr>${cells}</tr>`;
+  }).join("");
+}
+
+function renderPreview() {
+  const r = latestResult;
+  const canvas = document.getElementById("previewCanvas");
+  const ctx = canvas.getContext("2d");
+  const isVertical = r.input.placement === "left-ttb" || r.input.placement === "right-ttb";
+  const length = r.input.bannerLengthInches;
+  const depth  = r.input.bannerDepthInches;
+  const scale  = isVertical ? Math.min(800 / depth, 1000 / length) : Math.min(900 / length, 220 / depth);
+
+  canvas.width  = isVertical ? depth * scale + 80 : length * scale + 80;
+  canvas.height = isVertical ? length * scale + 80 : depth * scale + 80;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#0a0e17";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const borderW = isVertical ? depth * scale : length * scale;
+  const borderH = isVertical ? length * scale : depth * scale;
+  ctx.strokeStyle = "rgba(125,255,90,0.45)";
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(40, 40, borderW, borderH);
+
+  ctx.fillStyle = "#f2f5fb";
+  ctx.font = `${r.input.letterHeightInches * scale}px "${r.input.fontFamily}"`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  r.letterPositions.forEach(item => {
+    const x = 40 + item.x * scale;
+    const y = 40 + item.y * scale;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(item.rotationAngle * Math.PI / 180);
+    ctx.fillText(item.char, 0, 0);
+    ctx.restore();
+  });
+}
+
+function resultToText(r) {
+  const isAdvanced = r.mode === "advanced";
+  let text = "Windshield Banner Layout Results\n================================\n\n";
+  text += `Created: ${r.createdAt}\nMode: ${isAdvanced ? "Advanced" : "Regular"}\nText: ${r.input.text}\n`;
+  if (isAdvanced) text += `Placement: ${getPlacementName(r.input.placement)}\nStrip Depth: ${r.input.bannerDepthInches}"\nCurve: ${r.input.curveAmountInches}"\n`;
+  text += `Banner Length: ${r.input.bannerLengthInches}"\nLetter Height: ${r.input.letterHeightInches}"\nFont: ${r.input.fontFamily}\nWord Spacing Multiplier: ${r.input.wordSpacingMultiplier}\n`;
+  if (r.input.layoutMode === "fixed") text += `Fixed Margin: ${r.input.fixedMarginInches}"\n`;
+  text += `\nFinal Measurements\n------------------\nStart Margin: ${r.results.startMarginInches}"\nEnd Margin: ${r.results.endMarginInches}"\nLetter Spacing: ${r.results.normalLetterSpacingInches}"\nWord Spacing: ${r.results.wordSpacingInches}"\nText Starts At: ${r.results.textStartsAtInches}"\nText Ends At: ${r.results.textEndsAtInches}"\n`;
+  text += `\nLetter Positions\n----------------\n`;
+  r.letterPositions.forEach(item => {
+    if (isAdvanced) {
+      text += `${item.letterNumber}. ${item.char} | Start: ${item.startAlongBanner}" | Width: ${item.lengthAlongBanner}" | End: ${item.endAlongBanner}" | X: ${item.x}" | Y: ${item.y}" | Curve: ${item.curveOffset}" | Rotation: ${item.rotationAngle}deg\n`;
+    } else {
+      text += `${item.letterNumber}. ${item.char} | Start: ${item.startAlongBanner}" | Width: ${item.lengthAlongBanner}" | End: ${item.endAlongBanner}"\n`;
+    }
+  });
+  return text;
+}
+
+function resultToCSV(r) {
+  const isAdvanced = r.mode === "advanced";
+  let csv = isAdvanced ? "Letter Number,Letter,Start,Width,End,Center,X,Y,Curve Offset,Rotation\n" : "Letter Number,Letter,Start,Width,End\n";
+  r.letterPositions.forEach(item => {
+    if (isAdvanced) {
+      csv += `${item.letterNumber},${item.char},${item.startAlongBanner},${item.lengthAlongBanner},${item.endAlongBanner},${item.centerAlongBanner},${item.x},${item.y},${item.curveOffset},${item.rotationAngle}\n`;
+    } else {
+      csv += `${item.letterNumber},${item.char},${item.startAlongBanner},${item.lengthAlongBanner},${item.endAlongBanner}\n`;
+    }
+  });
+  return csv;
+}
+
+function downloadTXT()  { if (!latestResult) return; downloadFile("banner-results.txt",   resultToText(latestResult), "text/plain"); }
+function downloadJSON() { if (!latestResult) return; downloadFile("banner-results.json",  JSON.stringify(latestResult, null, 2), "application/json"); }
+function downloadCSV()  { if (!latestResult) return; downloadFile("banner-positions.csv", resultToCSV(latestResult), "text/csv"); }
+
+function downloadFile(filename, content, type) {
+  const blob = new Blob([content], { type });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+async function copyResults() {
+  if (!latestResult) return;
+  try {
+    await navigator.clipboard.writeText(resultToText(latestResult));
+    alert("Results copied to clipboard.");
+  } catch {
+    document.getElementById("plainTextOutput").select();
+    alert("Clipboard blocked. Results are selected — copy manually.");
+  }
+}
+
+function emailResults() {
+  if (!latestResult) return;
+  window.location.href = `mailto:?subject=${encodeURIComponent("Windshield Banner Layout")}&body=${encodeURIComponent(resultToText(latestResult))}`;
+}
+
+async function shareResults() {
+  if (!latestResult) return;
+  if (navigator.share) {
+    try { await navigator.share({ title: "Windshield Banner Layout", text: resultToText(latestResult) }); } catch {}
+  } else { await copyResults(); }
+}
+
+function round(num) { return Math.round(num * 1000) / 1000; }
+
+function escapeHTML(str) {
+  return String(str)
+    .replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;").replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+setMode("regular");
+toggleMargin();
+</script>
+
+</body>
+</html>

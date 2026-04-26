@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mustang Customizer | RenegadeMade Graphix</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html"><img class="brand-mark" src="assets/imgs/rmg_logo.png" alt="RMG logo" /></a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
+      <nav class="site-nav" id="siteNav">
+        <a href="index.html">Home</a>
+        <a href="shop.html" class="active">Shop</a>
+        <a href="contact.html">Contact</a>
+        <a href="faq.html">FAQ</a>
+        <a href="cart.html" class="cart-link">Cart <span id="cartCount">0</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <section class="page-hero compact">
+      <div class="container">
+        <p class="eyebrow">Customizer App</p>
+        <h1>Mustang Decal Live Viewer</h1>
+        <p>Type your own text and tune color, size, and placement live on a Mustang template.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container customize-layout">
+        <article class="card">
+          <h3>Live Mustang Preview</h3>
+          <div class="mustang-viewer" id="mustangViewer">
+            <img src="/assets/imgs/mustang-template.svg" alt="Mustang side template" />
+            <div class="mustang-text-overlay" id="mustangTextOverlay">RENEGADE</div>
+          </div>
+          <p class="form-note">This preview helps you visualize your decal before checkout.</p>
+        </article>
+
+        <form class="card form-grid" id="mustangCustomizerForm">
+          <div class="form-section full-width"><h3>Design Controls</h3></div>
+          <label class="full-width">Decal Text
+            <input type="text" id="mustangText" maxlength="26" value="RENEGADE" />
+          </label>
+          <label>Color
+            <input type="color" id="mustangColor" value="#7dff5a" />
+          </label>
+          <label>Outline
+            <input type="color" id="mustangOutline" value="#081108" />
+          </label>
+          <label>Size
+            <input type="range" id="mustangSize" min="28" max="150" value="78" />
+          </label>
+          <label>Rotation
+            <input type="range" id="mustangRotate" min="-25" max="25" value="-4" />
+          </label>
+          <label>Horizontal
+            <input type="range" id="mustangPosX" min="-35" max="35" value="0" />
+          </label>
+          <label>Vertical
+            <input type="range" id="mustangPosY" min="-35" max="35" value="0" />
+          </label>
+          <label>Letter Spacing
+            <input type="range" id="mustangSpacing" min="0" max="16" value="4" />
+          </label>
+          <label>Opacity
+            <input type="range" id="mustangOpacity" min="30" max="100" value="95" />
+          </label>
+
+          <div class="full-width customize-actions">
+            <a href="shop.html" class="btn btn-outline">Back to Shop</a>
+            <button type="button" class="btn" id="mustangCheckoutBtn">Customize</button>
+          </div>
+          <p class="form-note full-width">Use This Design sends your custom settings into checkout notes.</p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom"><p>© <span id="year"></span> RenegadeMade Graphix</p></div>
+  </footer>
+
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/mustang-customizer.js"></script>
+</body>
+</html>
+

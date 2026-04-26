@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Us | RenegadeMade Graphix</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html"><img class="brand-mark" src="assets/imgs/rmg_logo.png" alt="RMG logo" /></a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
+      <nav class="site-nav" id="siteNav">
+        <a href="index.html">Home</a>
+        <a href="shop.html">Shop</a>
+        <a href="contact.html" class="active">Contact</a>
+        <a href="faq.html">FAQ</a>
+        <a href="login.html">Login</a>
+        <a href="signup.html" class="btn btn-sm">Sign Up</a>
+        <a href="cart.html" class="cart-link">Cart <span id="cartCount">0</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <section class="page-hero compact">
+      <div class="container">
+        <p class="eyebrow">Contact</p>
+        <h1>Contact RenegadeMade Graphix</h1>
+        <p>Send your project details, custom decal idea, or quote request.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container contact-layout">
+        <form class="card form-grid" id="contactForm">
+          <label>Full Name<input type="text" name="name" required /></label>
+          <label>Email<input type="email" name="email" required /></label>
+          <label>Phone<input type="tel" name="phone" /></label>
+          <label>Subject<input type="text" name="subject" required /></label>
+          <label class="full-width">Message<textarea name="message" rows="7" placeholder="Tell us what you need, what vehicle it’s for, what size you want, colors, and anything else important." required></textarea></label>
+          <button class="btn full-width" type="submit">Send Message</button>
+        </form>
+        <div class="card">
+          <h2>Business Info</h2>
+          <p>Use this page for custom quotes, business lettering, vinyl design questions, large-format jobs, and special requests.</p>
+          <ul class="check-list">
+            <li>Custom decal quotes</li>
+            <li>Vehicle graphics</li>
+            <li>Business door lettering</li>
+            <li>Wrap accent design work</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><div class="container footer-bottom"><p>© <span id="year"></span> RenegadeMade Graphix</p></div></footer>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
+

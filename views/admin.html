@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMS Admin | RenegadeMade Graphix</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html"><img class="brand-mark" src="assets/imgs/rmg_logo.png" alt="RMG logo" /></a>
+      <nav class="site-nav" id="siteNav">
+        <a href="index.html">Home</a>
+        <a href="shop.html">Shop</a>
+        <a class="active" href="admin.html">CMS</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <section class="page-hero compact">
+      <div class="container">
+        <p class="eyebrow">CMS</p>
+        <h1>Site Management Dashboard</h1>
+        <p>Manage products, homepage text, orders, and contact messages.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container cms-layout">
+        <div class="card">
+          <h2>CMS Login</h2>
+          <form id="cmsLoginForm" class="form-grid">
+            <label class="full-width">Password
+              <input type="password" name="password" required />
+            </label>
+            <button class="btn" type="submit">Login</button>
+          </form>
+          <p class="form-note">Default password is changeme123 unless CMS_PASSWORD is set in environment.</p>
+        </div>
+
+        <div class="card">
+          <h2>Homepage Settings</h2>
+          <form id="cmsSettingsForm" class="form-grid">
+            <label class="full-width">Eyebrow Text
+              <input type="text" name="homeEyebrow" />
+            </label>
+            <label class="full-width">Home Title
+              <input type="text" name="homeTitle" />
+            </label>
+            <label class="full-width">Home Phrase
+              <textarea name="homePhrase" rows="4"></textarea>
+            </label>
+            <button class="btn" type="submit">Save Settings</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-dark">
+      <div class="container">
+        <div class="section-head">
+          <h2>Product Manager</h2>
+        </div>
+
+        <div class="card">
+          <form id="cmsProductForm" class="form-grid">
+            <input type="hidden" name="id" />
+            <label>Name
+              <input type="text" name="name" required />
+            </label>
+            <label>Slug
+              <input type="text" name="slug" placeholder="auto-generated-if-empty" />
+            </label>
+            <label>Category
+              <input type="text" name="category" required />
+            </label>
+            <label>Subcategory
+              <input type="text" name="subcategory" required />
+            </label>
+            <label>Sub-Subcategory
+              <input type="text" name="subSubcategory" placeholder="Optional" />
+            </label>
+            <label>Price
+              <input type="number" step="0.01" min="0" name="price" required />
+            </label>
+            <label>Featured
+              <select name="featured">
+                <option value="false">No</option>
+                <option value="true">Yes</option>
+              </select>
+            </label>
+            <label>Custom
+              <select name="custom">
+                <option value="false">No</option>
+                <option value="true">Yes</option>
+              </select>
+            </label>
+            <label class="full-width">Tags (comma separated)
+              <input type="text" name="tags" placeholder="Decals, Fender, Sponsor Stacks" />
+            </label>
+            <label class="full-width">Image Label
+              <input type="text" name="imageLabel" />
+            </label>
+            <label class="full-width">Image Path
+              <input type="text" name="imagePath" placeholder="/assets/imgs/main.PNG" />
+            </label>
+            <label class="full-width">Short Description
+              <textarea rows="3" name="description" required></textarea>
+            </label>
+            <div class="cms-actions-row full-width">
+              <button class="btn" type="submit">Save Product</button>
+              <button class="btn btn-outline" id="cmsProductReset" type="button">New Product</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <div id="cmsProductsTable" class="cms-table-wrap"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container cms-layout">
+        <div class="card">
+          <h2>Recent Orders</h2>
+          <div id="cmsOrdersList" class="cms-list"></div>
+        </div>
+        <div class="card">
+          <h2>Recent Messages</h2>
+          <div id="cmsMessagesList" class="cms-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom">
+      <p>© <span id="year"></span> RenegadeMade Graphix</p>
+    </div>
+  </footer>
+
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/admin.js"></script>
+</body>
+</html>
+

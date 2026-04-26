@@ -1,0 +1,31 @@
+const express = require("express");
+const path = require("path");
+const apiRoutes = require("./routes/apiRoutes");
+const webRoutes = require("./routes/webRoutes");
+const { ensureDbFile } = require("./models/dbModel");
+const { serveNotFound } = require("./controllers/pageController");
+const { errorHandler } = require("./middleware/errorHandler");
+
+const app = express();
+const rootDir = path.join(__dirname, "..");
+const publicDir = path.join(rootDir, "public");
+
+ensureDbFile();
+
+app.disable("x-powered-by");
+app.use(express.json({ limit: "1mb" }));
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+  next();
+});
+
+app.use(express.static(publicDir));
+app.use("/api", apiRoutes);
+app.use(webRoutes);
+app.use(serveNotFound);
+app.use(errorHandler);
+
+module.exports = app;

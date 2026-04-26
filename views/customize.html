@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customize | RenegadeMade Graphix</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html"><img class="brand-mark" src="assets/imgs/rmg_logo.png" alt="RMG logo" /></a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
+      <nav class="site-nav" id="siteNav">
+        <a href="index.html">Home</a>
+        <a href="shop.html" class="active">Shop</a>
+        <a href="contact.html">Contact</a>
+        <a href="faq.html">FAQ</a>
+        <a href="login.html">Login</a>
+        <a href="signup.html" class="btn btn-sm">Sign Up</a>
+        <a href="cart.html" class="cart-link">Cart <span id="cartCount">0</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <section class="page-hero compact">
+      <div class="container">
+        <p class="eyebrow">Live Viewer</p>
+        <h1>Customize Your Graphic</h1>
+        <p>Preview your text, color, size, and placement in real time before checkout.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container customize-layout">
+        <article class="card">
+          <h3 id="customizeProductName">Loading product...</h3>
+          <p class="form-note" id="customizeProductMeta"></p>
+          <div class="customize-viewer" id="customizeViewer">
+            <img id="customizeBaseImage" src="/assets/imgs/main.PNG" alt="Product preview" />
+            <div id="customizeDecal" class="customize-decal">YOUR TEXT</div>
+          </div>
+          <p class="form-note">Drag sliders to position and style the design. This is a live preview to guide your final production request.</p>
+        </article>
+
+        <form class="card form-grid" id="customizeForm">
+          <div class="form-section full-width"><h3>Design Controls</h3></div>
+          <label class="full-width">Custom Text
+            <input type="text" id="designText" value="YOUR TEXT" maxlength="40" />
+          </label>
+          <label>Color
+            <input type="color" id="designColor" value="#7dff5a" />
+          </label>
+          <label>Opacity
+            <input type="range" id="designOpacity" min="20" max="100" value="90" />
+          </label>
+          <label>Font Size
+            <input type="range" id="designSize" min="18" max="120" value="54" />
+          </label>
+          <label>Rotation
+            <input type="range" id="designRotate" min="-35" max="35" value="0" />
+          </label>
+          <label>Horizontal Position
+            <input type="range" id="designX" min="-45" max="45" value="0" />
+          </label>
+          <label>Vertical Position
+            <input type="range" id="designY" min="-45" max="45" value="0" />
+          </label>
+          <label>Finish
+            <select id="designFinish">
+              <option value="Gloss">Gloss</option>
+              <option value="Matte">Matte</option>
+              <option value="Satin">Satin</option>
+              <option value="Reflective">Reflective</option>
+            </select>
+          </label>
+          <label>Install Side
+            <select id="designPlacement">
+              <option value="Driver side">Driver side</option>
+              <option value="Passenger side">Passenger side</option>
+              <option value="Both sides">Both sides</option>
+              <option value="Rear glass">Rear glass</option>
+              <option value="Windshield">Windshield</option>
+            </select>
+          </label>
+
+          <div class="full-width customize-actions">
+            <a class="btn btn-outline" id="backToProduct" href="shop.html">Back to Product</a>
+            <button type="button" class="btn" id="continueToCheckout">Save Customization & Checkout</button>
+          </div>
+          <p class="form-note full-width" id="customizeVehicleNote"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom"><p>© <span id="year"></span> RenegadeMade Graphix</p></div>
+  </footer>
+
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/customize.js"></script>
+</body>
+</html>
+
