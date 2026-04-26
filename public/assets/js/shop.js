@@ -15,11 +15,9 @@ const DECAL_FILTERS = {
   ],
   "By Type": [
     "Brands",
-    "Geometrical Patterns",
     "Graphics",
     "Platform Specific",
     "Racing Stripes",
-    "Rips/Scratches/Tears",
     "Sponsor Stacks/Rows"
   ],
   "Custom": []
@@ -36,11 +34,9 @@ const PLACEMENT_IMAGES = {
 
 const TYPE_IMAGES = {
   "Brands": `${DECAL_IMAGE_BASE}/types/brands.png`,
-  "Geometrical Patterns": `${DECAL_IMAGE_BASE}/types/geometrical-patterns.png`,
   "Graphics": `${DECAL_IMAGE_BASE}/types/graphics.png`,
   "Platform Specific": `${DECAL_IMAGE_BASE}/types/platform-specific.png`,
   "Racing Stripes": `${DECAL_IMAGE_BASE}/types/racing-stripes.png`,
-  "Rips/Scratches/Tears": `${DECAL_IMAGE_BASE}/types/rips-scratches-tears.png`,
   "Sponsor Stacks/Rows": `${DECAL_IMAGE_BASE}/types/sponsor-stacks-rows.png`
 };
 
@@ -114,10 +110,10 @@ function normalizeType(value) {
 
   if (text.includes("racing stripe") || text.includes("stripe")) return "Racing Stripes";
   if (text.includes("sponsor stack") || text.includes("sponsor row")) return "Sponsor Stacks/Rows";
-  if (text.includes("geometrical") || text.includes("geometric") || text.includes("pattern")) return "Geometrical Patterns";
+  if (text.includes("geometrical") || text.includes("geometric") || text.includes("pattern")) return "Graphics";
   if (text.includes("platform")) return "Platform Specific";
   if (text.includes("brand") || text.includes("trd") || text.includes("mopar") || text.includes("coyote") || text.includes("nismo")) return "Brands";
-  if (text.includes("rip") || text.includes("scratch") || text.includes("tear")) return "Rips/Scratches/Tears";
+  if (text.includes("rip") || text.includes("scratch") || text.includes("tear")) return "Graphics";
   if (text.includes("graphic") || text.includes("banner") || text.includes("letter")) return "Graphics";
 
   return "";

@@ -17,12 +17,12 @@ const placementLabels = {
 
 const typeLabels = {
   "brands": "Brands",
-  "geometrical-patterns": "Geometrical Patterns",
+  "geometrical-patterns": "Graphics",
   "graphics": "Graphics",
   "platform-specific": "Platform Specific",
   "racing-stripes": "Racing Stripes",
   "stripes": "Racing Stripes",
-  "rips-scratches-tears": "Rips/Scratches/Tears",
+  "rips-scratches-tears": "Graphics",
   "sponsor-stacks-rows": "Sponsor Stacks/Rows",
   "sponsor-stacks": "Sponsor Stacks/Rows",
   "sponsor-rows": "Sponsor Stacks/Rows"

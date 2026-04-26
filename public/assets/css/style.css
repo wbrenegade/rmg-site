@@ -858,8 +858,7 @@ textarea { resize: vertical; }
 
 .taxonomy-card img {
   width: 100%;
-  height: auto;
-  aspect-ratio: auto;
+  aspect-ratio: 3 / 4;
   object-fit: contain;
   border-radius: 0;
   background: #111;
