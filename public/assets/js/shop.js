@@ -574,6 +574,15 @@ async function initShop() {
     renderSubcategoryDetailPicks();
   }
 
+  function scrollToActiveSubcategories() {
+    const category = categoryFilter?.value || "all";
+    const target = category === "Decals" || category === "Lettering" || category === "Wraps"
+      ? subcategoryWrap
+      : productsEl;
+
+    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   function buildVehicleLabel(vehicle) {
     return [vehicle.year, vehicle.make, vehicle.model, vehicle.trim].filter(Boolean).join(" ");
   }
@@ -999,6 +1008,7 @@ async function initShop() {
 
       syncAllHierarchyUI();
       render();
+      scrollToActiveSubcategories();
     });
   }
 

@@ -751,8 +751,8 @@ textarea { resize: vertical; }
 }
 
 .decal-filter-card-grid.is-compact {
-  grid-template-columns: repeat(6, minmax(84px, 1fr));
-  gap: 0.5rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
 }
 
 .decal-filter-card-grid.is-compact .taxonomy-card {
