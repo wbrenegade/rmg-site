@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Decal Preview | RenegadeMade Graphix</title>
   <link rel="stylesheet" href="/assets/css/style.css" />
+
 <style>
 :root {
   --bg: #101010;
@@ -17,32 +18,13 @@
   --line: #444;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
   font-family: Arial, sans-serif;
   background: var(--bg);
   color: var(--text);
-}
-
-header {
-  padding: 16px 20px;
-  background: #070707;
-  border-bottom: 1px solid var(--line);
-}
-
-header h1 {
-  margin: 0;
-  font-size: 22px;
-}
-
-header p {
-  margin: 6px 0 0;
-  color: var(--muted);
-  font-size: 14px;
 }
 
 .app {
@@ -94,14 +76,8 @@ input, select, button {
   font-size: 15px;
 }
 
-input[type="range"] {
-  padding: 0;
-}
-
-input[type="color"] {
-  height: 44px;
-  padding: 4px;
-}
+input[type="range"] { padding: 0; }
+input[type="color"] { height: 44px; padding: 4px; }
 
 button {
   background: var(--accent);
@@ -195,10 +171,14 @@ button.danger {
   font-weight: bold;
 }
 
+.buy-btn {
+  margin-top: 14px;
+  font-size: 16px;
+  padding: 14px;
+}
+
 @media (max-width: 900px) {
-  .app {
-    grid-template-columns: 1fr;
-  }
+  .app { grid-template-columns: 1fr; }
 
   .sidebar {
     border-right: none;
@@ -207,188 +187,212 @@ button.danger {
 }
 </style>
 </head>
+
 <body>
-  <header class="site-header">
-    <div class="container nav-wrap">
-      <a class="brand" href="/"><img class="brand-mark" src="/assets/imgs/rmg_logo.png" alt="RMG logo" /></a>
-      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
-      <nav class="site-nav" id="siteNav">
-        <a href="/">Home</a>
-        <a href="/shop">Shop</a>
-        <a href="/tools" class="active">Tools</a>
-        <a href="/contact">Contact</a>
-        <a href="/faq">FAQ</a>
-        <a href="/login">Login</a>
-        <a href="/signup" class="btn btn-sm">Sign Up</a>
-        <a href="/cart" class="cart-link">Cart <span id="cartCount">0</span></a>
-      </nav>
+
+<header class="site-header">
+  <div class="container nav-wrap">
+    <a class="brand" href="/">
+      <img class="brand-mark" src="/assets/imgs/rmg_logo.png" alt="RMG logo" />
+    </a>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
+
+    <nav class="site-nav" id="siteNav">
+      <a href="/">Home</a>
+      <a href="/shop">Shop</a>
+      <a href="/tools" class="active">Tools</a>
+      <a href="/contact">Contact</a>
+      <a href="/faq">FAQ</a>
+      <a href="/login">Login</a>
+      <a href="/signup" class="btn btn-sm">Sign Up</a>
+      <a href="/cart" class="cart-link">Cart <span id="cartCount">0</span></a>
+    </nav>
+  </div>
+</header>
+
+<main class="page-main">
+  <section class="page-hero compact">
+    <div class="container">
+      <p class="eyebrow">Tools</p>
+      <h1>RMG Decal Preview Tool</h1>
+      <p>Upload a car photo, upload a decal, place it on the vehicle, blend it, and send it to checkout.</p>
     </div>
-  </header>
+  </section>
 
-  <main class="page-main">
-    <section class="page-hero compact">
-      <div class="container">
-        <p class="eyebrow">Tools</p>
-        <h1>RMG Decal Preview Tool</h1>
-  <p>Upload a car photo, upload a decal, place it on the vehicle, blend it, and export the preview.</p>
-      </div>
-    </section>
+  <section class="section">
+    <div class="app">
 
-    <section class="section">
-      <div class="app">
-  <aside class="sidebar">
+      <aside class="sidebar">
 
-    <div class="box">
-      <h2>1. Upload Images</h2>
+        <div class="box">
+          <h2>1. Upload Images</h2>
 
-      <label>Car Photo</label>
-      <input id="carInput" type="file" accept="image/*">
+          <label>Car Photo</label>
+          <input id="carInput" type="file" accept="image/*">
 
-      <label>Decal Image PNG / SVG</label>
-      <input id="decalInput" type="file" accept=".png,.jpg,.jpeg,.webp,.svg,image/*">
+          <label>Decal Image PNG / SVG</label>
+          <input id="decalInput" type="file" accept=".png,.jpg,.jpeg,.webp,.svg,image/*">
 
-      <div class="help">Transparent PNG or SVG decals work best. Flat black cut-file style graphics preview the cleanest.</div>
+          <div class="help">Transparent PNG or SVG decals work best.</div>
+        </div>
+
+        <div class="box">
+          <h2>2. Decal Order Info</h2>
+
+          <label>Decal Name</label>
+          <input id="decalNameInput" type="text" value="Custom Decal Preview">
+
+          <label>Selected Size</label>
+          <select id="decalSizeInput">
+            <option value="12 inch">12 inch</option>
+            <option value="24 inch">24 inch</option>
+            <option value="36 inch" selected>36 inch</option>
+            <option value="48 inch">48 inch</option>
+            <option value="Custom Size">Custom Size</option>
+          </select>
+
+          <label>Price</label>
+          <input id="decalPriceInput" type="number" value="39.99" step="0.01">
+        </div>
+
+        <div class="box">
+          <h2>3. Placement Preset</h2>
+
+          <label>Placement</label>
+          <select id="placementPreset">
+            <option value="door">Door</option>
+            <option value="front_fender">Front Fender</option>
+            <option value="rear_quarter">Rear Quarter Panel</option>
+            <option value="rocker">Rocker / Side Skirt</option>
+            <option value="hood">Hood</option>
+            <option value="windshield_banner">Windshield Banner</option>
+            <option value="rear_window">Rear Window</option>
+            <option value="custom">Custom</option>
+          </select>
+
+          <button onclick="applyPlacementPreset()">Apply Preset</button>
+          <div class="help">Drag the green corner handles to fit the car angle and panel shape.</div>
+        </div>
+
+        <div class="box">
+          <h2>4. Transform</h2>
+
+          <div class="row">
+            <button class="secondary" onclick="nudge(0, -2)">↑</button>
+            <button class="secondary" onclick="nudge(0, 2)">↓</button>
+            <button class="secondary" onclick="nudge(-2, 0)">←</button>
+            <button class="secondary" onclick="nudge(2, 0)">→</button>
+          </div>
+
+          <div class="row">
+            <button class="secondary" onclick="scaleQuad(0.95)">Scale -</button>
+            <button class="secondary" onclick="scaleQuad(1.05)">Scale +</button>
+          </div>
+
+          <div class="row">
+            <button class="secondary" onclick="rotateQuad(-2)">Rotate -</button>
+            <button class="secondary" onclick="rotateQuad(2)">Rotate +</button>
+          </div>
+
+          <button class="secondary" onclick="resetDecal()">Reset Decal</button>
+        </div>
+
+        <div class="box">
+          <h2>5. Realism / Blend</h2>
+
+          <label>Blend Mode</label>
+          <select id="blendMode" onchange="render()">
+            <option value="source-over">Normal</option>
+            <option value="multiply">Multiply</option>
+            <option value="screen">Screen</option>
+            <option value="overlay">Overlay</option>
+            <option value="soft-light">Soft Light</option>
+            <option value="hard-light">Hard Light</option>
+            <option value="color-burn">Color Burn</option>
+          </select>
+
+          <label>Opacity: <span id="opacityVal" class="value">90%</span></label>
+          <input id="opacity" type="range" min="0" max="100" value="90" oninput="updateValues(); render();">
+
+          <label>Brightness: <span id="brightnessVal" class="value">100%</span></label>
+          <input id="brightness" type="range" min="20" max="200" value="100" oninput="updateValues(); render();">
+
+          <label>Contrast: <span id="contrastVal" class="value">100%</span></label>
+          <input id="contrast" type="range" min="20" max="200" value="100" oninput="updateValues(); render();">
+
+          <label>Saturation: <span id="saturationVal" class="value">100%</span></label>
+          <input id="saturation" type="range" min="0" max="250" value="100" oninput="updateValues(); render();">
+
+          <label>Shadow Amount: <span id="shadowVal" class="value">15%</span></label>
+          <input id="shadowAmount" type="range" min="0" max="100" value="15" oninput="updateValues(); render();">
+
+          <label>Highlight Amount: <span id="highlightVal" class="value">8%</span></label>
+          <input id="highlightAmount" type="range" min="0" max="100" value="8" oninput="updateValues(); render();">
+
+          <label>Panel Curve Warp: <span id="curveWarpVal" class="value">0</span></label>
+          <input id="curveWarp" type="range" min="-60" max="60" value="0" oninput="updateValues(); render();">
+        </div>
+
+        <div class="box">
+          <h2>6. Color Options</h2>
+
+          <label>
+            <input id="recolorToggle" type="checkbox" style="width:auto;" onchange="render()">
+            Recolor Decal
+          </label>
+
+          <label>Decal Color</label>
+          <input id="decalColor" type="color" value="#000000" onchange="render()">
+        </div>
+
+        <div class="box">
+          <h2>7. Buy / Export</h2>
+
+          <button class="buy-btn" onclick="buyDecal()">Buy This Decal</button>
+          <button class="secondary" onclick="downloadPreview()">Download Preview PNG</button>
+          <button class="secondary" onclick="copySettings()">Copy Placement Settings</button>
+          <button class="secondary" onclick="downloadSettings()">Download JSON Settings</button>
+        </div>
+
+        <div id="status" class="status">Upload a car image to start.</div>
+
+      </aside>
+
+      <main class="stage-wrap">
+        <div id="canvasBox">
+          <canvas id="mainCanvas"></canvas>
+
+          <div id="h0" class="handle" data-label="top-left"></div>
+          <div id="h1" class="handle" data-label="top-right"></div>
+          <div id="h2" class="handle" data-label="bottom-right"></div>
+          <div id="h3" class="handle" data-label="bottom-left"></div>
+        </div>
+
+        <p class="small">
+          Drag the corner handles to match the vehicle panel perspective. The checkout will save your placement settings and preview.
+        </p>
+      </main>
+
     </div>
+  </section>
+</main>
 
-    <div class="box">
-      <h2>2. Placement Preset</h2>
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div><h3>RenegadeMade Graphix</h3><p>Custom vinyl graphics and branding.</p></div>
+    <div><h4>Shop</h4><a href="/shop">All Products</a><a href="/cart">Cart</a></div>
+    <div><h4>Account</h4><a href="/login">Login</a><a href="/account">My Account</a></div>
+    <div><h4>Legal</h4><a href="/privacy">Privacy Policy</a><a href="/terms">Terms</a></div>
+  </div>
+  <div class="container footer-bottom"><p>© <span id="year"></span> RenegadeMade Graphix</p></div>
+</footer>
 
-      <label>Placement</label>
-      <select id="placementPreset">
-        <option value="door">Door</option>
-        <option value="front_fender">Front Fender</option>
-        <option value="rear_quarter">Rear Quarter Panel</option>
-        <option value="rocker">Rocker / Side Skirt</option>
-        <option value="hood">Hood</option>
-        <option value="windshield_banner">Windshield Banner</option>
-        <option value="rear_window">Rear Window</option>
-        <option value="custom">Custom</option>
-      </select>
+<script src="/assets/js/app.js"></script>
 
-      <button onclick="applyPlacementPreset()">Apply Preset</button>
-      <div class="help">This gives a starting position. Drag the green corner handles to fit the car angle and panel shape.</div>
-    </div>
-
-    <div class="box">
-      <h2>3. Transform</h2>
-
-      <div class="row">
-        <button class="secondary" onclick="nudge(0, -2)">↑</button>
-        <button class="secondary" onclick="nudge(0, 2)">↓</button>
-        <button class="secondary" onclick="nudge(-2, 0)">←</button>
-        <button class="secondary" onclick="nudge(2, 0)">→</button>
-      </div>
-
-      <div class="row">
-        <button class="secondary" onclick="scaleQuad(0.95)">Scale -</button>
-        <button class="secondary" onclick="scaleQuad(1.05)">Scale +</button>
-      </div>
-
-      <div class="row">
-        <button class="secondary" onclick="rotateQuad(-2)">Rotate -</button>
-        <button class="secondary" onclick="rotateQuad(2)">Rotate +</button>
-      </div>
-
-      <button class="secondary" onclick="resetDecal()">Reset Decal</button>
-    </div>
-
-    <div class="box">
-      <h2>4. Realism / Blend</h2>
-
-      <label>Blend Mode</label>
-      <select id="blendMode" onchange="render()">
-        <option value="source-over">Normal</option>
-        <option value="multiply">Multiply</option>
-        <option value="screen">Screen</option>
-        <option value="overlay">Overlay</option>
-        <option value="soft-light">Soft Light</option>
-        <option value="hard-light">Hard Light</option>
-        <option value="color-burn">Color Burn</option>
-      </select>
-
-      <label>Opacity: <span id="opacityVal" class="value">90%</span></label>
-      <input id="opacity" type="range" min="0" max="100" value="90" oninput="updateValues(); render();">
-
-      <label>Brightness: <span id="brightnessVal" class="value">100%</span></label>
-      <input id="brightness" type="range" min="20" max="200" value="100" oninput="updateValues(); render();">
-
-      <label>Contrast: <span id="contrastVal" class="value">100%</span></label>
-      <input id="contrast" type="range" min="20" max="200" value="100" oninput="updateValues(); render();">
-
-      <label>Saturation: <span id="saturationVal" class="value">100%</span></label>
-      <input id="saturation" type="range" min="0" max="250" value="100" oninput="updateValues(); render();">
-
-      <label>Shadow Amount: <span id="shadowVal" class="value">15%</span></label>
-      <input id="shadowAmount" type="range" min="0" max="100" value="15" oninput="updateValues(); render();">
-
-      <label>Highlight Amount: <span id="highlightVal" class="value">8%</span></label>
-      <input id="highlightAmount" type="range" min="0" max="100" value="8" oninput="updateValues(); render();">
-
-      <label>Panel Curve Warp: <span id="curveWarpVal" class="value">0</span></label>
-      <input id="curveWarp" type="range" min="-60" max="60" value="0" oninput="updateValues(); render();">
-
-      <div class="help">Curve warp bends the decal slightly before placing it. This helps fake body curvature on doors, fenders, and quarter panels.</div>
-    </div>
-
-    <div class="box">
-      <h2>5. Color Options</h2>
-
-      <label>
-        <input id="recolorToggle" type="checkbox" style="width:auto;" onchange="render()">
-        Recolor Decal
-      </label>
-
-      <label>Decal Color</label>
-      <input id="decalColor" type="color" value="#000000" onchange="render()">
-
-      <div class="help">Works best on black/white decals. Good for showing matte black, gloss black, copper, red, etc.</div>
-    </div>
-
-    <div class="box">
-      <h2>6. Export</h2>
-
-      <button onclick="downloadPreview()">Download Preview PNG</button>
-      <button class="secondary" onclick="copySettings()">Copy Placement Settings</button>
-      <button class="secondary" onclick="downloadSettings()">Download JSON Settings</button>
-    </div>
-
-    <div id="status" class="status">Upload a car image to start.</div>
-
-  </aside>
-
-  <main class="stage-wrap">
-    <div id="canvasBox">
-      <canvas id="mainCanvas"></canvas>
-
-      <div id="h0" class="handle" data-label="top-left"></div>
-      <div id="h1" class="handle" data-label="top-right"></div>
-      <div id="h2" class="handle" data-label="bottom-right"></div>
-      <div id="h3" class="handle" data-label="bottom-left"></div>
-    </div>
-
-    <p class="small">
-      Drag the corner handles to match the vehicle panel perspective. Export is exactly what you see on the canvas.
-    </p>
-  </main>
-</div>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="container footer-grid">
-      <div><h3>RenegadeMade Graphix</h3><p>Custom vinyl graphics and branding.</p></div>
-      <div><h4>Shop</h4><a href="/shop">All Products</a><a href="/cart">Cart</a></div>
-      <div><h4>Account</h4><a href="/login">Login</a><a href="/account">My Account</a></div>
-      <div><h4>Legal</h4><a href="/privacy">Privacy Policy</a><a href="/terms">Terms</a></div>
-    </div>
-    <div class="container footer-bottom"><p>© <span id="year"></span> RenegadeMade Graphix</p></div>
-  </footer>
-
-  <script src="/assets/js/app.js"></script>
-  <script>
+<script>
 const canvas = document.getElementById("mainCanvas");
 const ctx = canvas.getContext("2d");
-const canvasBox = document.getElementById("canvasBox");
 
 let carImage = null;
 let decalImage = null;
@@ -464,6 +468,8 @@ async function loadDecal(e) {
   if (!file) return;
 
   decalFileName = file.name;
+  document.getElementById("decalNameInput").value = file.name.replace(/\.[^/.]+$/, "");
+
   const ext = file.name.split(".").pop().toLowerCase();
 
   if (ext === "svg") {
@@ -482,9 +488,7 @@ function loadDecalImageFromUrl(url, revoke) {
 
   img.onload = () => {
     decalImage = img;
-    if (carImage) {
-      applyPlacementPreset();
-    }
+    if (carImage) applyPlacementPreset();
     setStatus("Decal loaded. Drag handles to fit the panel.");
     if (revoke) URL.revokeObjectURL(url);
     render();
@@ -500,77 +504,58 @@ function applyPlacementPreset() {
   const w = canvas.width;
   const h = canvas.height;
 
-  if (preset === "door") {
-    quad = [
+  const presets = {
+    door: [
       {x: w * 0.34, y: h * 0.45},
       {x: w * 0.66, y: h * 0.43},
       {x: w * 0.66, y: h * 0.61},
       {x: w * 0.34, y: h * 0.63}
-    ];
-  }
-
-  if (preset === "front_fender") {
-    quad = [
+    ],
+    front_fender: [
       {x: w * 0.18, y: h * 0.43},
       {x: w * 0.34, y: h * 0.42},
       {x: w * 0.34, y: h * 0.58},
       {x: w * 0.18, y: h * 0.60}
-    ];
-  }
-
-  if (preset === "rear_quarter") {
-    quad = [
+    ],
+    rear_quarter: [
       {x: w * 0.66, y: h * 0.43},
       {x: w * 0.86, y: h * 0.44},
       {x: w * 0.86, y: h * 0.61},
       {x: w * 0.66, y: h * 0.60}
-    ];
-  }
-
-  if (preset === "rocker") {
-    quad = [
+    ],
+    rocker: [
       {x: w * 0.20, y: h * 0.66},
       {x: w * 0.82, y: h * 0.65},
       {x: w * 0.82, y: h * 0.74},
       {x: w * 0.20, y: h * 0.75}
-    ];
-  }
-
-  if (preset === "hood") {
-    quad = [
+    ],
+    hood: [
       {x: w * 0.34, y: h * 0.20},
       {x: w * 0.66, y: h * 0.20},
       {x: w * 0.62, y: h * 0.43},
       {x: w * 0.38, y: h * 0.43}
-    ];
-  }
-
-  if (preset === "windshield_banner") {
-    quad = [
+    ],
+    windshield_banner: [
       {x: w * 0.28, y: h * 0.14},
       {x: w * 0.72, y: h * 0.14},
       {x: w * 0.70, y: h * 0.22},
       {x: w * 0.30, y: h * 0.22}
-    ];
-  }
-
-  if (preset === "rear_window") {
-    quad = [
+    ],
+    rear_window: [
       {x: w * 0.60, y: h * 0.18},
       {x: w * 0.84, y: h * 0.20},
       {x: w * 0.82, y: h * 0.34},
       {x: w * 0.60, y: h * 0.32}
-    ];
-  }
-
-  if (preset === "custom") {
-    quad = [
+    ],
+    custom: [
       {x: w * 0.35, y: h * 0.40},
       {x: w * 0.65, y: h * 0.40},
       {x: w * 0.65, y: h * 0.60},
       {x: w * 0.35, y: h * 0.60}
-    ];
-  }
+    ]
+  };
+
+  quad = presets[preset] || presets.custom;
 
   updateHandles();
   render();
@@ -652,9 +637,7 @@ function render() {
     ctx.fillRect(0, 0, canvas.width || 900, canvas.height || 500);
   }
 
-  if (decalImage) {
-    drawWarpedDecal();
-  }
+  if (decalImage) drawWarpedDecal();
 
   drawQuadOutline();
   updateValues();
@@ -666,12 +649,9 @@ function drawWarpedDecal() {
   const warped = warpCanvasToQuad(temp, quad, 48);
 
   ctx.save();
-
   ctx.globalAlpha = Number(document.getElementById("opacity").value) / 100;
   ctx.globalCompositeOperation = document.getElementById("blendMode").value;
-
   ctx.drawImage(warped, 0, 0);
-
   ctx.restore();
 
   applyShadowHighlightMask(warped);
@@ -700,9 +680,7 @@ function prepareDecalCanvas() {
     recolorCanvas(base, document.getElementById("decalColor").value);
   }
 
-  if (curveWarp !== 0) {
-    return curveWarpCanvas(base, curveWarp);
-  }
+  if (curveWarp !== 0) return curveWarpCanvas(base, curveWarp);
 
   return base;
 }
@@ -737,20 +715,12 @@ function curveWarpCanvas(source, amount) {
     const n = (x / source.width) * 2 - 1;
     const offset = amount * (1 - n * n);
 
-    octx.drawImage(
-      source,
-      x, 0, 1, source.height,
-      x, centerY - offset, 1, source.height
-    );
+    octx.drawImage(source, x, 0, 1, source.height, x, centerY - offset, 1, source.height);
   }
 
   return out;
 }
 
-/*
-  Approximate perspective warp by slicing source into many vertical strips.
-  This is fast enough for a browser MVP and looks good for decal previews.
-*/
 function warpCanvasToQuad(src, q, slices) {
   const out = document.createElement("canvas");
   out.width = canvas.width;
@@ -767,26 +737,14 @@ function warpCanvasToQuad(src, q, slices) {
     const bot0 = lerpPoint(q[3], q[2], t0);
     const bot1 = lerpPoint(q[3], q[2], t1);
 
-    const dxTop = top1.x - top0.x;
-    const dyTop = top1.y - top0.y;
-    const dxBot = bot1.x - bot0.x;
-    const dyBot = bot1.y - bot0.y;
-
     const x = i * src.width / slices;
     const sw = Math.ceil(src.width / slices);
 
     const leftH = distance(top0, bot0);
     const rightH = distance(top1, bot1);
 
-    const avgTop = {
-      x: (top0.x + top1.x) / 2,
-      y: (top0.y + top1.y) / 2
-    };
-
-    const avgBot = {
-      x: (bot0.x + bot1.x) / 2,
-      y: (bot0.y + bot1.y) / 2
-    };
+    const avgTop = { x: (top0.x + top1.x) / 2, y: (top0.y + top1.y) / 2 };
+    const avgBot = { x: (bot0.x + bot1.x) / 2, y: (bot0.y + bot1.y) / 2 };
 
     const destW = distance(top0, top1);
     const destH = (leftH + rightH) / 2;
@@ -795,16 +753,7 @@ function warpCanvasToQuad(src, q, slices) {
     octx.save();
     octx.translate(avgTop.x, avgTop.y);
     octx.rotate(angle);
-
-    const sx = x;
-    const sy = 0;
-
-    octx.drawImage(
-      src,
-      sx, sy, sw, src.height,
-      -destW / 2, 0, destW + 1, destH
-    );
-
+    octx.drawImage(src, x, 0, sw, src.height, -destW / 2, 0, destW + 1, destH);
     octx.restore();
   }
 
@@ -834,11 +783,7 @@ function applyShadowHighlightMask(decalLayer) {
     const da = decalData.data[i + 3];
 
     if (da > 0) {
-      const r = carData.data[i];
-      const g = carData.data[i + 1];
-      const b = carData.data[i + 2];
-      const lum = (r + g + b) / 3 / 255;
-
+      const lum = (carData.data[i] + carData.data[i + 1] + carData.data[i + 2]) / 3 / 255;
       const shadow = (0.5 - lum) * 2 * shadowAmount;
       const highlight = (lum - 0.5) * 2 * highlightAmount;
       const factor = 1 - Math.max(0, shadow) + Math.max(0, highlight);
@@ -869,6 +814,48 @@ function drawQuadOutline() {
   ctx.stroke();
 
   ctx.restore();
+}
+
+function buyDecal() {
+  const decalName = document.getElementById("decalNameInput").value || "Custom Decal Preview";
+  const decalSize = document.getElementById("decalSizeInput").value;
+  const decalPrice = Number(document.getElementById("decalPriceInput").value || 39.99);
+
+  let previewImage = null;
+
+  if (canvas.width && canvas.height) {
+    previewImage = canvas.toDataURL("image/png");
+  }
+
+  const checkoutData = {
+    source: "decal-preview-tool",
+    productId: "custom-preview-decal",
+    name: decalName,
+    title: decalName,
+    size: decalSize,
+    price: decalPrice,
+    quantity: 1,
+    previewImage,
+    settings: getSettings()
+  };
+
+  localStorage.setItem("checkout_data", JSON.stringify(checkoutData));
+
+  const cartItem = {
+    id: "custom-preview-decal-" + Date.now(),
+    name: decalName,
+    title: decalName,
+    size: decalSize,
+    price: decalPrice,
+    quantity: 1,
+    image: previewImage,
+    previewImage,
+    customization: checkoutData.settings
+  };
+
+  localStorage.setItem("rmg_cart", JSON.stringify([cartItem]));
+
+  window.location.href = "/checkout";
 }
 
 function downloadPreview() {
@@ -936,10 +923,7 @@ function setStatus(msg) {
 }
 
 function lerpPoint(a, b, t) {
-  return {
-    x: a.x + (b.x - a.x) * t,
-    y: a.y + (b.y - a.y) * t
-  };
+  return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
 }
 
 function distance(a, b) {
