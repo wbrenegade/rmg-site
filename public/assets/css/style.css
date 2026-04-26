@@ -1136,3 +1136,57 @@ textarea { resize: vertical; }
     padding: 12px;
   }
 }
+
+/* ===== MOBILE PREVIEW SYSTEM ===== */
+@media (max-width: 768px) {
+
+  .customize-layout,
+  .preview-builder,
+  .decal-previewer {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* PREVIEW - always visible */
+  .customize-viewer,
+  .preview-area,
+  .mustang-viewer {
+    position: sticky;
+    top: 76px; /* height of your header */
+    z-index: 10;
+
+    height: 180px; /* compact preview */
+    min-height: 180px;
+    max-height: 180px;
+
+    border-radius: 0;
+  }
+
+  .customize-viewer img,
+  .mustang-viewer img {
+    object-fit: cover;
+  }
+
+  /* OPTIONS PANEL */
+  .customize-controls,
+  .options-panel,
+  .filter-panel {
+    position: relative !important;
+    top: auto !important;
+
+    z-index: 1;
+    margin-top: 12px;
+  }
+
+  /* Prevent content from hiding behind preview */
+  .customize-controls,
+  .options-panel {
+    padding-bottom: 100px;
+  }
+
+   .customize-viewer {
+    backdrop-filter: blur(8px);
+    background: rgba(0,0,0,0.6);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+}

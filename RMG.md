@@ -10,27 +10,28 @@
 ## Category Heirarchy
 
 - Decals
-    - Brand Specific
-    - Custom
-    - Fender
-        - Sponsor Stacks
-    - Full Body/Half Body
-        - Racing Stripes
-    - Funny
-    - Hood Graphics
-    - Platform Specific
-        - Graphics
-        - Racing Stripes
-    - Rear Quarter Panel
-        - Geometrical Patterns
-        - Graphics
-        - Racing Stripes
-        - Rips/Scratches/Tears
-    - Rocker Panel/Side 
-        - Racing Stripes
-        - Sponsor Rows
+  - By Placement
+  - By Type
+  - Custom
 
-    - Windshield/Rear Window Banners
+- Placements
+  - Fender
+  - Full Body/Half Body
+  - Hood
+  - Rear Quarter Panel
+  - Rocker Panel/Side
+  - Windshield/Rear Window
+
+- By Type
+  - Brands
+  - Funny
+  - Geometrical Patterns
+  - Graphics
+  - Platform Specific
+  - Racing Stripes
+  - Rips/Scratches/Tears
+  - Sponsor Stacks/Rows
+
 - Window Tint
     - Full Rolls
     - Precut Kits

@@ -262,6 +262,129 @@ button.danger {
   font-size: 13px;
 }
 
+
+
+/* ===== Mobile sticky live preview + shrink system ===== */
+.stage-wrap {
+  min-width: 0;
+}
+
+.stage-card {
+  position: relative;
+}
+
+.live-price-box {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: rgba(57, 255, 20, 0.08);
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.live-price-box strong {
+  color: var(--text);
+}
+
+#livePrice {
+  color: var(--accent);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.mobile-preview-note {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .app {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stage-wrap {
+    order: 1;
+    position: sticky;
+    top: 76px;
+    z-index: 40;
+    padding: 0 10px 10px;
+    overflow: visible;
+    background: var(--bg);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+  }
+
+  .sidebar {
+    order: 2;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .stage-card {
+    position: relative;
+    top: auto;
+    z-index: 1;
+    width: 100%;
+    display: block;
+    padding: 10px;
+    border-radius: 0 0 12px 12px;
+    transition: padding 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: none;
+  }
+
+  .stage-card.preview-small {
+    padding: 7px;
+  }
+
+  .stage-header {
+    margin-bottom: 6px;
+  }
+
+  .stage-header h2 {
+    font-size: 15px;
+  }
+
+  .stage-header p,
+  .small {
+    display: none;
+  }
+
+  .mobile-preview-note {
+    display: block;
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  #canvasBox {
+    display: block;
+    width: 100%;
+    max-height: 230px;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+  }
+
+  .stage-card.preview-small #canvasBox {
+    max-height: 145px;
+  }
+
+  #mainCanvas {
+    width: 100%;
+    max-width: none;
+  }
+
+  .handle {
+    width: 22px;
+    height: 22px;
+  }
+
+  .handle::after {
+    display: none;
+  }
+}
+
 @media (max-width: 900px) {
   .app { grid-template-columns: 1fr; }
 
@@ -348,7 +471,7 @@ button.danger {
           <input id="decalNameInput" type="text" value="Custom Decal Preview">
 
           <label>Selected Size</label>
-          <select id="decalSizeInput" onchange="updatePriceFromSize()">
+          <select id="decalSizeInput" onchange="syncSizeFields(); updateLivePrice();">
             <option value="12 inch">12 inch</option>
             <option value="24 inch">24 inch</option>
             <option value="36 inch" selected>36 inch</option>
@@ -356,10 +479,35 @@ button.danger {
             <option value="Custom Size">Custom Size</option>
           </select>
 
-          <label>Price</label>
-          <input id="decalPriceInput" type="number" value="39.99" step="0.01">
+          <div class="row">
+            <div>
+              <label>Width Inches</label>
+              <input id="decalWidthInput" type="number" value="36" min="1" step="0.25" oninput="updateLivePrice()">
+            </div>
+            <div>
+              <label>Height Inches</label>
+              <input id="decalHeightInput" type="number" value="8" min="1" step="0.25" oninput="updateLivePrice()">
+            </div>
+          </div>
 
-          <div class="help">This is the price sent to checkout. You can adjust it for custom jobs.</div>
+          <label>Vinyl Finish</label>
+          <select id="vinylFinish" onchange="updateLivePrice()">
+            <option value="standard">Standard Gloss</option>
+            <option value="matte">Matte</option>
+            <option value="metallic">Metallic</option>
+            <option value="holographic">Holographic</option>
+            <option value="reflective">Reflective</option>
+          </select>
+
+          <label>Price</label>
+          <input id="decalPriceInput" type="number" value="39.99" step="0.01" oninput="manualPriceOverride = true; updateLivePriceDisplay();">
+
+          <div class="live-price-box">
+            <strong>Live Price</strong>
+            <span id="livePrice">$39.99</span>
+          </div>
+
+          <div class="help">The live price updates from size and finish. You can still manually adjust price for custom jobs.</div>
         </div>
 
         <div class="box">
@@ -464,6 +612,8 @@ button.danger {
           </div>
 
           <button class="secondary" onclick="downloadPreview()">Download Preview PNG</button>
+          <button class="secondary" onclick="saveDesign()">Save Design</button>
+          <button class="secondary" onclick="shareDesign()">Share Design</button>
           <button class="secondary" onclick="copySettings()">Copy Placement Settings</button>
           <button class="secondary" onclick="downloadSettings()">Download JSON Settings</button>
         </div>
@@ -489,6 +639,8 @@ button.danger {
             <div id="h2" class="handle" data-label="bottom-right"></div>
             <div id="h3" class="handle" data-label="bottom-left"></div>
           </div>
+
+          <p class="mobile-preview-note">Preview stays pinned while you scroll options. Drag green handles to resize/warp.</p>
 
           <p class="small">
             The preview sent to checkout is compressed so it does not overload browser storage.
@@ -564,20 +716,86 @@ handles.forEach((h, i) => {
   });
 });
 
-function updatePriceFromSize() {
+let manualPriceOverride = false;
+
+const finishMultipliers = {
+  standard: 1,
+  matte: 1.15,
+  metallic: 1.35,
+  holographic: 1.65,
+  reflective: 1.85
+};
+
+const sizeDefaults = {
+  "12 inch": { width: 12, height: 4 },
+  "24 inch": { width: 24, height: 6 },
+  "36 inch": { width: 36, height: 8 },
+  "48 inch": { width: 48, height: 10 },
+  "Custom Size": { width: 36, height: 8 }
+};
+
+function syncSizeFields() {
   const size = document.getElementById("decalSizeInput").value;
+  const widthInput = document.getElementById("decalWidthInput");
+  const heightInput = document.getElementById("decalHeightInput");
+  const defaults = sizeDefaults[size] || sizeDefaults["36 inch"];
+
+  if (size !== "Custom Size") {
+    widthInput.value = defaults.width;
+    heightInput.value = defaults.height;
+  }
+
+  manualPriceOverride = false;
+}
+
+function updatePriceFromSize() {
+  syncSizeFields();
+  updateLivePrice();
+}
+
+function calculateLivePrice() {
+  const width = Number(document.getElementById("decalWidthInput")?.value || 0);
+  const height = Number(document.getElementById("decalHeightInput")?.value || 0);
+  const finish = document.getElementById("vinylFinish")?.value || "standard";
+
+  const basePrice = 10;
+  const pricePerSquareInch = 0.10;
+  const squareInches = Math.max(0, width * height);
+  const multiplier = finishMultipliers[finish] || 1;
+
+  return (basePrice + squareInches * pricePerSquareInch) * multiplier;
+}
+
+function updateLivePrice() {
+  const price = calculateLivePrice();
   const priceInput = document.getElementById("decalPriceInput");
 
-  const prices = {
-    "12 inch": 19.99,
-    "24 inch": 29.99,
-    "36 inch": 39.99,
-    "48 inch": 49.99,
-    "Custom Size": 59.99
-  };
-
-  priceInput.value = prices[size] || 39.99;
+  manualPriceOverride = false;
+  priceInput.value = price.toFixed(2);
+  updateLivePriceDisplay();
 }
+
+function updateLivePriceDisplay() {
+  const priceInput = document.getElementById("decalPriceInput");
+  const livePrice = document.getElementById("livePrice");
+  const price = Number(priceInput.value || 0);
+
+  if (livePrice) livePrice.textContent = `$${price.toFixed(2)}`;
+}
+
+function shrinkPreviewOnScroll() {
+  const stageCard = document.querySelector(".stage-card");
+  if (!stageCard) return;
+
+  if (window.innerWidth <= 900 && window.scrollY > 160) {
+    stageCard.classList.add("preview-small");
+  } else {
+    stageCard.classList.remove("preview-small");
+  }
+}
+
+window.addEventListener("scroll", shrinkPreviewOnScroll, { passive: true });
+window.addEventListener("resize", shrinkPreviewOnScroll);
 
 function loadCar(e) {
   const file = e.target.files[0];
@@ -1043,11 +1261,79 @@ function downloadSettings() {
   URL.revokeObjectURL(url);
 }
 
+
+function saveDesign() {
+  const design = {
+    source: "decal-preview-tool",
+    previewImage: createSmallPreview(),
+    settings: getSettings(),
+    savedAt: new Date().toISOString()
+  };
+
+  try {
+    localStorage.setItem("rmgSavedPreviewDesign", JSON.stringify(design));
+    setStatus("Design saved on this device.", "success");
+  } catch (err) {
+    setStatus("Design settings saved, but preview image was too large for browser storage.", "warn");
+    localStorage.setItem("rmgSavedPreviewDesign", JSON.stringify({...design, previewImage: null}));
+  }
+}
+
+async function shareDesign() {
+  const settings = getSettings();
+  const shareText = `RenegadeMade Graphix decal preview\nName: ${settings.decalName}\nSize: ${settings.decalSize}\nWidth: ${settings.decalWidthInches}\"\nHeight: ${settings.decalHeightInches}\"\nFinish: ${settings.vinylFinish}\nPrice: $${settings.decalPrice.toFixed(2)}`;
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: "My RMG Decal Design",
+        text: shareText
+      });
+      return;
+    } catch (err) {
+      if (err.name === "AbortError") return;
+    }
+  }
+
+  try {
+    await navigator.clipboard.writeText(shareText);
+    setStatus("Share info copied to clipboard.", "success");
+  } catch {
+    alert(shareText);
+  }
+}
+
+function restoreSavedDesign() {
+  const raw = localStorage.getItem("rmgSavedPreviewDesign");
+  if (!raw) return;
+
+  try {
+    const design = JSON.parse(raw);
+    const settings = design.settings || {};
+
+    if (settings.decalName) document.getElementById("decalNameInput").value = settings.decalName;
+    if (settings.decalSize) document.getElementById("decalSizeInput").value = settings.decalSize;
+    if (settings.decalWidthInches) document.getElementById("decalWidthInput").value = settings.decalWidthInches;
+    if (settings.decalHeightInches) document.getElementById("decalHeightInput").value = settings.decalHeightInches;
+    if (settings.vinylFinish) document.getElementById("vinylFinish").value = settings.vinylFinish;
+    if (settings.decalPrice) document.getElementById("decalPriceInput").value = settings.decalPrice;
+    if (settings.placementPreset) document.getElementById("placementPreset").value = settings.placementPreset;
+    if (Array.isArray(settings.quad)) quad = settings.quad;
+
+    updateLivePriceDisplay();
+    updateHandles();
+    render();
+  } catch {}
+}
+
 function getSettings() {
   return {
     decalFileName,
     decalName: document.getElementById("decalNameInput").value,
     decalSize: document.getElementById("decalSizeInput").value,
+    decalWidthInches: Number(document.getElementById("decalWidthInput").value || 0),
+    decalHeightInches: Number(document.getElementById("decalHeightInput").value || 0),
+    vinylFinish: document.getElementById("vinylFinish").value,
     decalPrice: Number(document.getElementById("decalPriceInput").value || 0),
     placementPreset: document.getElementById("placementPreset").value,
     quad,
@@ -1103,6 +1389,9 @@ function hexToRgb(hex) {
 }
 
 updateValues();
+updateLivePriceDisplay();
+restoreSavedDesign();
+shrinkPreviewOnScroll();
 render();
 </script>
 </body>
