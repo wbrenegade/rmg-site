@@ -128,6 +128,8 @@ button { cursor: pointer; }
   align-items: center;
   justify-content: center;
   gap: 8px;
+  min-width: 0;
+  max-width: 100%;
   padding: 13px 18px;
   border-radius: 12px;
   border: 1px solid transparent;
@@ -555,7 +557,17 @@ textarea { resize: vertical; }
 .product-actions {
   margin-top: auto;
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
+}
+
+.product-actions .btn,
+.product-actions button {
+  flex: 1 1 135px;
+  min-width: 0;
+  padding-inline: 12px;
+  text-align: center;
+  white-space: normal;
 }
 
 .product-detail,
@@ -1127,6 +1139,12 @@ textarea { resize: vertical; }
   .product-actions,
   .customize-actions {
     flex-direction: column;
+  }
+
+  .product-actions .btn,
+  .product-actions button {
+    width: 100%;
+    flex-basis: auto;
   }
 
   .decal-tab-row {
