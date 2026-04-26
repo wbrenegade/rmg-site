@@ -973,3 +973,72 @@ textarea { resize: vertical; }
 .taxonomy-card.active {
   outline: 2px solid var(--accent, #39ff14);
 }
+
+.shop-layout,
+.shop-grid-layout {
+  align-items: start;
+}
+
+.shop-sidebar,
+.shop-filters,
+.filters-panel,
+.filter-panel {
+  position: sticky;
+  top: 90px;
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.decal-tab-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.decal-tab {
+  padding: 0.9rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: #161616;
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.decal-tab.active {
+  background: #39ff14;
+  color: #111;
+}
+
+.decal-filter-card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.taxonomy-card {
+  display: grid;
+  gap: 0.5rem;
+  text-align: left;
+  padding: 0.75rem;
+  overflow: hidden;
+}
+
+.taxonomy-card img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #111;
+}
+
+.taxonomy-card span {
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.taxonomy-card.active {
+  outline: 2px solid #39ff14;
+}

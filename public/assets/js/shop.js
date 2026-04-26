@@ -1,92 +1,68 @@
-const DECAL_HIERARCHY = {
-  "By Placement": {
-    Fender: ["Sponsor Stacks", "Brand Decals"],
-    "Rear Quarter Panel": ["Racing Stripes", "Graphics", "Brand Decals", "Rips/Scratches/Tears"],
-    "Rocker Panel/Side": ["Racing Stripes", "Graphics", "Brand Decals", "Sponsor Rows"],
-    "Windshield/Rear Window": ["Banners", "Lettering"],
-    Hood: ["Graphics", "Racing Stripes"],
-    Custom: []
-  },
-
-  "By Style": {
-    "Racing Stripes": [],
-    Graphics: [],
-    "Brand Decals": [],
-    "Sponsor Stacks": [],
-    "Sponsor Rows": [],
-    "Rips/Scratches/Tears": [],
-    Lettering: []
-  },
-
-  Custom: {}
-};
-
-const CATEGORY_HIERARCHY = {
-  Decals: DECAL_HIERARCHY,
-
-  "Window Tint": {
-    "Precut Kits": {},
-    "Full Rolls": {}
-  },
-
-  Lettering: {
-    "Business Name": {},
-    "Business Info": {}
-  },
-
-  Wraps: {
-    "Full Rolls": {},
-    "By The Foot": {}
-  }
-};
-
+const DECAL_IMAGE_BASE = "/assets/imgs/decals";
 const FALLBACK_IMAGE = "/assets/imgs/main.PNG";
 
-const CATEGORY_IMAGES = {
-  Decals: "/assets/imgs/decal-cats/graphics.png",
-  "Window Tint": "/assets/imgs/main.PNG",
-  Lettering: "/assets/imgs/decal-cats/brands.png",
-  Wraps: "/assets/imgs/main.PNG"
-};
-
-const DECAL_GROUP_IMAGES = {
-  "By Placement": "/assets/imgs/decal-cats/graphics.png",
-  "By Style": "/assets/imgs/decal-cats/platform_specific.png",
-  Custom: "/assets/imgs/decal-cats/custom.png"
+const DECAL_FILTERS = {
+  "By Placement": [
+    "Fender",
+    "Rear Quarter Panel",
+    "Rocker Panel/Side",
+    "Windshield/Rear Window",
+    "Hood",
+    "Custom"
+  ],
+  "By Type": [
+    "Racing Stripes",
+    "Graphics",
+    "Brands",
+    "Sponsor Stacks",
+    "Sponsor Rows",
+    "Rips/Scratches/Tears",
+    "Banners",
+    "Lettering"
+  ]
 };
 
 const PLACEMENT_IMAGES = {
-  Fender: "/assets/imgs/decal-cats/fender.png",
-  "Rear Quarter Panel": "/assets/imgs/product-cards/quarter_panel_kit.png",
-  "Rocker Panel/Side": "/assets/imgs/decal-cats/rocker_panel_side.png",
-  "Windshield/Rear Window": "/assets/imgs/decal-cats/windshield.png",
-  Hood: "/assets/imgs/decal-cats/full_body_half_body.png",
-  Custom: "/assets/imgs/decal-cats/custom.png"
+  "Fender": `${DECAL_IMAGE_BASE}/placements/fender.png`,
+  "Rear Quarter Panel": `${DECAL_IMAGE_BASE}/placements/rear-quarter-panel.png`,
+  "Rocker Panel/Side": `${DECAL_IMAGE_BASE}/placements/rocker-panel-side.png`,
+  "Windshield/Rear Window": `${DECAL_IMAGE_BASE}/placements/windshield-rear-window.png`,
+  "Hood": `${DECAL_IMAGE_BASE}/placements/hood.png`,
+  "Custom": `${DECAL_IMAGE_BASE}/placements/custom.png`
 };
 
-const STYLE_IMAGES = {
-  "Racing Stripes": "/assets/imgs/decal-sub-cats/racing_Stripes.png",
-  Graphics: "/assets/imgs/decal-cats/graphics.png",
-  "Brand Decals": "/assets/imgs/decal-cats/brands.png",
-  "Sponsor Stacks": "/assets/imgs/decal-cats/sponsor_stacks.png",
-  "Sponsor Rows": "/assets/imgs/decal-cats/sponsor_stacks.png",
-  "Rips/Scratches/Tears": "/assets/imgs/product-cards/quarter_panel_kit.png",
-  Banners: "/assets/imgs/product-cards/windshield_banner.png",
-  Lettering: "/assets/imgs/decal-cats/brands.png"
+const TYPE_IMAGES = {
+  "Racing Stripes": `${DECAL_IMAGE_BASE}/type/racing-stripes.png`,
+  "Graphics": `${DECAL_IMAGE_BASE}/type/graphics.png`,
+  "Brands": `${DECAL_IMAGE_BASE}/type/brands.png`,
+  "Sponsor Stacks": `${DECAL_IMAGE_BASE}/type/sponsor-stacks.png`,
+  "Sponsor Rows": `${DECAL_IMAGE_BASE}/type/sponsor-rows.png`,
+  "Rips/Scratches/Tears": `${DECAL_IMAGE_BASE}/type/rips-scratches-tears.png`,
+  "Banners": `${DECAL_IMAGE_BASE}/type/banners.png`,
+  "Lettering": `${DECAL_IMAGE_BASE}/type/lettering.png`
+};
+
+const CATEGORY_IMAGES = {
+  "Decals": `${DECAL_IMAGE_BASE}/type/graphics.png`,
+  "Window Tint": FALLBACK_IMAGE,
+  "Lettering": `${DECAL_IMAGE_BASE}/type/lettering.png`,
+  "Wraps": FALLBACK_IMAGE
 };
 
 const NON_DECAL_SUBCATEGORY_IMAGES = {
-  "Precut Kits": "/assets/imgs/main.PNG",
-  "Full Rolls": "/assets/imgs/main.PNG",
-  "By The Foot": "/assets/imgs/main.PNG",
-  "Business Name": "/assets/imgs/decal-cats/brands.png",
-  "Business Info": "/assets/imgs/decal-cats/brands.png"
+  "Precut Kits": FALLBACK_IMAGE,
+  "Full Rolls": FALLBACK_IMAGE,
+  "By The Foot": FALLBACK_IMAGE,
+  "Business Name": `${DECAL_IMAGE_BASE}/type/lettering.png`,
+  "Business Info": `${DECAL_IMAGE_BASE}/type/lettering.png`
 };
 
 function slugify(input) {
   return String(input || "")
     .trim()
     .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/\//g, "-")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 }
@@ -108,6 +84,7 @@ function normalizeCategory(value) {
   if (normalized === "business lettering") return "Lettering";
   if (normalized === "wraps") return "Wraps";
   if (normalized === "wrap graphics") return "Wraps";
+  if (normalized === "custom orders") return "Decals";
 
   return String(value || "").trim();
 }
@@ -119,7 +96,7 @@ function normalizePlacement(value) {
 
   if (text.includes("fender")) return "Fender";
   if (text.includes("quarter")) return "Rear Quarter Panel";
-  if (text.includes("rocker") || text.includes("side")) return "Rocker Panel/Side";
+  if (text.includes("rocker") || text.includes("side skirt") || text.includes("side")) return "Rocker Panel/Side";
   if (text.includes("windshield") || text.includes("rear window") || text.includes("banner")) return "Windshield/Rear Window";
   if (text.includes("hood")) return "Hood";
   if (text.includes("custom")) return "Custom";
@@ -127,7 +104,7 @@ function normalizePlacement(value) {
   return "";
 }
 
-function normalizeStyle(value) {
+function normalizeType(value) {
   const text = normalizeText(value);
 
   if (!text) return "";
@@ -135,7 +112,7 @@ function normalizeStyle(value) {
   if (text.includes("racing stripe") || text.includes("stripe")) return "Racing Stripes";
   if (text.includes("sponsor stack")) return "Sponsor Stacks";
   if (text.includes("sponsor row")) return "Sponsor Rows";
-  if (text.includes("brand") || text.includes("trd") || text.includes("mopar") || text.includes("coyote") || text.includes("nismo")) return "Brand Decals";
+  if (text.includes("brand") || text.includes("trd") || text.includes("mopar") || text.includes("coyote") || text.includes("nismo")) return "Brands";
   if (text.includes("rip") || text.includes("scratch") || text.includes("tear")) return "Rips/Scratches/Tears";
   if (text.includes("banner")) return "Banners";
   if (text.includes("letter")) return "Lettering";
@@ -150,173 +127,121 @@ function getProductPlacement(product) {
     normalizePlacement(product.subcategory) ||
     normalizePlacement(product.subSubcategory) ||
     normalizePlacement(product.name) ||
-    normalizePlacement(product.description)
+    normalizePlacement(product.description) ||
+    ""
   );
 }
 
-function getProductStyle(product) {
+function getProductType(product) {
   return (
+    product.type ||
     product.style ||
     product.decalType ||
-    normalizeStyle(product.subSubcategory) ||
-    normalizeStyle(product.subcategory) ||
-    normalizeStyle(product.name) ||
-    normalizeStyle(product.description)
+    normalizeType(product.subSubcategory) ||
+    normalizeType(product.subcategory) ||
+    normalizeType(product.name) ||
+    normalizeType(product.description) ||
+    ""
   );
 }
 
-function getTaxonomyImage(product) {
-  const category = product.category;
-  const placement = getProductPlacement(product);
-  const style = getProductStyle(product);
+function isGenericImage(path) {
+  return (
+    !path ||
+    path.includes("main.PNG") ||
+    path.includes("main.png") ||
+    path.includes("placeholder")
+  );
+}
 
-  const imagePath = product.imagePath || "";
+function buildDecalProductImagePath(product) {
+  const placement = slugify(product.placement || "custom");
+  const type = slugify(product.decalType || product.type || product.style || "graphics");
+  const productSlug = product.slug || slugify(product.name || "product");
 
-  const isGeneric =
-    !imagePath ||
-    imagePath.includes("main.PNG") ||
-    imagePath.includes("main.png");
+  return `${DECAL_IMAGE_BASE}/products/${placement}__${type}/${productSlug}.png`;
+}
 
-  if (!isGeneric) return imagePath;
+function getProductImage(product) {
+  if (!isGenericImage(product.imagePath)) {
+    return product.imagePath;
+  }
 
-  if (category === "Decals") {
-    return (
-      STYLE_IMAGES[style] ||
-      PLACEMENT_IMAGES[placement] ||
-      CATEGORY_IMAGES.Decals ||
-      FALLBACK_IMAGE
-    );
+  if (product.category === "Decals") {
+    return buildDecalProductImagePath(product);
   }
 
   return (
     NON_DECAL_SUBCATEGORY_IMAGES[product.subcategory] ||
-    CATEGORY_IMAGES[category] ||
+    CATEGORY_IMAGES[product.category] ||
     FALLBACK_IMAGE
   );
 }
 
-function getImageForChip(category, group, value) {
-  if (category === "Decals") {
-    if (group === "category") {
-      return CATEGORY_IMAGES.Decals;
-    }
-
-    if (group === "decalGroup") {
-      return DECAL_GROUP_IMAGES[value] || CATEGORY_IMAGES.Decals || FALLBACK_IMAGE;
-    }
-
-    if (group === "placement") {
-      return PLACEMENT_IMAGES[value] || CATEGORY_IMAGES.Decals || FALLBACK_IMAGE;
-    }
-
-    if (group === "style") {
-      return STYLE_IMAGES[value] || CATEGORY_IMAGES.Decals || FALLBACK_IMAGE;
-    }
-  }
-
-  if (group === "category") {
-    return CATEGORY_IMAGES[category] || FALLBACK_IMAGE;
-  }
-
-  return NON_DECAL_SUBCATEGORY_IMAGES[value] || CATEGORY_IMAGES[category] || FALLBACK_IMAGE;
-}
-
 function toDisplayProduct(product) {
   const category = normalizeCategory(product.category);
-
   const placement = getProductPlacement(product);
-  const style = getProductStyle(product);
+  const decalType = getProductType(product);
 
   let subcategory = product.subcategory || "";
   let subSubcategory = product.subSubcategory || "";
+
+  if (category === "Decals") {
+    if (!subcategory && placement) subcategory = placement;
+    if (!subSubcategory && decalType) subSubcategory = decalType;
+  }
 
   if (category === "Window Tint" && !subcategory) {
     subcategory = "Precut Kits";
   }
 
-  if (category === "Decals") {
-    if (!subcategory && placement) subcategory = placement;
-    if (!subSubcategory && style) subSubcategory = style;
-  }
-
-  return {
+  const displayProduct = {
     ...product,
     category,
-    subcategory,
-    subSubcategory,
     placement,
-    style,
-    imagePath: getTaxonomyImage({
-      ...product,
-      category,
-      subcategory,
-      subSubcategory,
-      placement,
-      style
-    }),
-    imageLabel: product.imageLabel || style || placement || subcategory || category || product.name
+    decalType,
+    type: decalType,
+    style: decalType,
+    subcategory,
+    subSubcategory
+  };
+
+  return {
+    ...displayProduct,
+    imagePath: getProductImage(displayProduct),
+    imageLabel:
+      product.imageLabel ||
+      decalType ||
+      placement ||
+      subcategory ||
+      category ||
+      product.name
   };
 }
 
-function createTaxonomyButton({
-  label,
-  image,
-  datasetName,
-  datasetValue,
-  active = false
-}) {
+function imageWithFallback(src, alt) {
+  return `<img src="${src || FALLBACK_IMAGE}" alt="${alt || ""}" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE}'">`;
+}
+
+function createTaxonomyButton({ label, image, datasetName, datasetValue, active = false }) {
   return `
     <button type="button" class="decal-chip taxonomy-card${active ? " active" : ""}" data-${datasetName}="${datasetValue}">
-      <img src="${image}" alt="${label}" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'">
+      ${imageWithFallback(image, label)}
       <span>${label}</span>
     </button>
   `;
 }
 
-function getCategoryOptions() {
-  return Object.keys(CATEGORY_HIERARCHY);
-}
-
-function getTopLevelOptions(category) {
-  if (category === "Decals") {
-    return Object.keys(DECAL_HIERARCHY);
-  }
-
-  return Object.keys(CATEGORY_HIERARCHY[category] || {});
-}
-
-function getDetailOptions(category, topLevel) {
-  if (category === "Decals") {
-    const branch = DECAL_HIERARCHY[topLevel];
-
-    if (!branch || Array.isArray(branch)) return [];
-
-    return Object.keys(branch);
-  }
-
-  return [];
-}
-
-function getFinalOptions(category, topLevel, detail) {
-  if (category === "Decals") {
-    const branch = DECAL_HIERARCHY[topLevel];
-
-    if (!branch || Array.isArray(branch)) return [];
-
-    return branch[detail] || [];
-  }
-
-  return [];
-}
-
 async function initShop() {
   const productsEl = document.getElementById("shopProducts");
   const resultsMeta = document.getElementById("resultsMeta");
+
   const categoryPicks = document.getElementById("categoryPicks");
   const subcategoryWrap = document.getElementById("subcategoryWrap");
   const subcategoryPicks = document.getElementById("subcategoryPicks");
   const subcategoryDetailWrap = document.getElementById("subcategoryDetailWrap");
   const subcategoryDetailPicks = document.getElementById("subcategoryDetailPicks");
+
   const toggleAdvancedFilters = document.getElementById("toggleAdvancedFilters");
   const advancedFilters = document.getElementById("advancedFilters");
 
@@ -339,6 +264,9 @@ async function initShop() {
   if (typeof window.ensureProductsLoaded === "function") {
     await window.ensureProductsLoaded();
   }
+
+  let activeDecalTab = "By Placement";
+  let activeDecalFilter = "all";
 
   function setAdvancedFiltersVisibility(expanded) {
     if (!toggleAdvancedFilters || !advancedFilters) return;
@@ -389,6 +317,184 @@ async function initShop() {
     list.innerHTML = values.map((value) => `<option value="${value}"></option>`).join("");
   }
 
+  function getCategories() {
+    const categories = [...new Set((window.PRODUCTS || PRODUCTS || []).map((product) => normalizeCategory(product.category)).filter(Boolean))];
+
+    ["Decals", "Window Tint", "Lettering", "Wraps"].forEach((category) => {
+      if (!categories.includes(category)) categories.push(category);
+    });
+
+    return categories;
+  }
+
+  function syncCategorySelect() {
+    if (!categoryFilter) return;
+    setSelectOptions(categoryFilter, getCategories(), "All Categories");
+  }
+
+  function syncLegacySelects() {
+    if (!categoryFilter || !subcategoryFilter || !subcategoryDetailFilter) return;
+
+    const category = categoryFilter.value;
+
+    if (category === "Decals") {
+      setSelectOptions(subcategoryFilter, Object.keys(DECAL_FILTERS), "All Decal Filters");
+      subcategoryFilter.value = activeDecalTab;
+
+      setSelectOptions(subcategoryDetailFilter, DECAL_FILTERS[activeDecalTab], "All");
+      subcategoryDetailFilter.value = activeDecalFilter;
+      return;
+    }
+
+    if (category === "Window Tint") {
+      setSelectOptions(subcategoryFilter, ["Precut Kits", "Full Rolls"], "All Subcategories");
+      setSelectOptions(subcategoryDetailFilter, [], "All Details");
+      return;
+    }
+
+    if (category === "Lettering") {
+      setSelectOptions(subcategoryFilter, ["Business Name", "Business Info"], "All Subcategories");
+      setSelectOptions(subcategoryDetailFilter, [], "All Details");
+      return;
+    }
+
+    if (category === "Wraps") {
+      setSelectOptions(subcategoryFilter, ["Full Rolls", "By The Foot"], "All Subcategories");
+      setSelectOptions(subcategoryDetailFilter, [], "All Details");
+      return;
+    }
+
+    setSelectOptions(subcategoryFilter, [], "All Subcategories");
+    setSelectOptions(subcategoryDetailFilter, [], "All Details");
+  }
+
+  function syncHierarchyVisibility() {
+    const category = categoryFilter?.value || "all";
+
+    if (subcategoryWrap) {
+      subcategoryWrap.hidden = category === "all";
+    }
+
+    if (subcategoryDetailWrap) {
+      subcategoryDetailWrap.hidden = true;
+    }
+  }
+
+  function renderCategoryPicks() {
+    if (!categoryPicks) return;
+
+    const selectedCategory = categoryFilter?.value || "all";
+
+    categoryPicks.innerHTML = ["all", ...getCategories()].map((category) => {
+      const label = category === "all" ? "All Products" : category;
+      const image = category === "all" ? FALLBACK_IMAGE : CATEGORY_IMAGES[category] || FALLBACK_IMAGE;
+
+      return createTaxonomyButton({
+        label,
+        image,
+        datasetName: "category",
+        datasetValue: category,
+        active: category === selectedCategory
+      });
+    }).join("");
+  }
+
+  function renderDecalTabs() {
+    if (!subcategoryPicks || !categoryFilter) return;
+
+    const category = categoryFilter.value;
+
+    if (category !== "Decals") {
+      renderNonDecalSubcategoryPicks();
+      return;
+    }
+
+    const filters = DECAL_FILTERS[activeDecalTab] || [];
+
+    subcategoryPicks.innerHTML = `
+      <div class="decal-tab-row">
+        <button type="button" class="decal-tab${activeDecalTab === "By Placement" ? " active" : ""}" data-decal-tab="By Placement">
+          By Placement
+        </button>
+        <button type="button" class="decal-tab${activeDecalTab === "By Type" ? " active" : ""}" data-decal-tab="By Type">
+          By Type
+        </button>
+      </div>
+
+      <div class="decal-filter-card-grid">
+        ${["all", ...filters].map((value) => {
+          const label = value === "all" ? `All ${activeDecalTab.replace("By ", "")}` : value;
+
+          const image = value === "all"
+            ? CATEGORY_IMAGES.Decals
+            : activeDecalTab === "By Placement"
+              ? PLACEMENT_IMAGES[value]
+              : TYPE_IMAGES[value];
+
+          return createTaxonomyButton({
+            label,
+            image,
+            datasetName: "decalFilter",
+            datasetValue: value,
+            active: activeDecalFilter === value
+          });
+        }).join("")}
+      </div>
+    `;
+  }
+
+  function renderNonDecalSubcategoryPicks() {
+    if (!subcategoryPicks || !categoryFilter || !subcategoryFilter) return;
+
+    const category = categoryFilter.value;
+
+    if (category === "all" || category === "Decals") {
+      subcategoryPicks.innerHTML = "";
+      return;
+    }
+
+    let values = [];
+
+    if (category === "Window Tint") values = ["Precut Kits", "Full Rolls"];
+    if (category === "Lettering") values = ["Business Name", "Business Info"];
+    if (category === "Wraps") values = ["Full Rolls", "By The Foot"];
+
+    const selected = subcategoryFilter.value || "all";
+
+    subcategoryPicks.innerHTML = `
+      <div class="decal-filter-card-grid">
+        ${["all", ...values].map((value) => {
+          const label = value === "all" ? "All" : value;
+          const image = value === "all"
+            ? CATEGORY_IMAGES[category] || FALLBACK_IMAGE
+            : NON_DECAL_SUBCATEGORY_IMAGES[value] || FALLBACK_IMAGE;
+
+          return createTaxonomyButton({
+            label,
+            image,
+            datasetName: "subcategory",
+            datasetValue: value,
+            active: selected === value
+          });
+        }).join("")}
+      </div>
+    `;
+  }
+
+  function renderSubcategoryDetailPicks() {
+    if (subcategoryDetailPicks) {
+      subcategoryDetailPicks.innerHTML = "";
+    }
+  }
+
+  function syncAllHierarchyUI() {
+    syncLegacySelects();
+    syncHierarchyVisibility();
+    renderCategoryPicks();
+    renderDecalTabs();
+    renderSubcategoryDetailPicks();
+  }
+
   function buildVehicleLabel(vehicle) {
     return [vehicle.year, vehicle.make, vehicle.model, vehicle.trim].filter(Boolean).join(" ");
   }
@@ -399,23 +505,29 @@ async function initShop() {
 
   function buildVehicleCustomizeUrl(vehicle) {
     const params = new URLSearchParams();
+
     params.set("type", "vehicle-tint-kit");
     params.set("year", vehicle.year);
     params.set("make", vehicle.make);
     params.set("model", vehicle.model);
+
     if (vehicle.trim) params.set("trim", vehicle.trim);
     if (vehicle.kitSku) params.set("sku", vehicle.kitSku);
+
     return `/mustang-customizer?${params.toString()}`;
   }
 
   function buildVehicleProductUrl(vehicle) {
     const params = new URLSearchParams();
+
     params.set("type", "vehicle-tint-kit");
     params.set("year", vehicle.year);
     params.set("make", vehicle.make);
     params.set("model", vehicle.model);
+
     if (vehicle.trim) params.set("trim", vehicle.trim);
     if (vehicle.kitSku) params.set("sku", vehicle.kitSku);
+
     return `/product?${params.toString()}`;
   }
 
@@ -435,7 +547,7 @@ async function initShop() {
         featured: true,
         description: `Pre-cut tint kit matched to ${fitmentLabel}.`,
         tags: ["Window Tint", "Precut Kits"].concat(vehicle.kitSku ? [vehicle.kitSku] : []),
-        imagePath: "/assets/imgs/main.PNG",
+        imagePath: FALLBACK_IMAGE,
         imageLabel: `${vehicleLabel} Tint Kit`,
         custom: true,
         productUrl: buildVehicleProductUrl(vehicle),
@@ -678,206 +790,8 @@ async function initShop() {
   applyStoredVehicleSelection();
   updateVehicleSearchSuggestions();
 
-  function syncCategorySelect() {
-    if (!categoryFilter) return;
-
-    setSelectOptions(categoryFilter, getCategoryOptions(), "All Categories");
-  }
-
-  function syncSubcategorySelect() {
-    if (!categoryFilter || !subcategoryFilter) return;
-
-    const category = categoryFilter.value;
-
-    if (category === "all") {
-      setSelectOptions(subcategoryFilter, [], "Select Category First");
-      subcategoryFilter.value = "all";
-      syncDetailSelect();
-      return;
-    }
-
-    const options = getTopLevelOptions(category);
-
-    setSelectOptions(
-      subcategoryFilter,
-      options,
-      category === "Decals" ? "Choose By Placement / By Style" : "All Subcategories"
-    );
-
-    if (!options.includes(subcategoryFilter.value)) {
-      subcategoryFilter.value = "all";
-    }
-
-    syncDetailSelect();
-  }
-
-  function syncDetailSelect() {
-    if (!categoryFilter || !subcategoryFilter || !subcategoryDetailFilter) return;
-
-    const category = categoryFilter.value;
-    const topLevel = subcategoryFilter.value;
-
-    if (category === "all" || topLevel === "all") {
-      setSelectOptions(subcategoryDetailFilter, [], "All Details");
-      subcategoryDetailFilter.value = "all";
-      return;
-    }
-
-    const details = getDetailOptions(category, topLevel);
-
-    setSelectOptions(
-      subcategoryDetailFilter,
-      details,
-      category === "Decals" && topLevel === "By Placement" ? "All Placements" :
-      category === "Decals" && topLevel === "By Style" ? "All Styles" :
-      "All Details"
-    );
-
-    if (!details.includes(subcategoryDetailFilter.value)) {
-      subcategoryDetailFilter.value = "all";
-    }
-  }
-
-  function syncHierarchyVisibility() {
-    const category = categoryFilter?.value || "all";
-    const topLevel = subcategoryFilter?.value || "all";
-
-    if (subcategoryWrap) {
-      subcategoryWrap.hidden = category === "all";
-    }
-
-    if (subcategoryDetailWrap) {
-      subcategoryDetailWrap.hidden = category === "all" || topLevel === "all";
-    }
-  }
-
-  function renderCategoryPicks() {
-    if (!categoryPicks) return;
-
-    const selectedCategory = categoryFilter?.value || "all";
-
-    categoryPicks.innerHTML = ["all", ...getCategoryOptions()].map((category) => {
-      const label = category === "all" ? "All Products" : category;
-      const image = category === "all" ? FALLBACK_IMAGE : getImageForChip(category, "category", category);
-
-      return createTaxonomyButton({
-        label,
-        image,
-        datasetName: "category",
-        datasetValue: category,
-        active: category === selectedCategory
-      });
-    }).join("");
-  }
-
-  function renderSubcategoryPicks() {
-    if (!subcategoryPicks || !categoryFilter) return;
-
-    const category = categoryFilter.value;
-
-    if (category === "all") {
-      subcategoryPicks.innerHTML = "";
-      return;
-    }
-
-    const selected = subcategoryFilter?.value || "all";
-    const options = getTopLevelOptions(category);
-
-    subcategoryPicks.innerHTML = ["all", ...options].map((value) => {
-      const label = value === "all" ? "All" : value;
-      const image = value === "all"
-        ? getImageForChip(category, "category", category)
-        : getImageForChip(category, category === "Decals" ? "decalGroup" : "subcategory", value);
-
-      return createTaxonomyButton({
-        label,
-        image,
-        datasetName: "subcategory",
-        datasetValue: value,
-        active: value === selected
-      });
-    }).join("");
-  }
-
-  function renderDetailPicks() {
-    if (!subcategoryDetailPicks || !categoryFilter || !subcategoryFilter) return;
-
-    const category = categoryFilter.value;
-    const topLevel = subcategoryFilter.value;
-
-    if (category === "all" || topLevel === "all") {
-      subcategoryDetailPicks.innerHTML = "";
-      return;
-    }
-
-    const selected = subcategoryDetailFilter?.value || "all";
-    const details = getDetailOptions(category, topLevel);
-
-    subcategoryDetailPicks.innerHTML = ["all", ...details].map((value) => {
-      const label = value === "all"
-        ? topLevel === "By Placement" ? "All Placements" :
-          topLevel === "By Style" ? "All Styles" :
-          "All Details"
-        : value;
-
-      let image = FALLBACK_IMAGE;
-
-      if (category === "Decals") {
-        if (value === "all") {
-          image = getImageForChip(category, "decalGroup", topLevel);
-        } else if (topLevel === "By Placement") {
-          image = getImageForChip(category, "placement", value);
-        } else if (topLevel === "By Style") {
-          image = getImageForChip(category, "style", value);
-        }
-      }
-
-      return createTaxonomyButton({
-        label,
-        image,
-        datasetName: "subsubcategory",
-        datasetValue: value,
-        active: value === selected
-      });
-    }).join("");
-  }
-
-  function syncAllHierarchyUI() {
-    syncSubcategorySelect();
-    syncDetailSelect();
-    syncHierarchyVisibility();
-    renderCategoryPicks();
-    renderSubcategoryPicks();
-    renderDetailPicks();
-  }
-
   syncCategorySelect();
   syncAllHierarchyUI();
-
-  function productMatchesDecalHierarchy(product, group, detail) {
-    const placement = product.placement || getProductPlacement(product);
-    const style = product.style || getProductStyle(product);
-
-    if (group === "all") return true;
-
-    if (group === "Custom") {
-      return normalizeText(product.name).includes("custom") ||
-        normalizeText(product.description).includes("custom") ||
-        normalizeText(product.subcategory).includes("custom");
-    }
-
-    if (group === "By Placement") {
-      if (detail === "all") return Boolean(placement);
-      return placement === detail;
-    }
-
-    if (group === "By Style") {
-      if (detail === "all") return Boolean(style);
-      return style === detail;
-    }
-
-    return true;
-  }
 
   function productMatchesSearch(product, search) {
     if (!search) return true;
@@ -888,7 +802,9 @@ async function initShop() {
       product.subcategory,
       product.subSubcategory,
       product.placement,
+      product.type,
       product.style,
+      product.decalType,
       product.description,
       ...(Array.isArray(product.tags) ? product.tags : [])
     ].join(" ").toLowerCase();
@@ -896,11 +812,27 @@ async function initShop() {
     return searchableText.includes(search);
   }
 
+  function matchesDecalFilter(product) {
+    if (activeDecalFilter === "all") return true;
+
+    if (activeDecalTab === "By Placement") {
+      return product.placement === activeDecalFilter;
+    }
+
+    if (activeDecalTab === "By Type") {
+      return product.decalType === activeDecalFilter ||
+        product.type === activeDecalFilter ||
+        product.style === activeDecalFilter;
+    }
+
+    return true;
+  }
+
   function render() {
+    const productsSource = window.PRODUCTS || PRODUCTS || [];
     const search = searchInput?.value.trim().toLowerCase() || "";
     const category = categoryFilter?.value || "all";
     const subcategory = subcategoryFilter?.value || "all";
-    const detail = subcategoryDetailFilter?.value || "all";
     const sort = sortFilter?.value || "default";
 
     const vehicleQuery = normalizeText(vehicleSearchInput?.value || "");
@@ -921,19 +853,21 @@ async function initShop() {
 
     const vehicleKits = createVehicleKitProducts(matchedVehicles.slice(0, 12));
 
-    let filtered = PRODUCTS.map(toDisplayProduct).filter((product) => {
+    let filtered = productsSource.map(toDisplayProduct).filter((product) => {
       const matchesSearch = productMatchesSearch(product, search);
       const matchesCategory = category === "all" || product.category === category;
 
-      let matchesHierarchy = true;
+      if (!matchesSearch || !matchesCategory) return false;
 
       if (category === "Decals") {
-        matchesHierarchy = productMatchesDecalHierarchy(product, subcategory, detail);
-      } else if (category !== "all") {
-        matchesHierarchy = subcategory === "all" || product.subcategory === subcategory;
+        return matchesDecalFilter(product);
       }
 
-      return matchesSearch && matchesCategory && matchesHierarchy;
+      if (category !== "all" && subcategory !== "all") {
+        return product.subcategory === subcategory;
+      }
+
+      return true;
     });
 
     if (vehicleKits.length) {
@@ -953,7 +887,7 @@ async function initShop() {
     if (sort === "name-asc") filtered.sort((a, b) => a.name.localeCompare(b.name));
 
     const vehicleSearchActive = Boolean(vehicleQuery || selectedYear || selectedMake || selectedModel || selectedTrim);
-    const hierarchyActive = Boolean(category !== "all" || subcategory !== "all" || detail !== "all");
+    const hierarchyActive = Boolean(category !== "all" || subcategory !== "all" || activeDecalFilter !== "all");
 
     const vehicleMeta = vehicleSearchActive
       ? ` • ${matchedVehicles.length} vehicle match${matchedVehicles.length !== 1 ? "es" : ""}`
@@ -970,46 +904,57 @@ async function initShop() {
       : '<div class="card empty-state">No matching products found.</div>';
   }
 
-  [searchInput, categoryFilter, subcategoryFilter, subcategoryDetailFilter, sortFilter]
-    .filter(Boolean)
-    .forEach((element) => {
-      element.addEventListener("input", () => {
-        if (element === categoryFilter) {
-          syncAllHierarchyUI();
-        }
+  if (categoryFilter) {
+    categoryFilter.addEventListener("change", () => {
+      if (categoryFilter.value === "Decals") {
+        activeDecalTab = "By Placement";
+        activeDecalFilter = "all";
+      }
 
-        if (element === subcategoryFilter) {
-          syncDetailSelect();
-          syncHierarchyVisibility();
-          renderSubcategoryPicks();
-          renderDetailPicks();
-        }
-
-        render();
-      });
-
-      element.addEventListener("change", () => {
-        if (element === categoryFilter) {
-          syncAllHierarchyUI();
-        }
-
-        if (element === subcategoryFilter) {
-          syncDetailSelect();
-          syncHierarchyVisibility();
-          renderSubcategoryPicks();
-          renderDetailPicks();
-        }
-
-        render();
-      });
+      syncAllHierarchyUI();
+      render();
     });
+  }
+
+  if (subcategoryFilter) {
+    subcategoryFilter.addEventListener("change", () => {
+      if (categoryFilter?.value === "Decals") {
+        activeDecalTab = subcategoryFilter.value === "By Type" ? "By Type" : "By Placement";
+        activeDecalFilter = "all";
+      }
+
+      renderDecalTabs();
+      render();
+    });
+  }
+
+  if (subcategoryDetailFilter) {
+    subcategoryDetailFilter.addEventListener("change", () => {
+      if (categoryFilter?.value === "Decals") {
+        activeDecalFilter = subcategoryDetailFilter.value || "all";
+      }
+
+      renderDecalTabs();
+      render();
+    });
+  }
+
+  [searchInput, sortFilter]
+    .filter(Boolean)
+    .forEach((element) => element.addEventListener("input", render));
 
   if (categoryPicks) {
     categoryPicks.addEventListener("click", (event) => {
-      const chip = event.target.closest(".decal-chip");
+      const chip = event.target.closest("[data-category]");
       if (!chip || !categoryFilter) return;
 
       categoryFilter.value = chip.dataset.category || "all";
+
+      if (categoryFilter.value === "Decals") {
+        activeDecalTab = "By Placement";
+        activeDecalFilter = "all";
+      }
+
       syncAllHierarchyUI();
       render();
     });
@@ -1017,26 +962,38 @@ async function initShop() {
 
   if (subcategoryPicks) {
     subcategoryPicks.addEventListener("click", (event) => {
-      const chip = event.target.closest(".decal-chip");
-      if (!chip || !subcategoryFilter) return;
+      const tab = event.target.closest("[data-decal-tab]");
+      if (tab) {
+        activeDecalTab = tab.dataset.decalTab;
+        activeDecalFilter = "all";
 
-      subcategoryFilter.value = chip.dataset.subcategory || "all";
-      syncDetailSelect();
-      syncHierarchyVisibility();
-      renderSubcategoryPicks();
-      renderDetailPicks();
-      render();
-    });
-  }
+        if (subcategoryFilter) subcategoryFilter.value = activeDecalTab;
+        if (subcategoryDetailFilter) subcategoryDetailFilter.value = "all";
 
-  if (subcategoryDetailPicks) {
-    subcategoryDetailPicks.addEventListener("click", (event) => {
-      const chip = event.target.closest(".decal-chip");
-      if (!chip || !subcategoryDetailFilter) return;
+        renderDecalTabs();
+        render();
+        return;
+      }
 
-      subcategoryDetailFilter.value = chip.dataset.subsubcategory || "all";
-      renderDetailPicks();
-      render();
+      const decalFilter = event.target.closest("[data-decal-filter]");
+      if (decalFilter) {
+        activeDecalFilter = decalFilter.dataset.decalFilter || "all";
+
+        if (subcategoryDetailFilter) {
+          subcategoryDetailFilter.value = activeDecalFilter;
+        }
+
+        renderDecalTabs();
+        render();
+        return;
+      }
+
+      const subcategoryChip = event.target.closest("[data-subcategory]");
+      if (subcategoryChip && subcategoryFilter) {
+        subcategoryFilter.value = subcategoryChip.dataset.subcategory || "all";
+        renderNonDecalSubcategoryPicks();
+        render();
+      }
     });
   }
 
@@ -1048,6 +1005,9 @@ async function initShop() {
       if (subcategoryFilter) subcategoryFilter.value = "all";
       if (subcategoryDetailFilter) subcategoryDetailFilter.value = "all";
       if (sortFilter) sortFilter.value = "default";
+
+      activeDecalTab = "By Placement";
+      activeDecalFilter = "all";
 
       if (yearFilter && makeFilter && modelFilter && trimFilter) {
         yearFilter.value = "";
@@ -1071,7 +1031,6 @@ async function initShop() {
     });
   }
 
-  syncAllHierarchyUI();
   render();
 }
 
