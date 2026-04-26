@@ -671,6 +671,14 @@ textarea { resize: vertical; }
   padding: 14px;
 }
 
+.shop-filters-toggle {
+  display: none;
+}
+
+.shop-filters-card[hidden] {
+  display: none;
+}
+
 .decal-nav {
   margin-bottom: 18px;
   padding: 18px;
@@ -1039,6 +1047,16 @@ textarea { resize: vertical; }
   .filters-panel,
   .filter-panel {
     order: 2;
+  }
+
+  .shop-filters-toggle {
+    display: flex;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .shop-filters-card {
+    margin-bottom: 10px;
   }
 
   .taxonomy-grid {

@@ -256,8 +256,8 @@ async function initShop() {
   const subcategoryDetailWrap = document.getElementById("subcategoryDetailWrap");
   const subcategoryDetailPicks = document.getElementById("subcategoryDetailPicks");
 
-  const toggleAdvancedFilters = document.getElementById("toggleAdvancedFilters");
-  const advancedFilters = document.getElementById("advancedFilters");
+  const shopFiltersToggle = document.getElementById("shopFiltersToggle");
+  const shopFiltersCard = document.getElementById("shopFiltersCard");
 
   const vehicleSearchInput = document.getElementById("vehicleSearchInput");
   const vehicleSearchOptions = document.getElementById("vehicleSearchOptions");
@@ -282,30 +282,30 @@ async function initShop() {
   let activeDecalTab = "By Placement";
   let activeDecalFilter = "all";
 
-  function setAdvancedFiltersVisibility(expanded) {
-    if (!toggleAdvancedFilters || !advancedFilters) return;
+  function setShopFiltersVisibility(expanded) {
+    if (!shopFiltersToggle || !shopFiltersCard) return;
 
-    advancedFilters.hidden = !expanded;
-    toggleAdvancedFilters.setAttribute("aria-expanded", String(expanded));
-    toggleAdvancedFilters.textContent = expanded ? "Hide Advanced Filters" : "Show Advanced Filters";
+    shopFiltersCard.hidden = !expanded;
+    shopFiltersToggle.setAttribute("aria-expanded", String(expanded));
+    shopFiltersToggle.textContent = expanded ? "Hide Filters" : "Filters & Sort";
   }
 
-  function syncAdvancedFiltersLayout() {
-    if (!toggleAdvancedFilters || !advancedFilters || typeof window.matchMedia !== "function") return;
+  function syncShopFiltersLayout() {
+    if (!shopFiltersToggle || !shopFiltersCard || typeof window.matchMedia !== "function") return;
 
     const isCompact = window.matchMedia("(max-width: 980px)").matches;
-    toggleAdvancedFilters.hidden = !isCompact;
-    setAdvancedFiltersVisibility(!isCompact);
+    shopFiltersToggle.hidden = !isCompact;
+    setShopFiltersVisibility(!isCompact);
   }
 
-  if (toggleAdvancedFilters && advancedFilters) {
-    toggleAdvancedFilters.addEventListener("click", () => {
-      const isExpanded = toggleAdvancedFilters.getAttribute("aria-expanded") === "true";
-      setAdvancedFiltersVisibility(!isExpanded);
+  if (shopFiltersToggle && shopFiltersCard) {
+    shopFiltersToggle.addEventListener("click", () => {
+      const isExpanded = shopFiltersToggle.getAttribute("aria-expanded") === "true";
+      setShopFiltersVisibility(!isExpanded);
     });
 
-    window.addEventListener("resize", syncAdvancedFiltersLayout);
-    syncAdvancedFiltersLayout();
+    window.addEventListener("resize", syncShopFiltersLayout);
+    syncShopFiltersLayout();
   }
 
   function setSelectOptions(select, values, allLabel) {
