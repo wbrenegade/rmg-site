@@ -191,7 +191,9 @@ button.danger {
 
 #mainCanvas {
   display: block;
-  max-width: 100%;
+  width: 100%;
+  max-width: 700px;
+  height: auto;
   background: #151515;
 }
 
@@ -514,16 +516,19 @@ button.danger {
 const canvas = document.getElementById("mainCanvas");
 const ctx = canvas.getContext("2d");
 
+canvas.width = 700;
+canvas.height = 360;
+
 let carImage = null;
 let decalImage = null;
 let decalSourceText = "";
 let decalFileName = "";
 
 let quad = [
-  {x: 100, y: 100},
-  {x: 300, y: 100},
-  {x: 300, y: 200},
-  {x: 100, y: 200}
+  {x: 220, y: 130},
+  {x: 480, y: 130},
+  {x: 480, y: 230},
+  {x: 220, y: 230}
 ];
 
 let dragIndex = null;
