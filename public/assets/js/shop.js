@@ -488,17 +488,19 @@ async function initShop() {
     }
 
     subcategoryDetailPicks.innerHTML = `
+      <div class="decal-text-filter-row">
+        <button type="button" class="decal-text-filter${activeDecalFilter === "all" ? " active" : ""}" data-decal-filter="all">
+          All ${activeDecalTab.replace("By ", "")}
+        </button>
+      </div>
       <div class="decal-filter-card-grid">
-        ${["all", ...filters].map((value) => {
-          const label = value === "all" ? `All ${activeDecalTab.replace("By ", "")}` : value;
-          const image = value === "all"
-            ? getDecalGroupImage(activeDecalTab)
-            : activeDecalTab === "By Placement"
-              ? PLACEMENT_IMAGES[value]
-              : TYPE_IMAGES[value];
+        ${filters.map((value) => {
+          const image = activeDecalTab === "By Placement"
+            ? PLACEMENT_IMAGES[value]
+            : TYPE_IMAGES[value];
 
           return createTaxonomyButton({
-            label,
+            label: value,
             image,
             datasetName: "decalFilter",
             datasetValue: value,
