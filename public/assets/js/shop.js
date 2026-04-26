@@ -1,5 +1,6 @@
 const DECAL_IMAGE_BASE = "/assets/imgs/decals";
 const FALLBACK_IMAGE = "/assets/imgs/main.PNG";
+const SHOP_CATEGORIES = ["Decals", "Lettering", "Wraps"];
 
 const DECAL_GROUPS = ["By Placement", "By Type", "Custom"];
 
@@ -44,18 +45,17 @@ const TYPE_IMAGES = {
 };
 
 const CATEGORY_IMAGES = {
-  "Decals": `${DECAL_IMAGE_BASE}/placements/fender.png`,
-  "Window Tint": FALLBACK_IMAGE,
-  "Lettering": `${DECAL_IMAGE_BASE}/type/lettering.png`,
-  "Wraps": FALLBACK_IMAGE
+  "Decals": `${DECAL_IMAGE_BASE}/decals.png`,
+  "Lettering": "/assets/imgs/lettering/lettering.png",
+  "Wraps": "/assets/imgs/wraps/wraps.png"
 };
 
 const NON_DECAL_SUBCATEGORY_IMAGES = {
   "Precut Kits": FALLBACK_IMAGE,
   "Full Rolls": FALLBACK_IMAGE,
   "By The Foot": FALLBACK_IMAGE,
-  "Business Name": `${DECAL_IMAGE_BASE}/type/lettering.png`,
-  "Business Info": `${DECAL_IMAGE_BASE}/type/lettering.png`
+  "Business Name": CATEGORY_IMAGES.Lettering,
+  "Business Info": CATEGORY_IMAGES.Lettering
 };
 
 function slugify(input) {
@@ -79,8 +79,6 @@ function normalizeCategory(value) {
   if (normalized === "decals") return "Decals";
   if (normalized.startsWith("vehicle decals")) return "Decals";
   if (normalized === "stickers") return "Decals";
-  if (normalized === "window tint") return "Window Tint";
-  if (normalized === "tint kits") return "Window Tint";
   if (normalized === "lettering") return "Lettering";
   if (normalized === "business lettering") return "Lettering";
   if (normalized === "wraps") return "Wraps";
@@ -211,10 +209,6 @@ function toDisplayProduct(product) {
     if (!subSubcategory && decalType) subSubcategory = decalType;
   }
 
-  if (category === "Window Tint" && !subcategory) {
-    subcategory = "Precut Kits";
-  }
-
   const displayProduct = {
     ...product,
     category,
@@ -338,9 +332,11 @@ async function initShop() {
   }
 
   function getCategories() {
-    const categories = [...new Set((window.PRODUCTS || PRODUCTS || []).map((product) => normalizeCategory(product.category)).filter(Boolean))];
+    const categories = [...new Set((window.PRODUCTS || PRODUCTS || [])
+      .map((product) => normalizeCategory(product.category))
+      .filter((category) => SHOP_CATEGORIES.includes(category)))];
 
-    ["Decals", "Window Tint", "Lettering", "Wraps"].forEach((category) => {
+    SHOP_CATEGORIES.forEach((category) => {
       if (!categories.includes(category)) categories.push(category);
     });
 
@@ -363,12 +359,6 @@ async function initShop() {
 
       setSelectOptions(subcategoryDetailFilter, DECAL_FILTERS[activeDecalTab], "All");
       subcategoryDetailFilter.value = activeDecalFilter;
-      return;
-    }
-
-    if (category === "Window Tint") {
-      setSelectOptions(subcategoryFilter, ["Precut Kits", "Full Rolls"], "All Subcategories");
-      setSelectOptions(subcategoryDetailFilter, [], "All Details");
       return;
     }
 
@@ -463,7 +453,6 @@ async function initShop() {
 
     let values = [];
 
-    if (category === "Window Tint") values = ["Precut Kits", "Full Rolls"];
     if (category === "Lettering") values = ["Business Name", "Business Info"];
     if (category === "Wraps") values = ["Full Rolls", "By The Foot"];
 
@@ -567,28 +556,7 @@ async function initShop() {
   }
 
   function createVehicleKitProducts(vehicles) {
-    return vehicles.map((vehicle) => {
-      const vehicleLabel = buildVehicleLabel(vehicle);
-      const fitmentLabel = [vehicleLabel, vehicle.bodyStyle].filter(Boolean).join(" ");
-
-      return {
-        id: `vehicle-tint-kit-${slugify(vehicle.kitSku || vehicle.id)}`,
-        name: `${vehicleLabel} Tint Kit`,
-        slug: slugify(`${vehicleLabel} tint kit`),
-        category: "Window Tint",
-        subcategory: "Precut Kits",
-        subSubcategory: null,
-        price: 149.99,
-        featured: true,
-        description: `Pre-cut tint kit matched to ${fitmentLabel}.`,
-        tags: ["Window Tint", "Precut Kits"].concat(vehicle.kitSku ? [vehicle.kitSku] : []),
-        imagePath: FALLBACK_IMAGE,
-        imageLabel: `${vehicleLabel} Tint Kit`,
-        custom: true,
-        productUrl: buildVehicleProductUrl(vehicle),
-        customizeUrl: buildVehicleCustomizeUrl(vehicle)
-      };
-    });
+    return [];
   }
 
   function matchesVehicleSearch(vehicle, query) {
@@ -892,13 +860,14 @@ async function initShop() {
 
     persistSelectedVehicleFromFilters(matchedVehicles);
 
-    const vehicleKits = createVehicleKitProducts(matchedVehicles.slice(0, 12));
+    const vehicleKits = [];
 
     let filtered = productsSource.map(toDisplayProduct).filter((product) => {
       const matchesSearch = productMatchesSearch(product, search);
       const matchesCategory = category === "all" || product.category === category;
+      const matchesStoreCategory = SHOP_CATEGORIES.includes(product.category);
 
-      if (!matchesSearch || !matchesCategory) return false;
+      if (!matchesStoreCategory || !matchesSearch || !matchesCategory) return false;
 
       if (category === "Decals") {
         return matchesDecalFilter(product);
