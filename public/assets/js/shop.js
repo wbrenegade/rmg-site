@@ -501,7 +501,7 @@ async function initShop() {
           All ${activeDecalTab.replace("By ", "")}
         </button>
       </div>
-      <div class="decal-filter-card-grid${activeDecalFilter !== "all" ? " is-compact" : ""}">
+      <div class="decal-filter-card-grid is-compact${activeDecalFilter !== "all" ? " has-selection" : ""}">
         ${filters.map((value) => {
           const image = activeDecalTab === "By Placement"
             ? PLACEMENT_IMAGES[value]

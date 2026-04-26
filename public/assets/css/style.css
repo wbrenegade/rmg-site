@@ -756,13 +756,17 @@ textarea { resize: vertical; }
 }
 
 .decal-filter-card-grid.is-compact .taxonomy-card {
-  opacity: 0.55;
+  opacity: 1;
   transform: scale(0.9);
   transform-origin: center;
   transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.decal-filter-card-grid.is-compact .taxonomy-card.active {
+.decal-filter-card-grid.is-compact.has-selection .taxonomy-card {
+  opacity: 0.55;
+}
+
+.decal-filter-card-grid.is-compact.has-selection .taxonomy-card.active {
   opacity: 1;
   position: relative;
   z-index: 2;
