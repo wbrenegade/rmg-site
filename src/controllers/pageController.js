@@ -19,6 +19,7 @@ const pageRoutes = [
   "faq",
   "order-success"
 ];
+const toolRoutes = ["svg-converter", "decal-preview"];
 
 function serveIndex(req, res) {
   res.sendFile(path.join(viewsDir, "index.html"));
@@ -34,6 +35,20 @@ function servePage(req, res) {
   res.sendFile(path.join(viewsDir, `${page}.html`));
 }
 
+function serveToolsIndex(req, res) {
+  res.sendFile(path.join(viewsDir, "tools.html"));
+}
+
+function serveToolPage(req, res) {
+  const { tool } = req.params;
+  if (!toolRoutes.includes(tool)) {
+    res.status(404).sendFile(path.join(viewsDir, "index.html"));
+    return;
+  }
+
+  res.sendFile(path.join(viewsDir, `${tool}.html`));
+}
+
 function serveNotFound(req, res) {
   res.status(404).sendFile(path.join(viewsDir, "index.html"));
 }
@@ -41,6 +56,9 @@ function serveNotFound(req, res) {
 module.exports = {
   serveIndex,
   servePage,
+  serveToolsIndex,
+  serveToolPage,
   serveNotFound,
-  pageRoutes
+  pageRoutes,
+  toolRoutes
 };
