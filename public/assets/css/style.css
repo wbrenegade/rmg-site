@@ -640,7 +640,7 @@ textarea { resize: vertical; }
 .shop-page-layout,
 .shop-grid-layout {
   display: grid;
-  grid-template-columns: 250px minmax(0, 1fr);
+  grid-template-columns: 200px minmax(0, 1fr);
   gap: 1.5rem;
   align-items: start;
 }
@@ -769,8 +769,12 @@ textarea { resize: vertical; }
 }
 
 .taxonomy-card span {
-  font-weight: 700;
-  line-height: 1.2;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .taxonomy-card.active {
