@@ -254,18 +254,6 @@ function createTaxonomyButton({ label, image, datasetName, datasetValue, active 
   `;
 }
 
-function createCompactTaxonomyButton({ label, datasetName, datasetValue, active = false }) {
-  const dataAttribute = String(datasetName || "")
-    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
-    .toLowerCase();
-
-  return `
-    <button type="button" class="decal-compact-filter${active ? " active" : ""}" data-${dataAttribute}="${datasetValue}">
-      ${label}
-    </button>
-  `;
-}
-
 async function initShop() {
   const productsEl = document.getElementById("shopProducts");
   const resultsMeta = document.getElementById("resultsMeta");
@@ -513,17 +501,8 @@ async function initShop() {
           All ${activeDecalTab.replace("By ", "")}
         </button>
       </div>
-      <div class="${activeDecalFilter === "all" ? "decal-filter-card-grid" : "decal-compact-filter-row"}">
+      <div class="decal-filter-card-grid${activeDecalFilter !== "all" ? " is-compact" : ""}">
         ${filters.map((value) => {
-          if (activeDecalFilter !== "all") {
-            return createCompactTaxonomyButton({
-              label: value,
-              datasetName: "decalFilter",
-              datasetValue: value,
-              active: activeDecalFilter === value
-            });
-          }
-
           const image = activeDecalTab === "By Placement"
             ? PLACEMENT_IMAGES[value]
             : TYPE_IMAGES[value];
