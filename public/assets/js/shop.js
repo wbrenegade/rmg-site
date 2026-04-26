@@ -427,15 +427,13 @@ async function initShop() {
     }
 
     subcategoryPicks.innerHTML = `
-      <div class="decal-filter-card-grid">
+      <div class="decal-text-filter-row">
         ${DECAL_GROUPS.map((value) => {
-          return createTaxonomyButton({
-            label: value,
-            image: getDecalGroupImage(value),
-            datasetName: "decalGroup",
-            datasetValue: value,
-            active: activeDecalTab === value
-          });
+          return `
+            <button type="button" class="decal-text-filter${activeDecalTab === value ? " active" : ""}" data-decal-group="${value}">
+              ${value}
+            </button>
+          `;
         }).join("")}
       </div>
     `;

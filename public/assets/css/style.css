@@ -745,6 +745,33 @@ textarea { resize: vertical; }
   gap: 0.75rem;
 }
 
+.decal-text-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.decal-text-filter {
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.02);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.decal-text-filter:hover {
+  color: var(--text);
+  border-color: rgba(255,255,255,0.25);
+}
+
+.decal-text-filter.active {
+  color: #091108;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--accent), #b2ff8c);
+}
+
 .filter-group {
   margin-bottom: 18px;
   padding-bottom: 6px;
