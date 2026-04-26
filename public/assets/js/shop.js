@@ -532,7 +532,7 @@ async function initShop() {
           All ${activeDecalTab.replace("By ", "")}
         </button>
       </div>
-      <div class="decal-filter-card-grid is-compact${activeDecalFilter !== "all" ? " has-selection" : ""}">
+      <div class="decal-filter-card-grid ${activeDecalTab === "By Type" ? "is-type-grid" : "is-placement-grid"} is-compact${activeDecalFilter !== "all" ? " has-selection" : ""}">
         ${filters.map((value) => {
           const image = activeDecalTab === "By Placement"
             ? PLACEMENT_IMAGES[value]
@@ -551,7 +551,7 @@ async function initShop() {
         <div class="decal-text-filter-row decal-subfilter-heading">
           <strong>Graphics Type</strong>
         </div>
-        <div class="decal-filter-card-grid is-compact${activeGraphicsFilter !== "All Graphics" ? " has-selection" : ""}">
+        <div class="decal-filter-card-grid is-type-grid is-compact${activeGraphicsFilter !== "All Graphics" ? " has-selection" : ""}">
           ${GRAPHICS_FILTERS.map((value) => {
             return createTaxonomyButton({
               label: value,
@@ -581,6 +581,12 @@ async function initShop() {
       : productsEl;
 
     target?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function scrollToProductsGrid() {
+    window.setTimeout(() => {
+      productsEl?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
   }
 
   function buildVehicleLabel(vehicle) {
@@ -1114,6 +1120,7 @@ async function initShop() {
 
       renderSubcategoryDetailPicks();
       render();
+      scrollToProductsGrid();
     });
   }
 
@@ -1126,7 +1133,7 @@ async function initShop() {
 
       renderSubcategoryDetailPicks();
       render();
-      productsEl?.scrollIntoView({ behavior: "smooth", block: "start" });
+      scrollToProductsGrid();
     });
   }
 
