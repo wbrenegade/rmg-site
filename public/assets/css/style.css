@@ -643,9 +643,13 @@ textarea { resize: vertical; }
   grid-template-columns: 260px minmax(0, 1fr);
   gap: 1rem;
   align-items: start;
+  width: min(1480px, calc(100% - 18px));
 }
 
-.shop-content { min-width: 0; }
+.shop-content {
+  min-width: 0;
+  order: 2;
+}
 
 .shop-sidebar,
 .shop-filters,
@@ -657,6 +661,7 @@ textarea { resize: vertical; }
   overflow-y: auto;
   padding-right: 0;
   scrollbar-width: thin;
+  order: 1;
 }
 
 .shop-sidebar .card,
@@ -1023,6 +1028,17 @@ textarea { resize: vertical; }
   .shop-filters,
   .filters-panel {
     padding-bottom: 14px;
+  }
+
+  .shop-content {
+    order: 1;
+  }
+
+  .shop-sidebar,
+  .shop-filters,
+  .filters-panel,
+  .filter-panel {
+    order: 2;
   }
 
   .taxonomy-grid {
