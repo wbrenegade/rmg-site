@@ -28,7 +28,7 @@ function initSignup() {
 
       setCurrentUser(newUser);
       showMessage('Account created successfully.', 'success', '#signupForm');
-      setTimeout(() => window.location.href = 'account.html', 900);
+      setTimeout(() => window.location.href = '/account', 900);
     } catch (error) {
       // Local fallback keeps demo behavior when API is unavailable.
       const users = getUsers();
@@ -50,7 +50,7 @@ function initSignup() {
       setUsers(users);
       setCurrentUser({ id: newUser.id, name: newUser.name, email: newUser.email });
       showMessage(error?.message || 'Account created locally.', 'success', '#signupForm');
-      setTimeout(() => window.location.href = 'account.html', 900);
+      setTimeout(() => window.location.href = '/account', 900);
     }
   });
 }
@@ -67,7 +67,7 @@ function initLogin() {
       const user = await window.RMGApi.login(data);
       setCurrentUser(user);
       showMessage('Logged in successfully.', 'success', '#loginForm');
-      setTimeout(() => window.location.href = 'account.html', 900);
+      setTimeout(() => window.location.href = '/account', 900);
     } catch {
       const users = getUsers();
       const user = users.find(item => item.email.toLowerCase() === data.email.toLowerCase() && item.password === data.password);
@@ -79,7 +79,7 @@ function initLogin() {
 
       setCurrentUser({ id: user.id, name: user.name, email: user.email });
       showMessage('Logged in successfully (local mode).', 'success', '#loginForm');
-      setTimeout(() => window.location.href = 'account.html', 900);
+      setTimeout(() => window.location.href = '/account', 900);
     }
   });
 }

@@ -6,7 +6,7 @@ async function initAccount() {
 
   const currentUser = getCurrentUser();
   if (!currentUser) {
-    window.location.href = 'login.html';
+    window.location.href = '/login';
     return;
   }
 
@@ -37,7 +37,7 @@ async function initAccount() {
 
   logoutBtn?.addEventListener('click', () => {
     setCurrentUser(null);
-    window.location.href = 'login.html';
+    window.location.href = '/login';
   });
 }
 

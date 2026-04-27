@@ -27,8 +27,27 @@
     return h === 'login' || h === 'login.html';
   }
 
-  function updateNav(nav) {
-    var user = getUser();
+  function isAccountHref(href) {
+    if (!href) return false;
+    var h = href.replace(/^.*\//, '').split('?')[0];
+    return h === 'account' || h === 'account.html';
+  }
+
+  function updateAccountLinks(user) {
+    var links = document.querySelectorAll('a');
+
+    links.forEach(function (a) {
+      if (!isAccountHref(a.getAttribute('href'))) return;
+
+      a.href = user ? '/account' : '/signup';
+
+      if (user && (window.location.pathname === '/account' || window.location.pathname.endsWith('account.html'))) {
+        a.classList.add('active');
+      }
+    });
+  }
+
+  function updateNav(nav, user) {
     var links = nav.querySelectorAll('a');
 
     // Collect login + signup nodes to remove
@@ -37,9 +56,9 @@
       if (isAuthHref(a.getAttribute('href'))) toRemove.push(a);
     });
 
-    if (!toRemove.length) return; // nothing to update
-
     if (user) {
+      if (!toRemove.length) return;
+
       // Logged in — replace login/signup with My Account + Log Out
       var loginLink = toRemove.find(function (a) { return isLoginHref(a.getAttribute('href')); }) || toRemove[0];
 
@@ -66,6 +85,8 @@
       loginLink.parentNode.insertBefore(outLink, loginLink);
       toRemove.forEach(function (a) { a.parentNode.removeChild(a); });
     } else {
+      if (!toRemove.length) return;
+
       // Not logged in — make sure Login goes to /login and Sign Up goes to /signup
       toRemove.forEach(function (a) {
         var href = a.getAttribute('href');
@@ -79,8 +100,12 @@
   }
 
   function init() {
+    var user = getUser();
+    updateAccountLinks(user);
     var navs = document.querySelectorAll('.site-nav');
-    navs.forEach(updateNav);
+    navs.forEach(function (nav) {
+      updateNav(nav, user);
+    });
   }
 
   if (document.readyState === 'loading') {
