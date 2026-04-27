@@ -121,6 +121,93 @@
     .locate-btn:hover { opacity: 0.85; }
     .locate-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
+    /* ── Location banner ── */
+    .location-banner {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1a1a1a;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+      z-index: 9999;
+      max-width: 460px;
+      width: calc(100vw - 40px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .location-banner.visible {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .location-banner .banner-icon {
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+
+    .location-banner .banner-text {
+      flex: 1;
+    }
+
+    .location-banner .banner-text p {
+      margin: 0;
+      font-size: 0.875rem;
+      color: rgba(255,255,255,0.85);
+      line-height: 1.4;
+    }
+
+    .location-banner .banner-text strong {
+      color: #fff;
+      display: block;
+      margin-bottom: 2px;
+      font-size: 0.9rem;
+    }
+
+    .banner-actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .banner-yes {
+      background: var(--accent, #39ff14);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 16px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    .banner-yes:hover { opacity: 0.85; }
+
+    .banner-no {
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.6);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    .banner-no:hover { opacity: 0.8; }
+
     .results-meta {
       padding: 10px 16px 8px;
       font-size: 0.78rem;
@@ -353,6 +440,19 @@
     </div>
   </main>
 
+  <!-- Location permission banner -->
+  <div class="location-banner" id="locationBanner" role="dialog" aria-label="Location permission">
+    <span class="banner-icon">📍</span>
+    <div class="banner-text">
+      <strong>Find installers near you</strong>
+      <p>Allow location access to show the closest shops first.</p>
+    </div>
+    <div class="banner-actions">
+      <button class="banner-yes" id="bannerYes">Use My Location</button>
+      <button class="banner-no" id="bannerNo">No thanks</button>
+    </div>
+  </div>
+
   <footer class="site-footer" style="margin-top:0;">
     <div class="container footer-bottom">
       <p>© <span id="year"></span> RenegadeMade Graphix</p>
@@ -465,6 +565,7 @@
         allListings = data;
         populateFilters();
         applyFilters();
+        maybePromptLocation();
       })
       .catch(() => {
         document.getElementById('resultsMeta').textContent = 'Failed to load directory.';
@@ -627,15 +728,14 @@
       selectInstaller(id);
     }
 
-    // ── Geolocation ──
-    document.getElementById('locateBtn').addEventListener('click', () => {
+    // ── Geolocation (shared) ──
+    function doLocate(onDone) {
       const btn = document.getElementById('locateBtn');
-      if (!navigator.geolocation) {
-        alert('Geolocation is not supported by your browser.');
-        return;
-      }
+      if (!navigator.geolocation) return;
+
       btn.disabled = true;
       btn.textContent = '…';
+
       navigator.geolocation.getCurrentPosition(pos => {
         btn.disabled = false;
         btn.textContent = '📍 Near Me';
@@ -647,18 +747,15 @@
           .bindPopup('<strong>You are here</strong>')
           .addTo(map);
 
-        // Sort filtered by distance
         function dist(a, b) {
           return Math.sqrt((a.lat - b.lat) ** 2 + (a.lng - b.lng) ** 2);
         }
 
-        const withCoords = allListings
+        const nearby = allListings
           .filter(l => l.lat && l.lng)
           .map(l => ({ ...l, _dist: dist({ lat, lng }, l) }))
-          .sort((a, b) => a._dist - b._dist);
-
-        const nearby = withCoords.slice(0, 50);
-        const nearbyIds = new Set(nearby.map(l => l._id));
+          .sort((a, b) => a._dist - b._dist)
+          .slice(0, 50);
 
         // Reset filters & show nearby
         document.getElementById('stateFilter').value = '';
@@ -671,12 +768,61 @@
         updateMeta();
 
         map.flyTo([lat, lng], 10, { duration: 1 });
+        if (onDone) onDone(true);
       }, () => {
         btn.disabled = false;
         btn.textContent = '📍 Near Me';
-        alert('Could not get your location. Please check your browser permissions.');
+        if (onDone) onDone(false);
+      });
+    }
+
+    // ── Near Me button ──
+    document.getElementById('locateBtn').addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        alert('Geolocation is not supported by your browser.');
+        return;
+      }
+      doLocate();
+    });
+
+    // ── Location banner ──
+    const LOCATION_KEY = 'rmg_location_pref';
+    const banner = document.getElementById('locationBanner');
+
+    function hideBanner() {
+      banner.classList.remove('visible');
+    }
+
+    function showBanner() {
+      banner.classList.add('visible');
+    }
+
+    document.getElementById('bannerYes').addEventListener('click', () => {
+      hideBanner();
+      localStorage.setItem(LOCATION_KEY, 'granted');
+      doLocate(ok => {
+        if (!ok) localStorage.removeItem(LOCATION_KEY);
       });
     });
+
+    document.getElementById('bannerNo').addEventListener('click', () => {
+      hideBanner();
+      localStorage.setItem(LOCATION_KEY, 'denied');
+    });
+
+    function maybePromptLocation() {
+      const pref = localStorage.getItem(LOCATION_KEY);
+      if (pref === 'denied') return;
+      if (!navigator.geolocation) return;
+
+      if (pref === 'granted') {
+        // Auto-locate silently if they previously said yes
+        doLocate();
+      } else {
+        // Show the banner after a short delay so the page feels loaded
+        setTimeout(showBanner, 800);
+      }
+    }
 
     // ── Filter listeners ──
     let debounceTimer;
