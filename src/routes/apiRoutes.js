@@ -1,6 +1,7 @@
 const express = require("express");
 const { getHealth } = require("../controllers/healthController");
 const { listProducts } = require("../controllers/productController");
+const { listInstallers } = require("../controllers/installerController");
 const { listCategories } = require("../controllers/categoryController");
 const { listVehicleCatalog } = require("../controllers/vehicleController");
 const { signup, login } = require("../controllers/authController");
@@ -27,6 +28,7 @@ const router = express.Router();
 
 router.get("/health", getHealth);
 router.get("/products", listProducts);
+router.get("/installers", listInstallers);
 router.get("/categories", listCategories);
 router.get("/vehicles/catalog", listVehicleCatalog);
 router.get("/settings/public", getPublicSettings);

@@ -18,7 +18,8 @@ const pageRoutes = [
   "privacy",
   "terms",
   "faq",
-  "order-success"
+  "order-success",
+  "installers"
 ];
 
 const toolRoutes = [

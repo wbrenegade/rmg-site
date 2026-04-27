@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Find an Installer Near You | RenegadeMade Graphix</title>
+  <meta name="description" content="Find local vinyl wrap, decal, and vehicle graphics installers near you. Browse our directory of vetted shops across the US." />
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="RenegadeMade Graphix" />
+  <meta property="og:url" content="https://renegademadegraphix.com/installers" />
+  <meta property="og:title" content="Find a Local Installer | RenegadeMade Graphix" />
+  <meta property="og:description" content="Find local vinyl wrap, decal, and vehicle graphics installers near you. Browse our directory of vetted shops across the US." />
+  <meta property="og:image" content="https://renegademadegraphix.com/assets/imgs/main.PNG" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Find a Local Installer | RenegadeMade Graphix" />
+  <meta name="twitter:description" content="Find local vinyl wrap, decal, and vehicle graphics installers near you. Browse our directory of vetted shops across the US." />
+  <meta name="twitter:image" content="https://renegademadegraphix.com/assets/imgs/main.PNG" />
+  <link rel="icon" type="image/png" href="/assets/imgs/favicon.png" />
+  <link rel="stylesheet" href="/assets/css/style.css" />
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <style>
+    /* ── Layout ── */
+    .installer-layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 0;
+      height: calc(100vh - 68px);
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ── */
+    .installer-sidebar {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg, #0d0d0d);
+      border-right: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+    }
+
+    .sidebar-controls {
+      padding: 18px 16px 12px;
+      background: var(--surface, #111);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      flex-shrink: 0;
+    }
+
+    .sidebar-controls h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 0 0 12px;
+      color: var(--text, #fff);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .search-row input {
+      flex: 1;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--text, #fff);
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-row input::placeholder { color: rgba(255,255,255,0.35); }
+    .search-row input:focus { border-color: var(--accent, #39ff14); }
+
+    .filter-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .filter-row select {
+      flex: 1;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--text, #fff);
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23aaa' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+      transition: border-color 0.2s;
+    }
+
+    .filter-row select:focus { border-color: var(--accent, #39ff14); }
+    .filter-row select option { background: #1a1a1a; color: #fff; }
+
+    .locate-btn {
+      background: var(--accent, #39ff14);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 13px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: opacity 0.2s;
+    }
+
+    .locate-btn:hover { opacity: 0.85; }
+    .locate-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .results-meta {
+      padding: 10px 16px 8px;
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.45);
+      flex-shrink: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .results-meta strong { color: var(--accent, #39ff14); }
+
+    /* ── Listing cards ── */
+    .installer-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 10px 20px;
+    }
+
+    .installer-list::-webkit-scrollbar { width: 5px; }
+    .installer-list::-webkit-scrollbar-track { background: transparent; }
+    .installer-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+
+    .installer-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 14px 14px 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .installer-card:hover,
+    .installer-card.active {
+      border-color: var(--accent, #39ff14);
+      background: rgba(57,255,20,0.06);
+    }
+
+    .installer-card .card-name {
+      font-size: 0.93rem;
+      font-weight: 700;
+      color: #fff;
+      text-transform: capitalize;
+      margin: 0 0 4px;
+      line-height: 1.3;
+    }
+
+    .installer-card .card-service {
+      font-size: 0.75rem;
+      color: var(--accent, #39ff14);
+      text-transform: capitalize;
+      margin: 0 0 6px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    .installer-card .card-addr {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.55);
+      text-transform: capitalize;
+      margin: 0 0 8px;
+      line-height: 1.4;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .card-actions a {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+
+    .card-actions a:hover { opacity: 0.8; }
+
+    .card-actions .btn-call {
+      background: var(--accent, #39ff14);
+      color: #000;
+    }
+
+    .card-actions .btn-map {
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.8);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .card-actions .btn-dir {
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.8);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 48px 20px;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.9rem;
+    }
+
+    /* ── Map ── */
+    #installerMap {
+      flex: 1;
+      height: 100%;
+      background: #0d0d0d;
+    }
+
+    /* Leaflet dark overrides */
+    .leaflet-tile-pane { filter: brightness(0.7) saturate(0.6); }
+    .leaflet-popup-content-wrapper {
+      background: #1a1a1a;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    }
+    .leaflet-popup-tip { background: #1a1a1a; }
+    .leaflet-popup-content { margin: 14px 16px; }
+    .leaflet-popup-content h4 {
+      margin: 0 0 4px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+    .leaflet-popup-content p {
+      margin: 0 0 6px;
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.6);
+      text-transform: capitalize;
+    }
+    .leaflet-popup-content a {
+      display: inline-block;
+      margin-top: 6px;
+      margin-right: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 5px;
+      text-decoration: none;
+    }
+    .leaflet-popup-content a.pop-call { background: #39ff14; color: #000; }
+    .leaflet-popup-content a.pop-dir { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+
+    .leaflet-control-zoom a {
+      background: #1a1a1a !important;
+      color: #fff !important;
+      border-color: rgba(255,255,255,0.15) !important;
+    }
+
+    .leaflet-control-attribution {
+      background: rgba(0,0,0,0.7) !important;
+      color: rgba(255,255,255,0.4) !important;
+    }
+
+    .leaflet-control-attribution a { color: rgba(255,255,255,0.5) !important; }
+
+    /* ── Responsive ── */
+    @media (max-width: 820px) {
+      .installer-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        height: auto;
+        overflow: visible;
+      }
+
+      .installer-sidebar {
+        height: auto;
+        overflow: visible;
+        border-right: none;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+      }
+
+      .installer-list {
+        max-height: 420px;
+      }
+
+      #installerMap {
+        height: 420px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="/"><img class="brand-mark" src="/assets/imgs/rmg_logo.png" alt="RMG logo" /></a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
+      <nav class="site-nav" id="siteNav">
+        <a href="/">Home</a>
+        <a href="/shop">Shop</a>
+        <a href="/tools">Tools</a>
+        <a href="/installers" class="active">Find Installer</a>
+        <a href="/contact">Contact</a>
+        <a href="/login">Login</a>
+        <a href="/signup" class="btn btn-sm">Sign Up</a>
+        <a href="/cart" class="cart-link">Cart <span id="cartCount">0</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="installer-layout">
+      <!-- Sidebar -->
+      <aside class="installer-sidebar">
+        <div class="sidebar-controls">
+          <h2>Find an Installer</h2>
+          <div class="search-row">
+            <input type="text" id="searchInput" placeholder="Search by name or city…" autocomplete="off" />
+            <button class="locate-btn" id="locateBtn" title="Use my location">📍 Near Me</button>
+          </div>
+          <div class="filter-row">
+            <select id="stateFilter">
+              <option value="">All States</option>
+            </select>
+            <select id="serviceFilter">
+              <option value="">All Services</option>
+            </select>
+          </div>
+        </div>
+        <div class="results-meta" id="resultsMeta">Loading directory…</div>
+        <div class="installer-list" id="installerList"></div>
+      </aside>
+
+      <!-- Map -->
+      <div id="installerMap"></div>
+    </div>
+  </main>
+
+  <footer class="site-footer" style="margin-top:0;">
+    <div class="container footer-bottom">
+      <p>© <span id="year"></span> RenegadeMade Graphix</p>
+    </div>
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLs=" crossorigin=""></script>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ── State helpers ──
+    const STATE_NAMES = {
+      al:'Alabama',ak:'Alaska',az:'Arizona',ar:'Arkansas',ca:'California',
+      co:'Colorado',ct:'Connecticut',de:'Delaware',fl:'Florida',ga:'Georgia',
+      hi:'Hawaii',id:'Idaho',il:'Illinois',in:'Indiana',ia:'Iowa',
+      ks:'Kansas',ky:'Kentucky',la:'Louisiana',me:'Maine',md:'Maryland',
+      ma:'Massachusetts',mi:'Michigan',mn:'Minnesota',ms:'Mississippi',mo:'Missouri',
+      mt:'Montana',ne:'Nebraska',nv:'Nevada',nh:'New Hampshire',nj:'New Jersey',
+      nm:'New Mexico',ny:'New York',nc:'North Carolina',nd:'North Dakota',oh:'Ohio',
+      ok:'Oklahoma',or:'Oregon',pa:'Pennsylvania',ri:'Rhode Island',sc:'South Carolina',
+      sd:'South Dakota',tn:'Tennessee',tx:'Texas',ut:'Utah',vt:'Vermont',
+      va:'Virginia',wa:'Washington',wv:'West Virginia',wi:'Wisconsin',wy:'Wyoming'
+    };
+
+    // Known legit service categories (normalised)
+    const KNOWN_SERVICES = new Set([
+      'auto customization','auto detailing','auto body shop','auto repair',
+      'auto restoration services','auto glass service','auto parts & supply store',
+      'body shop','car window tinting','commercial window tinting','commercial printer',
+      'car detailing service','car stereo installation','graphic designer',
+      'home window tinting','marketing agency','printing services',
+      'promotional products & services','screen printing/t-shirt printing',
+      'sign making','sign shop','vehicle wrap','vehicle wrapping service',
+      'vinyl sign shop','window tinting service','business signage',
+      'advertising agency','business manufacturing & supply',
+      'business-to-business services','masign making','zsign making'
+    ]);
+
+    function isValidService(s) {
+      if (!s) return false;
+      // Filter out obviously bad data (addresses, state codes, etc.)
+      return KNOWN_SERVICES.has(s.toLowerCase()) || /[a-z]{4,}/.test(s);
+    }
+
+    function serviceLabel(s) {
+      if (!s) return 'Installer';
+      return s.replace(/^(inc\.|masign|zsign)/, '').trim() || 'Installer';
+    }
+
+    function capitalize(str) {
+      return str ? str.replace(/\b\w/g, c => c.toUpperCase()) : '';
+    }
+
+    // ── Map init ──
+    const map = L.map('installerMap', {
+      center: [39.5, -98.35],
+      zoom: 4,
+      zoomControl: true
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      maxZoom: 19
+    }).addTo(map);
+
+    // Custom marker
+    function makeIcon(active) {
+      return L.divIcon({
+        className: '',
+        html: `<div style="
+          width:14px;height:14px;
+          background:${active ? '#fff' : '#39ff14'};
+          border:2px solid ${active ? '#39ff14' : 'rgba(0,0,0,0.5)'};
+          border-radius:50%;
+          box-shadow:0 0 6px ${active ? '#fff' : '#39ff14'};
+        "></div>`,
+        iconSize: [14,14],
+        iconAnchor: [7,7],
+        popupAnchor: [0,-10]
+      });
+    }
+
+    const userIcon = L.divIcon({
+      className: '',
+      html: `<div style="
+        width:16px;height:16px;
+        background:#4af;
+        border:3px solid #fff;
+        border-radius:50%;
+        box-shadow:0 0 10px #4af;
+      "></div>`,
+      iconSize: [16,16],
+      iconAnchor: [8,8]
+    });
+
+    // ── State ──
+    let allListings = [];
+    let filtered = [];
+    let markers = {};       // id → { marker, data }
+    let activeId = null;
+    let userMarker = null;
+    let markerLayer = L.layerGroup().addTo(map);
+
+    // ── Fetch data ──
+    fetch('/api/installers')
+      .then(r => r.json())
+      .then(data => {
+        allListings = data;
+        populateFilters();
+        applyFilters();
+      })
+      .catch(() => {
+        document.getElementById('resultsMeta').textContent = 'Failed to load directory.';
+      });
+
+    // ── Filters ──
+    function populateFilters() {
+      const stateSet = new Set();
+      const serviceSet = new Set();
+
+      allListings.forEach(l => {
+        if (l.state) stateSet.add(l.state.toLowerCase());
+        const svc = (l.services || '').toLowerCase().trim();
+        if (svc && KNOWN_SERVICES.has(svc)) serviceSet.add(svc);
+      });
+
+      const stateFilter = document.getElementById('stateFilter');
+      [...stateSet].sort().forEach(code => {
+        const opt = document.createElement('option');
+        opt.value = code;
+        opt.textContent = STATE_NAMES[code] || code.toUpperCase();
+        stateFilter.appendChild(opt);
+      });
+
+      const serviceFilter = document.getElementById('serviceFilter');
+      [...serviceSet].sort().forEach(svc => {
+        const opt = document.createElement('option');
+        opt.value = svc;
+        opt.textContent = capitalize(serviceLabel(svc));
+        serviceFilter.appendChild(opt);
+      });
+    }
+
+    function applyFilters() {
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
+      const state = document.getElementById('stateFilter').value;
+      const service = document.getElementById('serviceFilter').value;
+
+      filtered = allListings.filter(l => {
+        if (state && (l.state || '').toLowerCase() !== state) return false;
+        if (service && (l.services || '').toLowerCase().trim() !== service) return false;
+        if (q) {
+          const hay = `${l.name} ${l.city} ${l.address}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+
+      renderList();
+      renderMarkers();
+      updateMeta();
+    }
+
+    function updateMeta() {
+      const withCoords = filtered.filter(l => l.lat && l.lng).length;
+      document.getElementById('resultsMeta').innerHTML =
+        `<strong>${filtered.length}</strong> installer${filtered.length !== 1 ? 's' : ''} found &middot; <strong>${withCoords}</strong> on map`;
+    }
+
+    // ── List rendering ──
+    function renderList() {
+      const container = document.getElementById('installerList');
+      container.innerHTML = '';
+
+      if (!filtered.length) {
+        container.innerHTML = '<div class="no-results">No installers match your search.<br>Try a different state or search term.</div>';
+        return;
+      }
+
+      filtered.forEach((l, i) => {
+        const card = document.createElement('div');
+        card.className = 'installer-card' + (l._id === activeId ? ' active' : '');
+        card.dataset.id = l._id;
+
+        const addrLine = [l.address, l.city, (l.state || '').toUpperCase(), l.zip]
+          .filter(Boolean).join(', ');
+
+        const dirUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(addrLine)}`;
+        const callHtml = l.phone
+          ? `<a class="btn-call" href="tel:${l.phone.replace(/\D/g,'')}">${l.phone}</a>`
+          : '';
+        const mapHtml = (l.lat && l.lng)
+          ? `<a class="btn-map" data-id="${l._id}">View on Map</a>`
+          : '';
+        const dirHtml = `<a class="btn-dir" href="${dirUrl}" target="_blank" rel="noopener">Directions</a>`;
+
+        card.innerHTML = `
+          <p class="card-name">${capitalize(l.name)}</p>
+          <p class="card-service">${capitalize(serviceLabel(l.services || 'Installer'))}</p>
+          <p class="card-addr">${addrLine}</p>
+          <div class="card-actions">${callHtml}${mapHtml}${dirHtml}</div>
+        `;
+
+        card.addEventListener('click', () => selectInstaller(l._id));
+        card.querySelector('.btn-map')?.addEventListener('click', e => {
+          e.stopPropagation();
+          focusMarker(l._id);
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    // ── Markers ──
+    function renderMarkers() {
+      markerLayer.clearLayers();
+      markers = {};
+
+      filtered.forEach(l => {
+        if (!l.lat || !l.lng) return;
+
+        const m = L.marker([l.lat, l.lng], { icon: makeIcon(false) });
+        const addrLine = [l.address, l.city, (l.state || '').toUpperCase()]
+          .filter(Boolean).join(', ');
+        const dirUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(addrLine + ' ' + (l.zip || ''))}`;
+        const callHtml = l.phone
+          ? `<a class="pop-call" href="tel:${l.phone.replace(/\D/g,'')}">${l.phone}</a>`
+          : '';
+
+        m.bindPopup(`
+          <h4>${capitalize(l.name)}</h4>
+          <p>${capitalize(serviceLabel(l.services || ''))}</p>
+          <p>${capitalize(addrLine)}</p>
+          ${callHtml}
+          <a class="pop-dir" href="${dirUrl}" target="_blank" rel="noopener">Get Directions</a>
+        `);
+
+        m.on('click', () => selectInstaller(l._id));
+        m.addTo(markerLayer);
+        markers[l._id] = { marker: m, data: l };
+      });
+    }
+
+    // ── Selection ──
+    function selectInstaller(id) {
+      // Update active card
+      document.querySelectorAll('.installer-card').forEach(c => {
+        c.classList.toggle('active', c.dataset.id === String(id));
+      });
+
+      // Scroll card into view
+      const activeCard = document.querySelector(`.installer-card[data-id="${id}"]`);
+      if (activeCard) activeCard.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+
+      // Update marker icons
+      if (activeId && markers[activeId]) {
+        markers[activeId].marker.setIcon(makeIcon(false));
+      }
+      activeId = id;
+      if (markers[id]) {
+        markers[id].marker.setIcon(makeIcon(true));
+        markers[id].marker.openPopup();
+      }
+    }
+
+    function focusMarker(id) {
+      if (!markers[id]) return;
+      const { marker, data } = markers[id];
+      map.flyTo([data.lat, data.lng], 14, { duration: 0.8 });
+      selectInstaller(id);
+    }
+
+    // ── Geolocation ──
+    document.getElementById('locateBtn').addEventListener('click', () => {
+      const btn = document.getElementById('locateBtn');
+      if (!navigator.geolocation) {
+        alert('Geolocation is not supported by your browser.');
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = '…';
+      navigator.geolocation.getCurrentPosition(pos => {
+        btn.disabled = false;
+        btn.textContent = '📍 Near Me';
+        const { latitude: lat, longitude: lng } = pos.coords;
+
+        // Drop user pin
+        if (userMarker) map.removeLayer(userMarker);
+        userMarker = L.marker([lat, lng], { icon: userIcon })
+          .bindPopup('<strong>You are here</strong>')
+          .addTo(map);
+
+        // Sort filtered by distance
+        function dist(a, b) {
+          return Math.sqrt((a.lat - b.lat) ** 2 + (a.lng - b.lng) ** 2);
+        }
+
+        const withCoords = allListings
+          .filter(l => l.lat && l.lng)
+          .map(l => ({ ...l, _dist: dist({ lat, lng }, l) }))
+          .sort((a, b) => a._dist - b._dist);
+
+        const nearby = withCoords.slice(0, 50);
+        const nearbyIds = new Set(nearby.map(l => l._id));
+
+        // Reset filters & show nearby
+        document.getElementById('stateFilter').value = '';
+        document.getElementById('serviceFilter').value = '';
+        document.getElementById('searchInput').value = '';
+
+        filtered = nearby;
+        renderList();
+        renderMarkers();
+        updateMeta();
+
+        map.flyTo([lat, lng], 10, { duration: 1 });
+      }, () => {
+        btn.disabled = false;
+        btn.textContent = '📍 Near Me';
+        alert('Could not get your location. Please check your browser permissions.');
+      });
+    });
+
+    // ── Filter listeners ──
+    let debounceTimer;
+    document.getElementById('searchInput').addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(applyFilters, 200);
+    });
+    document.getElementById('stateFilter').addEventListener('change', applyFilters);
+    document.getElementById('serviceFilter').addEventListener('change', applyFilters);
+
+    // ── main.js cart count ──
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.updateCartCount) window.updateCartCount();
+    });
+  </script>
+
+  <script src="/assets/js/main.js"></script>
+</body>
+</html>

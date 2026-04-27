@@ -31,7 +31,7 @@ function buildCrawlablePaths() {
     return slug ? `/product?slug=${slug}` : "/product";
   });
 
-  return ["/", ...generalPages, ...toolsIndex, ...toolPages, "/shop", ...productUrls];
+  return ["/", ...generalPages, ...toolsIndex, ...toolPages, "/shop", "/installers", ...productUrls];
 }
 
 function escapeXml(value) {
