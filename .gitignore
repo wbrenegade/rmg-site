@@ -5,3 +5,6 @@ uploads/
 outputs/
 __pycache__/
 *.svg
+data/app.sqlite
+data/app.sqlite-shm
+data/app.sqlite-wal

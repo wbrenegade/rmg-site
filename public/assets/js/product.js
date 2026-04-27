@@ -66,6 +66,10 @@ async function initProductPage() {
     window.setSelectedVehicle(vehicleKitProduct.selectedVehicle);
   }
 
+  if (window.RMGAnalytics?.trackProductView) {
+    window.RMGAnalytics.trackProductView(product);
+  }
+
   const imagePath = product.imagePath || '/assets/imgs/main.PNG';
   const imageAlt = product.imageLabel || product.name || 'Product preview';
   const customizeUrl = typeof window.buildCustomizeUrl === 'function'

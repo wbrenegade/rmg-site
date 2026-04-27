@@ -668,6 +668,10 @@ button.danger {
 const canvas = document.getElementById("mainCanvas");
 const ctx = canvas.getContext("2d");
 
+function trackDecalPreview(action, payload = {}) {
+  window.RMGAnalytics?.trackTool("decal-preview", action, payload);
+}
+
 canvas.width = 700;
 canvas.height = 360;
 
@@ -801,6 +805,10 @@ function loadCar(e) {
   const file = e.target.files[0];
   if (!file) return;
 
+  trackDecalPreview("car_uploaded", {
+    fileType: file.type || "unknown"
+  });
+
   const url = URL.createObjectURL(file);
   const img = new Image();
 
@@ -824,6 +832,11 @@ function loadCar(e) {
 async function loadDecal(e) {
   const file = e.target.files[0];
   if (!file) return;
+
+  trackDecalPreview("decal_uploaded", {
+    fileType: file.type || "unknown",
+    extension: file.name.split(".").pop()?.toLowerCase() || ""
+  });
 
   decalFileName = file.name;
   document.getElementById("decalNameInput").value = file.name.replace(/\.[^/.]+$/, "");
@@ -914,6 +927,7 @@ function applyPlacementPreset() {
   };
 
   quad = presets[preset] || presets.custom;
+  trackDecalPreview("placement_preset_applied", { preset });
 
   updateHandles();
   render();
@@ -1203,6 +1217,12 @@ function buyDecal() {
     settings: getSettings()
   };
 
+  trackDecalPreview("checkout_started", {
+    decalName,
+    decalSize,
+    price: decalPrice
+  });
+
   sessionStorage.setItem("checkout_data", JSON.stringify(checkoutData));
 
   localStorage.setItem("checkout_data", JSON.stringify({
@@ -1232,6 +1252,8 @@ function createSmallPreview() {
 function downloadPreview() {
   if (!canvas.width) return;
 
+  trackDecalPreview("preview_downloaded");
+
   const link = document.createElement("a");
   link.download = "decal-preview.png";
   link.href = canvas.toDataURL("image/png");
@@ -1243,6 +1265,7 @@ async function copySettings() {
 
   try {
     await navigator.clipboard.writeText(text);
+    trackDecalPreview("settings_copied");
     alert("Placement settings copied.");
   } catch {
     alert(text);
@@ -1250,6 +1273,7 @@ async function copySettings() {
 }
 
 function downloadSettings() {
+  trackDecalPreview("settings_downloaded");
   const blob = new Blob([JSON.stringify(getSettings(), null, 2)], {type: "application/json"});
   const url = URL.createObjectURL(blob);
 
@@ -1272,10 +1296,12 @@ function saveDesign() {
 
   try {
     localStorage.setItem("rmgSavedPreviewDesign", JSON.stringify(design));
+    trackDecalPreview("design_saved");
     setStatus("Design saved on this device.", "success");
   } catch (err) {
     setStatus("Design settings saved, but preview image was too large for browser storage.", "warn");
     localStorage.setItem("rmgSavedPreviewDesign", JSON.stringify({...design, previewImage: null}));
+    trackDecalPreview("design_saved_without_preview");
   }
 }
 
@@ -1289,6 +1315,7 @@ async function shareDesign() {
         title: "My RMG Decal Design",
         text: shareText
       });
+      trackDecalPreview("design_shared");
       return;
     } catch (err) {
       if (err.name === "AbortError") return;
@@ -1297,6 +1324,7 @@ async function shareDesign() {
 
   try {
     await navigator.clipboard.writeText(shareText);
+    trackDecalPreview("share_copied_to_clipboard");
     setStatus("Share info copied to clipboard.", "success");
   } catch {
     alert(shareText);

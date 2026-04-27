@@ -189,6 +189,20 @@ label { font-weight: bold; display: block; }
 let latestSvgText = "";
 let latestSvgUrl = "";
 
+  function trackSvgConverter(action, payload = {}) {
+    window.RMGAnalytics?.trackTool("svg-converter", action, payload);
+  }
+
+  document.getElementById("fileInput")?.addEventListener("change", (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    trackSvgConverter("file_selected", {
+      fileType: file.type || "unknown",
+      extension: file.name.split(".").pop()?.toLowerCase() || ""
+    });
+  });
+
 function toggleAdvanced() {
   const box = document.getElementById("advancedSettings");
   box.style.display = box.style.display === "block" ? "none" : "block";
@@ -316,6 +330,11 @@ async function convertFile() {
   const ext = file.name.split(".").pop().toLowerCase();
   const preset = document.getElementById("preset").value;
 
+  trackSvgConverter("convert_started", {
+    preset,
+    extension: ext
+  });
+
   if ((ext === "jpg" || ext === "jpeg") && (preset === "vinyl" || preset === "logo")) {
     status.innerHTML = '<span class="warning">JPEG photos are better in Car Photo / Posterized SVG mode. Switching preset automatically.</span>';
     document.getElementById("preset").value = "photo";
@@ -373,9 +392,17 @@ async function convertFile() {
 
     status.innerHTML = '<span class="success">Conversion complete.</span>';
     resultBox.style.display = "block";
+    trackSvgConverter("convert_completed", {
+      preset,
+      extension: ext
+    });
 
   } catch (error) {
     status.innerHTML = `<span class="error">Error: ${escapeHTML(error.message)}</span>`;
+    trackSvgConverter("convert_failed", {
+      preset,
+      extension: ext
+    });
   } finally {
     convertBtn.disabled = false;
   }
@@ -386,6 +413,7 @@ async function copySVG() {
 
   try {
     await navigator.clipboard.writeText(latestSvgText);
+    trackSvgConverter("copy_svg");
     alert("SVG code copied.");
   } catch (err) {
     alert("Clipboard blocked by browser.");
@@ -394,6 +422,7 @@ async function copySVG() {
 
 function openSVG() {
   if (!latestSvgUrl) return;
+  trackSvgConverter("open_svg_tab");
   window.open(latestSvgUrl, "_blank");
 }
 

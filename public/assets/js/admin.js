@@ -172,18 +172,92 @@ function fillSettingsForm(settings) {
   form.elements.homePhrase.value = settings.homePhrase || "";
 }
 
+function renderAnalyticsMetric(id, value) {
+  const target = document.getElementById(id);
+  if (target) {
+    target.textContent = value;
+  }
+}
+
+function renderAnalyticsList(id, items, emptyLabel, formatter) {
+  const target = document.getElementById(id);
+  if (!target) return;
+
+  if (!items.length) {
+    target.innerHTML = `<div class="empty-state">${emptyLabel}</div>`;
+    return;
+  }
+
+  target.innerHTML = items.map((item) => formatter(item)).join("");
+}
+
+function renderAnalyticsSummary(summary) {
+  if (!summary || !summary.totals) return;
+
+  renderAnalyticsMetric("analyticsTotalVisitors", String(summary.totals.uniqueVisitors || 0));
+  renderAnalyticsMetric("analyticsTotalPageViews", String(summary.totals.pageViews || 0));
+  renderAnalyticsMetric("analyticsTotalProductViews", String(summary.totals.productViews || 0));
+  renderAnalyticsMetric("analyticsTotalToolEvents", String(summary.totals.toolEvents || 0));
+
+  renderAnalyticsList(
+    "analyticsTopPages",
+    summary.topPages || [],
+    "No page views yet.",
+    (item) => `<div class="order-summary-line"><span>${item.label}</span><strong>${item.count}</strong></div>`
+  );
+
+  renderAnalyticsList(
+    "analyticsTopProducts",
+    summary.topProducts || [],
+    "No product views yet.",
+    (item) => `<div class="order-summary-line"><span>${item.label}</span><strong>${item.count}</strong></div>`
+  );
+
+  renderAnalyticsList(
+    "analyticsTopTools",
+    summary.topTools || [],
+    "No tool usage yet.",
+    (item) => `<div class="order-summary-line"><span>${item.label}</span><strong>${item.count}</strong></div>`
+  );
+
+  renderAnalyticsList(
+    "analyticsTopCountries",
+    summary.topCountries || [],
+    "No country data yet.",
+    (item) => `<div class="order-summary-line"><span>${item.label}</span><strong>${item.count}</strong></div>`
+  );
+
+  renderAnalyticsList(
+    "analyticsRecentEvents",
+    summary.recentEvents || [],
+    "No recent activity yet.",
+    (event) => {
+      const title = event.productName || event.pathname || event.tool || event.type;
+      const detailParts = [event.type, event.tool, event.action, event.location?.country].filter(Boolean);
+      return `
+        <div class="order-card">
+          <div class="order-summary-line"><span>${title}</span><strong>${new Date(event.timestamp).toLocaleString()}</strong></div>
+          <p>${detailParts.join(" • ")}</p>
+        </div>
+      `;
+    }
+  );
+}
+
 async function loadCmsData() {
-  const [products, orders, messages, settings] = await Promise.all([
+  const [products, orders, messages, settings, analytics] = await Promise.all([
     cmsRequest("/api/cms/products"),
     cmsRequest("/api/cms/orders"),
     cmsRequest("/api/cms/messages"),
-    cmsRequest("/api/cms/settings")
+    cmsRequest("/api/cms/settings"),
+    cmsRequest("/api/cms/analytics")
   ]);
 
   renderProductsTable(products);
   renderOrders(orders);
   renderMessages(messages);
   fillSettingsForm(settings);
+  renderAnalyticsSummary(analytics);
 }
 
 function initCmsLogin() {

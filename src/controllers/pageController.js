@@ -23,7 +23,8 @@ const pageRoutes = [
 
 const toolRoutes = [
   "svg-converter",
-  "decal-preview"
+  "decal-preview",
+  "windshield-banner-calculator"
 ];
 
 function sendView(res, fileName, statusCode = 200) {

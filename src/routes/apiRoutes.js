@@ -6,6 +6,7 @@ const { listVehicleCatalog } = require("../controllers/vehicleController");
 const { signup, login } = require("../controllers/authController");
 const { listOrders, createNewOrder } = require("../controllers/orderController");
 const { createNewMessage } = require("../controllers/messageController");
+const { createAnalyticsEvent, getCmsAnalyticsSummary } = require("../controllers/analyticsController");
 const {
 	cmsLogin,
 	listCmsProducts,
@@ -27,6 +28,7 @@ router.get("/products", listProducts);
 router.get("/categories", listCategories);
 router.get("/vehicles/catalog", listVehicleCatalog);
 router.get("/settings/public", getPublicSettings);
+router.post("/analytics/events", createAnalyticsEvent);
 router.post("/auth/signup", signup);
 router.post("/auth/login", login);
 router.get("/orders", listOrders);
@@ -40,6 +42,7 @@ router.put("/cms/products/:id", requireCmsAuth, updateCmsProduct);
 router.delete("/cms/products/:id", requireCmsAuth, deleteCmsProduct);
 router.get("/cms/orders", requireCmsAuth, listCmsOrders);
 router.get("/cms/messages", requireCmsAuth, listCmsMessages);
+router.get("/cms/analytics", requireCmsAuth, getCmsAnalyticsSummary);
 router.get("/cms/settings", requireCmsAuth, getCmsSettings);
 router.put("/cms/settings", requireCmsAuth, updateCmsSettings);
 

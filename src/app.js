@@ -5,6 +5,7 @@ const { router: stripeRoutes, handleStripeWebhook } = require("./routes/stripeRo
 const webRoutes = require("./routes/webRoutes");
 const { ensureDbFile } = require("./models/dbModel");
 const { serveNotFound } = require("./controllers/pageController");
+const { activityLogger } = require("./middleware/activityLogger");
 const { errorHandler } = require("./middleware/errorHandler");
 
 const app = express();
@@ -14,6 +15,7 @@ const publicDir = path.join(rootDir, "public");
 ensureDbFile();
 
 app.disable("x-powered-by");
+app.set("trust proxy", true);
 app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), handleStripeWebhook);
 app.use(express.json({ limit: "1mb" }));
 app.use((req, res, next) => {
@@ -25,6 +27,7 @@ app.use((req, res, next) => {
 });
 
 app.use(express.static(publicDir));
+app.use(activityLogger);
 app.use("/api", apiRoutes);
 app.use("/api/stripe", stripeRoutes);
 app.use(webRoutes);

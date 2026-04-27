@@ -71,10 +71,59 @@ const RMGApi = {
       method: 'POST',
       body: JSON.stringify(data)
     });
+  },
+  async trackAnalytics(data) {
+    return requestJson('/api/analytics/events', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
   }
 };
 
 window.RMGApi = RMGApi;
+
+function trackAnalyticsEvent(event) {
+  if (!event || typeof event !== 'object') {
+    return Promise.resolve();
+  }
+
+  return fetch('/api/analytics/events', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      pathname: window.location.pathname,
+      ...event
+    }),
+    keepalive: true
+  }).catch(() => undefined);
+}
+
+window.RMGAnalytics = {
+  track: trackAnalyticsEvent,
+  trackProductView(product) {
+    if (!product?.id) return Promise.resolve();
+    return trackAnalyticsEvent({
+      type: 'product_view',
+      productId: product.id,
+      productName: product.name || product.id,
+      payload: {
+        category: product.category || '',
+        subcategory: product.subcategory || ''
+      }
+    });
+  },
+  trackTool(tool, action, payload = {}) {
+    if (!tool || !action) return Promise.resolve();
+    return trackAnalyticsEvent({
+      type: 'tool_event',
+      tool,
+      action,
+      payload
+    });
+  }
+};
 
 function getStorage(key, fallback) {
   try {

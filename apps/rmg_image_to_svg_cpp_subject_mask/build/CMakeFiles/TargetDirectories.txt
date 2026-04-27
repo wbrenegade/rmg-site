@@ -1,3 +1,0 @@
-/var/www/rmg-site/apps/rmg_image_to_svg_cpp_subject_mask/build/CMakeFiles/rmg_svgtrace.dir
-/var/www/rmg-site/apps/rmg_image_to_svg_cpp_subject_mask/build/CMakeFiles/edit_cache.dir
-/var/www/rmg-site/apps/rmg_image_to_svg_cpp_subject_mask/build/CMakeFiles/rebuild_cache.dir
