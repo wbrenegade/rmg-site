@@ -7,6 +7,7 @@ const { signup, login } = require("../controllers/authController");
 const { listOrders, createNewOrder } = require("../controllers/orderController");
 const { createNewMessage } = require("../controllers/messageController");
 const { createAnalyticsEvent, getCmsAnalyticsSummary } = require("../controllers/analyticsController");
+const { sendCmsTestOrderAlert } = require("../controllers/orderAlertController");
 const {
 	cmsLogin,
 	listCmsProducts,
@@ -43,6 +44,7 @@ router.delete("/cms/products/:id", requireCmsAuth, deleteCmsProduct);
 router.get("/cms/orders", requireCmsAuth, listCmsOrders);
 router.get("/cms/messages", requireCmsAuth, listCmsMessages);
 router.get("/cms/analytics", requireCmsAuth, getCmsAnalyticsSummary);
+router.post("/cms/order-alerts/test", requireCmsAuth, sendCmsTestOrderAlert);
 router.get("/cms/settings", requireCmsAuth, getCmsSettings);
 router.put("/cms/settings", requireCmsAuth, updateCmsSettings);
 

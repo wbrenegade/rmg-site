@@ -73,6 +73,7 @@ API endpoints:
 - GET /api/cms/messages
 - GET /api/cms/settings
 - PUT /api/cms/settings
+- POST /api/cms/order-alerts/test
 - POST /api/stripe/create-checkout-session
 - POST /api/stripe/webhook
 
@@ -82,8 +83,14 @@ Stripe paid-order alerts:
 - Set `STRIPE_WEBHOOK_SECRET` to the signing secret from your Stripe webhook endpoint.
 - In Stripe, point a webhook endpoint at `/api/stripe/webhook` and subscribe to `checkout.session.completed`.
 - To receive text alerts, also set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_PHONE`, and `ORDER_ALERT_TO_PHONE`.
-- To receive a webhook alert in Slack, Discord, Zapier, or another service, set `ORDER_ALERT_WEBHOOK_URL`.
+- To receive webhook alerts (Slack/Discord/Zapier/etc), set `ORDER_ALERT_WEBHOOK_URL`.
+- Optional: set `ORDER_ALERT_WEBHOOK_FORMAT` to `auto`, `slack`, `discord`, or `json`.
 - If SMS/webhook credentials are missing, the server still logs each paid order alert to stdout.
+
+Order alert testing:
+- Login to CMS first (to obtain a CMS token).
+- Call `POST /api/cms/order-alerts/test` with your CMS Bearer token.
+- This sends a sample paid-order alert through configured channels so you can verify setup instantly.
 
 MVC backend structure:
 - src/models: data and persistence logic

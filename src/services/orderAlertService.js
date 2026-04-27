@@ -2,6 +2,39 @@ function formatMoney(amount) {
   return `$${Number(amount || 0).toFixed(2)}`;
 }
 
+function detectWebhookFormat(webhookUrl) {
+  const configuredFormat = String(process.env.ORDER_ALERT_WEBHOOK_FORMAT || "auto").trim().toLowerCase();
+
+  if (configuredFormat && configuredFormat !== "auto") {
+    return configuredFormat;
+  }
+
+  if (webhookUrl.includes("discord.com/api/webhooks")) {
+    return "discord";
+  }
+
+  if (webhookUrl.includes("hooks.slack.com/services")) {
+    return "slack";
+  }
+
+  return "json";
+}
+
+function buildWebhookPayload(order, message, webhookFormat) {
+  if (webhookFormat === "discord") {
+    return { content: message };
+  }
+
+  if (webhookFormat === "slack") {
+    return { text: message };
+  }
+
+  return {
+    text: message,
+    order
+  };
+}
+
 function buildOrderAlertMessage(order = {}) {
   const customerName = [order.customer?.firstName, order.customer?.lastName].filter(Boolean).join(" ") || "Unknown customer";
   const itemCount = Array.isArray(order.items)
@@ -28,7 +61,7 @@ async function sendTwilioSms(message) {
   const toPhone = process.env.ORDER_ALERT_TO_PHONE || process.env.ALERT_TO_PHONE;
 
   if (!accountSid || !authToken || !fromPhone || !toPhone) {
-    return { skipped: true, channel: "sms" };
+    return { skipped: true, channel: "sms", reason: "missing-config" };
   }
 
   const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
@@ -56,16 +89,17 @@ async function sendWebhookAlert(order, message) {
   const webhookUrl = process.env.ORDER_ALERT_WEBHOOK_URL;
 
   if (!webhookUrl) {
-    return { skipped: true, channel: "webhook" };
+    return { skipped: true, channel: "webhook", reason: "missing-config" };
   }
+
+  const webhookFormat = detectWebhookFormat(webhookUrl);
+  const payload = buildWebhookPayload(order, message, webhookFormat);
 
   const response = await fetch(webhookUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      text: message,
-      order
-    })
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(8000)
   });
 
   if (!response.ok) {
@@ -73,23 +107,46 @@ async function sendWebhookAlert(order, message) {
     throw new Error(`Webhook alert failed: ${response.status} ${errorText}`);
   }
 
-  return { skipped: false, channel: "webhook" };
+  return { skipped: false, channel: "webhook", webhookFormat };
 }
 
 async function sendOrderAlert(order) {
   const message = buildOrderAlertMessage(order);
   console.info(`[order-alert] ${message}`);
 
-  const results = await Promise.allSettled([
+  const settled = await Promise.allSettled([
     sendTwilioSms(message),
     sendWebhookAlert(order, message)
   ]);
 
-  results.forEach((result) => {
+  settled.forEach((result) => {
     if (result.status === "rejected") {
       console.error("Order alert delivery failed:", result.reason);
     }
   });
+
+  const results = settled.map((result, index) => {
+    const channel = index === 0 ? "sms" : "webhook";
+    if (result.status === "rejected") {
+      return {
+        channel,
+        skipped: false,
+        ok: false,
+        error: result.reason?.message || String(result.reason || "Unknown alert error")
+      };
+    }
+
+    return {
+      channel,
+      ...result.value,
+      ok: !result.value?.skipped
+    };
+  });
+
+  const deliveredCount = results.filter((result) => result.ok).length;
+  if (!deliveredCount) {
+    console.warn("[order-alert] No external channels delivered this alert. Configure ORDER_ALERT_WEBHOOK_URL and/or Twilio settings.");
+  }
 
   return results;
 }

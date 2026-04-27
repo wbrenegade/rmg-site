@@ -361,10 +361,34 @@ function initCmsSettingsForm() {
   });
 }
 
+function initCmsOrderAlertTools() {
+  const testButton = document.getElementById("sendOrderAlertTestBtn");
+  if (!testButton) return;
+
+  testButton.addEventListener("click", async () => {
+    const originalText = testButton.textContent;
+    testButton.disabled = true;
+    testButton.textContent = "Sending test alert...";
+
+    try {
+      const result = await cmsRequest("/api/cms/order-alerts/test", {
+        method: "POST"
+      });
+      showMessage(result.message || "Test order alert sent.");
+    } catch (error) {
+      showMessage(error.message || "Failed to send test order alert.", "error");
+    } finally {
+      testButton.disabled = false;
+      testButton.textContent = originalText;
+    }
+  });
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   initCmsLogin();
   initCmsProductForm();
   initCmsSettingsForm();
+  initCmsOrderAlertTools();
 
   if (getCmsToken()) {
     try {
