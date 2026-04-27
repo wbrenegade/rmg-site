@@ -12,7 +12,14 @@ function getOrdersByUserId(userId) {
   return db.orders.filter((order) => order.userId === userId);
 }
 
-function createOrder({ userId, customer, items, subtotal, tax, total }) {
+function findOrderByStripeSessionId(stripeSessionId) {
+  const db = readDb();
+  const normalizedSessionId = String(stripeSessionId || "").trim();
+  if (!normalizedSessionId) return null;
+  return db.orders.find((order) => order.stripeSessionId === normalizedSessionId) || null;
+}
+
+function createOrder({ userId, customer, items, subtotal, tax, total, status, stripeSessionId, paymentStatus }) {
   const db = readDb();
   const order = {
     id: randomUUID(),
@@ -22,7 +29,9 @@ function createOrder({ userId, customer, items, subtotal, tax, total }) {
     subtotal,
     tax,
     total,
-    status: "Pending Fulfillment",
+    status: status || "Pending Fulfillment",
+    stripeSessionId: stripeSessionId || null,
+    paymentStatus: paymentStatus || null,
     createdAt: new Date().toISOString()
   };
 
@@ -34,5 +43,6 @@ function createOrder({ userId, customer, items, subtotal, tax, total }) {
 module.exports = {
   getAllOrders,
   getOrdersByUserId,
+  findOrderByStripeSessionId,
   createOrder
 };

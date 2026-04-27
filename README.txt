@@ -17,7 +17,7 @@ That means:
 - orders are saved via backend API (with local fallback)
 - contact form submissions are saved via backend API (with local fallback)
 - cart remains browser localStorage for quick storefront UX
-- payment is NOT live and should be replaced with Stripe, PayPal, Square, Shopify, or another real payment provider
+- Stripe checkout is wired in, and paid orders can now trigger server-side alerts when Stripe webhooks are configured
 
 Pages included:
 - views/index.html
@@ -73,6 +73,17 @@ API endpoints:
 - GET /api/cms/messages
 - GET /api/cms/settings
 - PUT /api/cms/settings
+- POST /api/stripe/create-checkout-session
+- POST /api/stripe/webhook
+
+Stripe paid-order alerts:
+- Set `STRIPE_SECRET_KEY` to your Stripe secret key.
+- Set `SITE_URL` to your public site URL so Stripe redirects correctly.
+- Set `STRIPE_WEBHOOK_SECRET` to the signing secret from your Stripe webhook endpoint.
+- In Stripe, point a webhook endpoint at `/api/stripe/webhook` and subscribe to `checkout.session.completed`.
+- To receive text alerts, also set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_PHONE`, and `ORDER_ALERT_TO_PHONE`.
+- To receive a webhook alert in Slack, Discord, Zapier, or another service, set `ORDER_ALERT_WEBHOOK_URL`.
+- If SMS/webhook credentials are missing, the server still logs each paid order alert to stdout.
 
 MVC backend structure:
 - src/models: data and persistence logic

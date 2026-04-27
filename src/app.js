@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require("path");
 const apiRoutes = require("./routes/apiRoutes");
-const stripeRoutes = require("./routes/stripeRoutes");
+const { router: stripeRoutes, handleStripeWebhook } = require("./routes/stripeRoutes");
 const webRoutes = require("./routes/webRoutes");
 const { ensureDbFile } = require("./models/dbModel");
 const { serveNotFound } = require("./controllers/pageController");
@@ -14,6 +14,7 @@ const publicDir = path.join(rootDir, "public");
 ensureDbFile();
 
 app.disable("x-powered-by");
+app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), handleStripeWebhook);
 app.use(express.json({ limit: "1mb" }));
 app.use((req, res, next) => {
   res.setHeader("X-Content-Type-Options", "nosniff");

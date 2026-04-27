@@ -130,6 +130,7 @@ function buildInitialData() {
   return {
     users: [],
     orders: [],
+    pendingCheckouts: [],
     messages: [],
     categories: defaultCategories,
     products: defaultProducts,
@@ -145,6 +146,7 @@ function normalizeDb(parsed = {}) {
   return {
     users: Array.isArray(parsed.users) ? parsed.users : [],
     orders: Array.isArray(parsed.orders) ? parsed.orders : [],
+    pendingCheckouts: Array.isArray(parsed.pendingCheckouts) ? parsed.pendingCheckouts : [],
     messages: Array.isArray(parsed.messages) ? parsed.messages : [],
     categories: normalizeCategories(parsed.categories),
     products: parsedProducts,
