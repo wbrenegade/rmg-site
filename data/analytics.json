@@ -419,6 +419,28 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "09fb6ea4-3ada-4d14-a851-931e8ac5c77a",
+      "type": "page_view",
+      "pathname": "/installers",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/login.html",
+      "method": "GET",
+      "timestamp": "2026-04-27T05:34:34.802Z",
+      "date": "2026-04-27",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }

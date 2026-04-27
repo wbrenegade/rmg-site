@@ -20,7 +20,7 @@
   <link rel="icon" type="image/png" href="/assets/imgs/favicon.png" />
   <link rel="stylesheet" href="/assets/css/style.css" />
   <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     /* ── Layout ── */
     .installer-layout {
@@ -360,7 +360,7 @@
   </footer>
 
   <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLs=" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
@@ -689,10 +689,21 @@
 
     // ── main.js cart count ──
     window.addEventListener('DOMContentLoaded', () => {
-      if (window.updateCartCount) window.updateCartCount();
+      // ── cart count ──
+      try {
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const count = cart.reduce((s, i) => s + (i.quantity || 1), 0);
+        document.querySelectorAll('#cartCount').forEach(el => el.textContent = count);
+      } catch(e) {}
+
+      // ── nav toggle ──
+      const navToggle = document.getElementById('navToggle');
+      const siteNav = document.getElementById('siteNav');
+      if (navToggle && siteNav) {
+        navToggle.addEventListener('click', () => siteNav.classList.toggle('open'));
+      }
     });
   </script>
 
-  <script src="/assets/js/main.js"></script>
 </body>
 </html>
