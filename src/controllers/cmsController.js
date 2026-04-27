@@ -5,7 +5,7 @@ const {
   deleteProduct,
   getProductById
 } = require("../models/productModel");
-const { getAllOrders } = require("../models/orderModel");
+const { getAllOrders, markOrderFulfilled } = require("../models/orderModel");
 const { getAllMessages } = require("../models/messageModel");
 const { getSiteSettings, updateSiteSettings } = require("../models/siteSettingsModel");
 const { createCmsToken } = require("../middleware/requireCmsAuth");
@@ -75,6 +75,18 @@ function listCmsOrders(req, res) {
   res.json(getAllOrders());
 }
 
+function markCmsOrderFulfilled(req, res) {
+  const { id } = req.params;
+  const updated = markOrderFulfilled(id);
+
+  if (!updated) {
+    res.status(404).json({ error: "Order not found." });
+    return;
+  }
+
+  res.json(updated);
+}
+
 function listCmsMessages(req, res) {
   res.json(getAllMessages());
 }
@@ -104,6 +116,7 @@ module.exports = {
   updateCmsProduct,
   deleteCmsProduct,
   listCmsOrders,
+  markCmsOrderFulfilled,
   listCmsMessages,
   getPublicSettings,
   getCmsSettings,

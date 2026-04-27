@@ -2,9 +2,11 @@ const { randomUUID } = require("crypto");
 const { readDb, writeDb } = require("./dbModel");
 const {
   getAllOrdersFromSqlite,
+  getOrderByIdFromSqlite,
   getOrdersByUserIdFromSqlite,
   findOrderByStripeSessionIdFromSqlite,
-  insertOrderIntoSqlite
+  insertOrderIntoSqlite,
+  updateOrderStatusInSqlite
 } = require("./sqliteStoreModel");
 
 const shouldUseSqliteReads = process.env.USE_SQLITE_READS !== "false";
@@ -102,9 +104,52 @@ function createOrder({ userId, customer, items, subtotal, tax, total, status, st
   return order;
 }
 
+function markOrderFulfilled(orderId) {
+  const normalizedOrderId = String(orderId || "").trim();
+  if (!normalizedOrderId) {
+    return null;
+  }
+
+  let sqliteUpdateSucceeded = false;
+  let sqliteUpdatedOrder = null;
+
+  try {
+    sqliteUpdateSucceeded = updateOrderStatusInSqlite(normalizedOrderId, "Fulfilled");
+    if (sqliteUpdateSucceeded) {
+      sqliteUpdatedOrder = getOrderByIdFromSqlite(normalizedOrderId);
+    }
+  } catch {
+    sqliteUpdateSucceeded = false;
+  }
+
+  const db = readDb();
+  db.orders = Array.isArray(db.orders) ? db.orders : [];
+  const orderIndex = db.orders.findIndex((order) => order.id === normalizedOrderId);
+  const jsonOrderExists = orderIndex >= 0;
+
+  if (jsonOrderExists) {
+    db.orders[orderIndex] = {
+      ...db.orders[orderIndex],
+      status: "Fulfilled"
+    };
+  }
+
+  if (shouldDualWriteJson || !sqliteUpdateSucceeded) {
+    if (!jsonOrderExists) {
+      return sqliteUpdatedOrder;
+    }
+
+    writeDb(db);
+    return db.orders[orderIndex];
+  }
+
+  return sqliteUpdatedOrder;
+}
+
 module.exports = {
   getAllOrders,
   getOrdersByUserId,
   findOrderByStripeSessionId,
-  createOrder
+  createOrder,
+  markOrderFulfilled
 };

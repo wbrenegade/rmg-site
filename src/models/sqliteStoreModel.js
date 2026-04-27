@@ -245,6 +245,17 @@ function getAllOrdersFromSqlite() {
   return rows.map(mapOrderRow);
 }
 
+function getOrderByIdFromSqlite(orderId) {
+  const db = getSqliteDb();
+  const normalizedOrderId = String(orderId || "").trim();
+  if (!normalizedOrderId) {
+    return null;
+  }
+
+  const row = db.prepare("SELECT * FROM orders WHERE id = ? LIMIT 1").get(normalizedOrderId);
+  return row ? mapOrderRow(row) : null;
+}
+
 function getOrdersByUserIdFromSqlite(userId) {
   const db = getSqliteDb();
   const normalizedUserId = String(userId || "").trim();
@@ -296,6 +307,19 @@ function insertOrderIntoSqlite(order) {
     order.paymentStatus ? String(order.paymentStatus) : null,
     String(order.createdAt || new Date().toISOString())
   );
+}
+
+function updateOrderStatusInSqlite(orderId, status) {
+  const db = getSqliteDb();
+  const normalizedOrderId = String(orderId || "").trim();
+  const normalizedStatus = String(status || "").trim();
+
+  if (!normalizedOrderId || !normalizedStatus) {
+    return false;
+  }
+
+  const result = db.prepare("UPDATE orders SET status = ? WHERE id = ?").run(normalizedStatus, normalizedOrderId);
+  return result.changes > 0;
 }
 
 function getAllAnalyticsEventsFromSqlite() {
@@ -362,9 +386,11 @@ module.exports = {
   getSqliteDb,
   sqliteFilePath,
   getAllOrdersFromSqlite,
+  getOrderByIdFromSqlite,
   getOrdersByUserIdFromSqlite,
   findOrderByStripeSessionIdFromSqlite,
   insertOrderIntoSqlite,
+  updateOrderStatusInSqlite,
   getAllAnalyticsEventsFromSqlite,
   insertAnalyticsEventIntoSqlite,
   trimAnalyticsEventsInSqlite

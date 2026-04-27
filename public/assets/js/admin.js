@@ -144,6 +144,66 @@ function renderOrders(orders) {
   `).join("");
 }
 
+function isOrderWaitingFulfillment(order = {}) {
+  const status = String(order.status || "").trim().toLowerCase();
+  const paymentStatus = String(order.paymentStatus || "").trim().toLowerCase();
+
+  const pendingByStatus = status.includes("pending fulfillment") || status.includes("pending fulfilment");
+  const notFulfilled = !status.includes("fulfilled") && !status.includes("complete") && !status.includes("completed");
+  const paid = paymentStatus === "paid" || status.includes("paid");
+
+  return pendingByStatus || (paid && notFulfilled);
+}
+
+function renderPendingOrders(orders) {
+  const target = document.getElementById("cmsPendingOrdersList");
+  if (!target) return;
+
+  const pendingOrders = (orders || []).filter((order) => isOrderWaitingFulfillment(order));
+
+  if (!pendingOrders.length) {
+    target.innerHTML = '<div class="empty-state">No orders currently waiting for fulfillment.</div>';
+    return;
+  }
+
+  target.innerHTML = pendingOrders.slice(0, 25).map((order) => `
+    <div class="order-card">
+      <div class="order-summary-line"><span>Order #</span><strong>${order.id.slice(0, 8).toUpperCase()}</strong></div>
+      <div class="order-summary-line"><span>Customer</span><strong>${order.customer?.firstName || "Guest"} ${order.customer?.lastName || ""}</strong></div>
+      <div class="order-summary-line"><span>Total</span><strong>${formatCurrency(order.total || 0)}</strong></div>
+      <div class="order-summary-line"><span>Status</span><strong>${order.status || "Pending Fulfillment"}</strong></div>
+      <div class="order-summary-line"><span>Email</span><strong>${order.customer?.email || "N/A"}</strong></div>
+      <div class="order-summary-line"><span>Date</span><strong>${new Date(order.createdAt).toLocaleString()}</strong></div>
+      <div class="cms-actions-row">
+        <button class="btn btn-outline" data-action="mark-fulfilled" data-id="${order.id}">Mark Fulfilled</button>
+      </div>
+    </div>
+  `).join("");
+
+  target.querySelectorAll("button[data-action='mark-fulfilled']").forEach((button) => {
+    button.addEventListener("click", async () => {
+      if (!confirm("Mark this order as fulfilled?")) return;
+
+      const originalText = button.textContent;
+      button.disabled = true;
+      button.textContent = "Updating...";
+
+      try {
+        await cmsRequest(`/api/cms/orders/${button.dataset.id}/fulfill`, {
+          method: "PATCH"
+        });
+        showMessage("Order marked as fulfilled.");
+        await loadCmsData();
+      } catch (error) {
+        showMessage(error.message || "Failed to mark order as fulfilled.", "error");
+      } finally {
+        button.disabled = false;
+        button.textContent = originalText;
+      }
+    });
+  });
+}
+
 function renderMessages(messages) {
   const target = document.getElementById("cmsMessagesList");
   if (!target) return;
@@ -254,6 +314,7 @@ async function loadCmsData() {
   ]);
 
   renderProductsTable(products);
+  renderPendingOrders(orders);
   renderOrders(orders);
   renderMessages(messages);
   fillSettingsForm(settings);

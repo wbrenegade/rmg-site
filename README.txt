@@ -77,6 +77,12 @@ API endpoints:
 - POST /api/stripe/create-checkout-session
 - POST /api/stripe/webhook
 
+SEO endpoints and indexing behavior:
+- GET /robots.txt
+- GET /sitemap.xml
+- Canonical link headers are added on HTML page responses.
+- X-Robots-Tag is set to noindex for private pages (/admin, /login, /signup, /account, /cart, /checkout, /order-success).
+
 Stripe paid-order alerts:
 - Set `STRIPE_SECRET_KEY` to your Stripe secret key.
 - Set `SITE_URL` to your public site URL so Stripe redirects correctly.

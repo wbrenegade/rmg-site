@@ -15,6 +15,7 @@ const {
 	updateCmsProduct,
 	deleteCmsProduct,
 	listCmsOrders,
+	markCmsOrderFulfilled,
 	listCmsMessages,
 	getPublicSettings,
 	getCmsSettings,
@@ -42,6 +43,7 @@ router.post("/cms/products", requireCmsAuth, createCmsProduct);
 router.put("/cms/products/:id", requireCmsAuth, updateCmsProduct);
 router.delete("/cms/products/:id", requireCmsAuth, deleteCmsProduct);
 router.get("/cms/orders", requireCmsAuth, listCmsOrders);
+router.patch("/cms/orders/:id/fulfill", requireCmsAuth, markCmsOrderFulfilled);
 router.get("/cms/messages", requireCmsAuth, listCmsMessages);
 router.get("/cms/analytics", requireCmsAuth, getCmsAnalyticsSummary);
 router.post("/cms/order-alerts/test", requireCmsAuth, sendCmsTestOrderAlert);

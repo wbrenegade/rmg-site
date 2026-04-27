@@ -11,6 +11,7 @@ const {
   pageRoutes,
   toolRoutes
 } = require("../controllers/pageController");
+const { serveRobotsTxt, serveSitemapXml } = require("../controllers/seoController");
 
 const router = express.Router();
 
@@ -18,6 +19,8 @@ const pagePattern = pageRoutes.join("|");
 const toolPattern = toolRoutes.join("|");
 
 router.get("/", serveIndex);
+router.get("/robots.txt", serveRobotsTxt);
+router.get("/sitemap.xml", serveSitemapXml);
 
 router.get("/tools", serveToolsIndex);
 router.get(`/tools/:tool(${toolPattern})`, serveToolPage);

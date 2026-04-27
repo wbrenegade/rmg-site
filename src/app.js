@@ -6,6 +6,7 @@ const webRoutes = require("./routes/webRoutes");
 const { ensureDbFile } = require("./models/dbModel");
 const { serveNotFound } = require("./controllers/pageController");
 const { activityLogger } = require("./middleware/activityLogger");
+const { setSeoHeaders } = require("./middleware/seoHeaders");
 const { errorHandler } = require("./middleware/errorHandler");
 
 const app = express();
@@ -26,6 +27,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(setSeoHeaders);
 app.use(express.static(publicDir));
 app.use(activityLogger);
 app.use("/api", apiRoutes);

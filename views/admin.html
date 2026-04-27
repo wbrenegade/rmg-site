@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CMS Admin | RenegadeMade Graphix</title>
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="RenegadeMade Graphix" />
+  <meta property="og:title" content="CMS Admin | RenegadeMade Graphix" />
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
@@ -125,6 +129,10 @@
 
     <section class="section">
       <div class="container cms-layout">
+        <div class="card">
+          <h2>Orders Waiting to Be Fulfilled</h2>
+          <div id="cmsPendingOrdersList" class="cms-list"></div>
+        </div>
         <div class="card">
           <h2>Recent Orders</h2>
           <div id="cmsOrdersList" class="cms-list"></div>
