@@ -2,6 +2,7 @@ async function initHomePage() {
   const heroVideo = document.getElementById('heroVideo');
   const tabsWrap = document.getElementById('homeCategoryTabs');
   const grid = document.getElementById('homeCategoryProducts');
+  const browseHint = document.getElementById('homeBrowseHint');
   const homeEyebrow = document.getElementById('homeEyebrow');
   const homeTitle = document.getElementById('homeTitle');
   const homePhrase = document.getElementById('homePhrase');
@@ -113,6 +114,57 @@ async function initHomePage() {
       .replaceAll('>', '&gt;')
       .replaceAll('"', '&quot;')
       .replaceAll("'", '&#39;');
+  }
+
+  function getTabIcon(category) {
+    if (category === 'featured') return '★';
+    if (category === 'all') return '▦';
+    if (category === 'Decals') return '🏁';
+    if (category === 'Window Tint') return '◼';
+    if (category === 'Lettering') return 'A';
+    if (category === 'Wraps') return '▤';
+    return '•';
+  }
+
+  function updateBrowseHint() {
+    if (!browseHint) return;
+
+    if (activeCategory === 'featured') {
+      browseHint.textContent = 'Featured shows hand-picked products to get started quickly. Use tabs to browse more categories.';
+      return;
+    }
+
+    if (activeCategory === 'all') {
+      browseHint.textContent = 'Showing all products. Use category tabs to narrow results, then open details or add to cart.';
+      return;
+    }
+
+    if (activeCategory === 'Decals') {
+      if (activeDecalsSearchBy === 'type' && !activeDecalsType) {
+        browseHint.textContent = 'Decals: choose a type first, then pick the product that matches your style.';
+        return;
+      }
+
+      if (activeDecalsSearchBy === 'type' && activeDecalsType) {
+        browseHint.textContent = `Decals: viewing type ${activeDecalsType}. Use Back to choose a different type.`;
+        return;
+      }
+
+      if (!activeSubcategory) {
+        browseHint.textContent = 'Decals: choose a position first, then drill down into products.';
+        return;
+      }
+
+      if (activeSubcategory && !activeSubSubcategory) {
+        browseHint.textContent = `Decals: browsing ${activeSubcategory}. Choose a sub-type or use Back to change position.`;
+        return;
+      }
+
+      browseHint.textContent = `Decals: refined to ${activeSubSubcategory}. Open details for full customization options.`;
+      return;
+    }
+
+    browseHint.textContent = `Showing ${activeCategory} products. Open details for options, previews, and checkout flow.`;
   }
 
   function renderBrowseCards(items, level, categoryName, selectedSubcategory) {
@@ -235,6 +287,7 @@ async function initHomePage() {
       grid.innerHTML = showcaseProducts.length
         ? showcaseProducts.map((product) => renderProductCard(product)).join('')
         : '<div class="card empty-state">No featured products available right now.</div>';
+      updateBrowseHint();
       return;
     }
 
@@ -242,6 +295,7 @@ async function initHomePage() {
       grid.innerHTML = products.length
         ? products.map((product) => renderProductCard(product)).join('')
         : '<div class="card empty-state">No products available right now.</div>';
+      updateBrowseHint();
       return;
     }
 
@@ -251,6 +305,7 @@ async function initHomePage() {
       grid.innerHTML = categoryProducts.length
         ? categoryProducts.map((product) => renderProductCard(product)).join('')
         : '<div class="card empty-state">No products in this category yet.</div>';
+      updateBrowseHint();
       return;
     }
 
@@ -260,6 +315,7 @@ async function initHomePage() {
       grid.innerHTML = categoryProducts.length
         ? categoryProducts.map((product) => renderProductCard(product)).join('')
         : '<div class="card empty-state">No products in this category yet.</div>';
+      updateBrowseHint();
       return;
     }
 
@@ -278,6 +334,7 @@ async function initHomePage() {
             </div>
           </div>
         `;
+        updateBrowseHint();
         return;
       }
 
@@ -294,6 +351,7 @@ async function initHomePage() {
             : '<div class="card empty-state">No products in this selection yet.</div>'}
         </div>
       `;
+      updateBrowseHint();
       return;
     }
 
@@ -310,6 +368,7 @@ async function initHomePage() {
           </div>
         </div>
       `;
+      updateBrowseHint();
       return;
     }
 
@@ -336,6 +395,7 @@ async function initHomePage() {
           </div>
         </div>
       `;
+      updateBrowseHint();
       return;
     }
 
@@ -368,6 +428,7 @@ async function initHomePage() {
           : '<div class="card empty-state">No products in this selection yet.</div>'}
       </div>
     `;
+    updateBrowseHint();
   }
 
   function getTabLabel(category) {
@@ -391,7 +452,10 @@ async function initHomePage() {
 
   function renderTabs() {
     tabsWrap.innerHTML = tabs.map((category) => `
-      <button class="home-tab ${category === activeCategory ? 'active' : ''}" data-category="${category}" role="tab" aria-selected="${category === activeCategory}">${getTabLabel(category)}</button>
+      <button class="home-tab ${category === activeCategory ? 'active' : ''}" data-category="${category}" role="tab" aria-selected="${category === activeCategory}">
+        <span class="home-tab-icon" aria-hidden="true">${getTabIcon(category)}</span>
+        <span class="home-tab-label">${getTabLabel(category)}</span>
+      </button>
     `).join('');
 
     tabsWrap.querySelectorAll('.home-tab').forEach((tab) => {
