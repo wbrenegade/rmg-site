@@ -1943,6 +1943,74 @@
       "payload": {
         "mode": "regular"
       }
+    },
+    {
+      "id": "b52c67ac-ed65-4d8b-91e1-22cf64015ff1",
+      "type": "page_view",
+      "pathname": "/tools/windshield-banner-calculator",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/tools",
+      "method": "GET",
+      "timestamp": "2026-04-28T04:18:26.184Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "988feebd-e75e-4a5a-bc73-6e4c81c2b8d5",
+      "type": "tool_event",
+      "pathname": "/tools/windshield-banner-calculator",
+      "productId": null,
+      "productName": null,
+      "tool": "windshield-banner-calculator",
+      "action": "mode_changed",
+      "referrer": "https://renegademadegraphix.com/tools/windshield-banner-calculator",
+      "method": "POST",
+      "timestamp": "2026-04-28T04:18:26.953Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {
+        "mode": "regular"
+      }
+    },
+    {
+      "id": "559eb5d3-17e3-4469-b150-3e43cb7506ea",
+      "type": "tool_event",
+      "pathname": "/tools/windshield-banner-calculator",
+      "productId": null,
+      "productName": null,
+      "tool": "windshield-banner-calculator",
+      "action": "viewed",
+      "referrer": "https://renegademadegraphix.com/tools/windshield-banner-calculator",
+      "method": "POST",
+      "timestamp": "2026-04-28T04:18:26.962Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }
