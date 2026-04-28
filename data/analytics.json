@@ -1365,6 +1365,50 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "02f3b5a7-1932-4ad2-a3c7-0414a23e1111",
+      "type": "page_view",
+      "pathname": "/windshield-banner-creator",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/shop",
+      "method": "GET",
+      "timestamp": "2026-04-28T03:33:52.982Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "057382d7-d756-4d40-8f45-9a00b20947a2",
+      "type": "page_view",
+      "pathname": "/cart",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/cart.html",
+      "method": "GET",
+      "timestamp": "2026-04-28T03:34:55.965Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }

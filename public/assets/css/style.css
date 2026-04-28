@@ -643,6 +643,14 @@ textarea { resize: vertical; }
   gap: 10px;
 }
 
+.preview-option-row {
+  margin-top: 12px;
+}
+
+.preview-option-row label {
+  margin-bottom: 0;
+}
+
 .history-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
