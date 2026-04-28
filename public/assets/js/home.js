@@ -35,6 +35,8 @@ async function initHomePage() {
   }
 
   const products = typeof window.getProductsList === 'function' ? window.getProductsList() : (window.PRODUCTS || []);
+  const featuredProducts = products.filter((product) => Boolean(product && product.featured));
+  const showcaseProducts = featuredProducts.length ? featuredProducts : products.slice(0, 8);
   let categories = [];
 
   try {
@@ -91,14 +93,14 @@ async function initHomePage() {
     ...preferredCategoryOrder.filter((category) => uniqueCategories.includes(category)),
     ...uniqueCategories.filter((category) => !preferredCategoryOrder.includes(category))
   ];
-  const tabs = ['all', ...orderedCategories];
+  const tabs = ['featured', 'all', ...orderedCategories];
 
   if (!orderedCategories.length) {
     grid.innerHTML = '<div class="card empty-state">No products available right now.</div>';
     return;
   }
 
-  let activeCategory = 'all';
+  let activeCategory = 'featured';
   let activeSubcategory = null;
   let activeSubSubcategory = null;
   let activeDecalsSearchBy = 'position';
@@ -229,6 +231,13 @@ async function initHomePage() {
   }
 
   function renderProducts(category) {
+    if (category === 'featured') {
+      grid.innerHTML = showcaseProducts.length
+        ? showcaseProducts.map((product) => renderProductCard(product)).join('')
+        : '<div class="card empty-state">No featured products available right now.</div>';
+      return;
+    }
+
     if (category === 'all') {
       grid.innerHTML = products.length
         ? products.map((product) => renderProductCard(product)).join('')
@@ -362,6 +371,7 @@ async function initHomePage() {
   }
 
   function getTabLabel(category) {
+    if (category === 'featured') return `Featured (${showcaseProducts.length})`;
     if (category === 'all') return `All Products (${products.length})`;
     return category;
   }
