@@ -344,6 +344,7 @@ textarea { resize: vertical; }
 }
 
 .hero-collage-item {
+  position: relative;
   width: 120px;
   height: 80px;
   border-radius: 10px;
@@ -358,6 +359,27 @@ textarea { resize: vertical; }
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.hero-collage-label {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  border-radius: 999px;
+  padding: 3px 8px;
+  background: rgba(11, 13, 18, 0.78);
+  border: 1px solid rgba(255,255,255,0.16);
+  color: #f2f5fb;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: center;
+  font-weight: 700;
+}
+
+.home-followup-section {
+  padding-top: 20px;
 }
 
 @keyframes hero-collage-scroll {
@@ -1586,6 +1608,10 @@ body.modal-open {
   .hero-collage-item {
     width: 104px;
     height: 72px;
+  }
+
+  .home-followup-section {
+    padding-top: 14px;
   }
 
   .shop-toolbar,
