@@ -382,6 +382,14 @@ textarea { resize: vertical; }
   padding-top: 20px;
 }
 
+.home-hero {
+  padding-bottom: 24px;
+}
+
+.home-hero .hero-grid {
+  align-items: start;
+}
+
 @keyframes hero-collage-scroll {
   from {
     transform: translateX(0);
@@ -1612,6 +1620,10 @@ body.modal-open {
 
   .home-followup-section {
     padding-top: 14px;
+  }
+
+  .home-hero {
+    padding-bottom: 14px;
   }
 
   .shop-toolbar,

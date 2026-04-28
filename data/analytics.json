@@ -2123,6 +2123,50 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "7fbc7b3e-72f1-403d-8435-3255bf5b2ed3",
+      "type": "page_view",
+      "pathname": "/",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/tools",
+      "method": "GET",
+      "timestamp": "2026-04-28T04:28:50.706Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "1f935d83-c80a-4e7f-8407-944bc2b76573",
+      "type": "page_view",
+      "pathname": "/",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/tools",
+      "method": "GET",
+      "timestamp": "2026-04-28T04:28:53.356Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }
