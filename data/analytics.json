@@ -1167,6 +1167,28 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "95ea7740-324e-4143-bb1c-f5a124d60f8d",
+      "type": "page_view",
+      "pathname": "/shop",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/customize.html?productId=rmg-custom-banner",
+      "method": "GET",
+      "timestamp": "2026-04-28T02:27:12.302Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }

@@ -272,6 +272,19 @@ function calculateCartTotals() {
 function buildCustomizeUrl(product) {
   if (!product) return 'customize.html';
   if (product.customizeUrl) return product.customizeUrl;
+
+  const id = String(product.id || '').trim();
+  const subcategory = String(product.subcategory || '').toLowerCase();
+  const name = String(product.name || '').toLowerCase();
+  const isBannerProduct = id === 'rmg-windshield-banner'
+    || id === 'rmg-custom-banner'
+    || (subcategory.includes('windshield/rear window') && name.includes('banner'));
+
+  if (isBannerProduct) {
+    const params = new URLSearchParams({ productId: id || 'rmg-windshield-banner' });
+    return `/windshield-banner-creator?${params.toString()}`;
+  }
+
   const params = new URLSearchParams({ productId: product.id });
   return `customize.html?${params.toString()}`;
 }
