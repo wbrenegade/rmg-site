@@ -29,7 +29,10 @@ function initBannerCustomizer() {
     startY: 0,
     startPosX: 0,
     startPosY: 0,
-    startSize: 0
+    startSize: 0,
+    centerX: 0,
+    centerY: 0,
+    startDistance: 1
   };
 
   function getDragBounds() {
@@ -38,11 +41,10 @@ function initBannerCustomizer() {
     const designWidth = Math.max(design.offsetWidth, 1);
     const designHeight = Math.max(design.offsetHeight, 1);
 
-    const maxXByEdge = ((viewerWidth - designWidth) / 2 / designWidth) * 100;
-    const maxYByEdge = ((viewerHeight - designHeight) / 2 / designHeight) * 100;
-
-    const maxX = Math.max(35, Math.min(220, Math.floor(maxXByEdge)));
-    const maxY = Math.max(35, Math.min(220, Math.floor(maxYByEdge)));
+    const maxOffsetX = Math.max((viewerWidth - designWidth) / 2, 0);
+    const maxOffsetY = Math.max((viewerHeight - designHeight) / 2, 0);
+    const maxX = Math.max(35, Math.min(220, Math.floor((maxOffsetX / viewerWidth) * 100)));
+    const maxY = Math.max(35, Math.min(220, Math.floor((maxOffsetY / viewerHeight) * 100)));
 
     return {
       minX: -maxX,
@@ -132,7 +134,9 @@ function initBannerCustomizer() {
     textNode.style.fontWeight = '900';
     textNode.style.opacity = String(opacity);
 
-    design.style.transform = `translate(calc(-50% + ${posX}%), calc(-50% + ${posY}%)) rotate(${rotate}deg)`;
+    const offsetXpx = (posX / 100) * Math.max(viewer.clientWidth, 1);
+    const offsetYpx = (posY / 100) * Math.max(viewer.clientHeight, 1);
+    design.style.transform = `translate(calc(-50% + ${offsetXpx}px), calc(-50% + ${offsetYpx}px)) rotate(${rotate}deg)`;
   }
 
   function beginDrag(event, mode) {
@@ -142,6 +146,17 @@ function initBannerCustomizer() {
     dragState.startPosX = Number(posXInput?.value || 0);
     dragState.startPosY = Number(posYInput?.value || 0);
     dragState.startSize = Number(sizeInput?.value || 72);
+
+    if (mode === 'resize') {
+      const rect = design.getBoundingClientRect();
+      dragState.centerX = rect.left + (rect.width / 2);
+      dragState.centerY = rect.top + (rect.height / 2);
+      dragState.startDistance = Math.max(
+        1,
+        Math.hypot(event.clientX - dragState.centerX, event.clientY - dragState.centerY)
+      );
+    }
+
     design.classList.add('dragging');
     event.preventDefault();
   }
@@ -170,8 +185,12 @@ function initBannerCustomizer() {
         setGuideState(snappedY.center, snappedX.center);
       }
     } else {
-      const delta = Math.max(dx, -dy);
-      const nextSize = dragState.startSize + (delta * 0.18);
+      const currentDistance = Math.max(
+        1,
+        Math.hypot(event.clientX - dragState.centerX, event.clientY - dragState.centerY)
+      );
+      const scale = currentDistance / dragState.startDistance;
+      const nextSize = dragState.startSize * scale;
       sizeInput.value = String(Math.max(28, Math.min(150, Math.round(nextSize))));
       setGuideState(false, false);
     }
