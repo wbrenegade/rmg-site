@@ -324,11 +324,14 @@ textarea { resize: vertical; }
 }
 
 .hero-collage {
-  margin-top: 20px;
   border: 1px solid var(--line);
   border-radius: 14px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.02);
+}
+
+.hero-collage-row {
+  margin-top: 14px;
 }
 
 .hero-collage-track {
