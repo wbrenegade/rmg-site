@@ -17,17 +17,39 @@ const router = express.Router();
 
 const pagePattern = pageRoutes.join("|");
 const toolPattern = toolRoutes.join("|");
+const canonicalPagePath = new Map([
+  ["index", "/"],
+  ["tools", "/" + "tools"],
+  ...pageRoutes.map((page) => [page, `/${page}`])
+]);
+const canonicalToolPath = new Map(toolRoutes.map((tool) => [tool, `/tools/${tool}`]));
 
-function redirectToBannerCreator(req, res) {
+function redirectWithQuery(req, res, targetPath) {
   const queryIndex = req.originalUrl.indexOf("?");
   const query = queryIndex >= 0 ? req.originalUrl.slice(queryIndex) : "";
-  res.redirect(301, `/windshield-banner-creator${query}`);
+  res.redirect(301, `${targetPath}${query}`);
 }
 
-function redirectToCart(req, res) {
-  const queryIndex = req.originalUrl.indexOf("?");
-  const query = queryIndex >= 0 ? req.originalUrl.slice(queryIndex) : "";
-  res.redirect(301, `/cart${query}`);
+function redirectToCanonicalPage(req, res) {
+  const key = String(req.params.page || "").toLowerCase();
+  const target = canonicalPagePath.get(key);
+  if (!target) {
+    res.status(404).end();
+    return;
+  }
+
+  redirectWithQuery(req, res, target);
+}
+
+function redirectToCanonicalTool(req, res) {
+  const key = String(req.params.tool || "").toLowerCase();
+  const target = canonicalToolPath.get(key);
+  if (!target) {
+    res.status(404).end();
+    return;
+  }
+
+  redirectWithQuery(req, res, target);
 }
 
 router.get("/", serveIndex);
@@ -36,11 +58,13 @@ router.get("/sitemap.xml", serveSitemapXml);
 
 router.get("/tools", serveToolsIndex);
 router.get(`/tools/:tool(${toolPattern})`, serveToolPage);
+router.get(`/tools/:tool(${toolPattern})\\.html`, redirectToCanonicalTool);
+router.get(`/:tool(${toolPattern})\\.html`, redirectToCanonicalTool);
 
-router.get("/mustang-customizer", redirectToBannerCreator);
-router.get("/mustang-customizer.html", redirectToBannerCreator);
-router.get("/windshield-banner-creator.html", redirectToBannerCreator);
-router.get("/cart.html", redirectToCart);
+router.get(`/:page(index|tools|${pagePattern})\\.html`, redirectToCanonicalPage);
+
+router.get("/mustang-customizer", (req, res) => redirectWithQuery(req, res, "/windshield-banner-creator"));
+router.get("/mustang-customizer.html", (req, res) => redirectWithQuery(req, res, "/windshield-banner-creator"));
 
 router.get("/checkout", serveCheckout);
 router.get("/cart", serveCart);

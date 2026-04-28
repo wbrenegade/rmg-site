@@ -1409,6 +1409,50 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "b8baf655-ff3a-4466-96d4-e582cdb5b2cd",
+      "type": "page_view",
+      "pathname": "/shop",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/cart.html",
+      "method": "GET",
+      "timestamp": "2026-04-28T03:37:01.176Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "2d334a21-6337-4940-adf6-313523fbb08c",
+      "type": "page_view",
+      "pathname": "/cart",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/shop",
+      "method": "GET",
+      "timestamp": "2026-04-28T03:37:02.815Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }
