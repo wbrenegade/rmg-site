@@ -34,7 +34,20 @@ async function initHomePage() {
     await window.ensureProductsLoaded();
   }
 
-  const products = typeof window.getProductsList === 'function' ? window.getProductsList() : (window.PRODUCTS || []);
+  const sourceProducts = typeof window.getProductsList === 'function' ? window.getProductsList() : (window.PRODUCTS || []);
+  const excludedHomeCategories = new Set(['window tint', 'tint kits', 'film kits']);
+
+  function isExcludedHomeProduct(product) {
+    const category = String(product?.category || '').trim().toLowerCase();
+    const subcategory = String(product?.subcategory || '').trim().toLowerCase();
+    const name = String(product?.name || '').trim().toLowerCase();
+    const description = String(product?.description || '').trim().toLowerCase();
+    if (excludedHomeCategories.has(category)) return true;
+    if (subcategory === 'precut kits') return true;
+    return name.includes('tint kit') || description.includes('tint kit');
+  }
+
+  const products = sourceProducts.filter((product) => !isExcludedHomeProduct(product));
   const featuredProducts = products.filter((product) => Boolean(product && product.featured));
   const showcaseProducts = featuredProducts.length ? featuredProducts : products.slice(0, 8);
   let categories = [];
@@ -43,7 +56,7 @@ async function initHomePage() {
     if (window.RMGApi && typeof window.RMGApi.getCategories === 'function') {
       const apiCategories = await window.RMGApi.getCategories();
       if (Array.isArray(apiCategories)) {
-        categories = apiCategories;
+        categories = apiCategories.filter((category) => !excludedHomeCategories.has(String(category?.name || '').trim().toLowerCase()));
       }
     }
   } catch {
