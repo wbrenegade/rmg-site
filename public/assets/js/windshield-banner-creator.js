@@ -22,6 +22,173 @@ function initBannerCustomizer() {
   const spacingInput = document.getElementById('bannerSpacing');
   const curveInput = document.getElementById('bannerCurve');
   const opacityInput = document.getElementById('bannerOpacity');
+  const undoBtn = document.getElementById('bannerUndoBtn');
+  const redoBtn = document.getElementById('bannerRedoBtn');
+
+  const controls = [
+    {
+      key: 'bannerText',
+      element: textInput,
+      format: (value) => `"${value}" (${String(value || '').length} chars)`
+    },
+    {
+      key: 'bannerColor',
+      element: colorInput,
+      format: (value) => String(value || '#ffffff').toUpperCase()
+    },
+    {
+      key: 'bannerOutline',
+      element: outlineInput,
+      format: (value) => String(value || '#000000').toUpperCase()
+    },
+    {
+      key: 'bannerFont',
+      element: fontInput,
+      format: (_, element) => element?.selectedOptions?.[0]?.textContent || 'Impact'
+    },
+    {
+      key: 'bannerSize',
+      element: sizeInput,
+      format: (value) => {
+        const px = Number(value || 72);
+        return `${px}px (${(px / 96).toFixed(2)} in)`;
+      }
+    },
+    {
+      key: 'bannerRotate',
+      element: rotateInput,
+      format: (value) => `${Number(value || 0)} deg`
+    },
+    {
+      key: 'bannerPosX',
+      element: posXInput,
+      format: (value) => `${Number(value || 0)}%`
+    },
+    {
+      key: 'bannerPosY',
+      element: posYInput,
+      format: (value) => `${Number(value || 0)}%`
+    },
+    {
+      key: 'bannerSpacing',
+      element: spacingInput,
+      format: (value) => `${Number(value || 0)} px`
+    },
+    {
+      key: 'bannerCurve',
+      element: curveInput,
+      format: (value) => `${Number(value || 0)} deg`
+    },
+    {
+      key: 'bannerOpacity',
+      element: opacityInput,
+      format: (value) => `${Number(value || 100)}%`
+    }
+  ].filter((item) => item.element);
+
+  function captureControlState() {
+    return controls.reduce((acc, item) => {
+      acc[item.key] = item.element.value;
+      return acc;
+    }, {});
+  }
+
+  function applyControlState(state) {
+    controls.forEach((item) => {
+      if (state[item.key] !== undefined) {
+        item.element.value = state[item.key];
+      }
+    });
+  }
+
+  function statesEqual(left, right) {
+    return controls.every((item) => String(left[item.key]) === String(right[item.key]));
+  }
+
+  const initialState = captureControlState();
+  let historyStack = [captureControlState()];
+  let historyIndex = 0;
+  let isApplyingHistory = false;
+
+  function syncHistoryButtons() {
+    if (undoBtn) undoBtn.disabled = historyIndex <= 0;
+    if (redoBtn) redoBtn.disabled = historyIndex >= historyStack.length - 1;
+  }
+
+  function pushHistoryState() {
+    if (isApplyingHistory) return;
+
+    const snapshot = captureControlState();
+    if (statesEqual(snapshot, historyStack[historyIndex])) {
+      syncHistoryButtons();
+      return;
+    }
+
+    if (historyIndex < historyStack.length - 1) {
+      historyStack = historyStack.slice(0, historyIndex + 1);
+    }
+
+    historyStack.push(snapshot);
+    if (historyStack.length > 200) {
+      historyStack.shift();
+    } else {
+      historyIndex += 1;
+    }
+    historyIndex = historyStack.length - 1;
+    syncHistoryButtons();
+  }
+
+  function applyHistoryIndex(nextIndex) {
+    if (nextIndex < 0 || nextIndex >= historyStack.length) return;
+    historyIndex = nextIndex;
+    isApplyingHistory = true;
+    applyControlState(historyStack[historyIndex]);
+    isApplyingHistory = false;
+    renderOverlay();
+    syncHistoryButtons();
+  }
+
+  function ensureControlMetaUI() {
+    controls.forEach((item) => {
+      const label = item.element.closest('label');
+      if (!label) return;
+
+      let meta = label.querySelector(`.control-meta[data-control="${item.key}"]`);
+      if (!meta) {
+        meta = document.createElement('div');
+        meta.className = 'control-meta';
+        meta.dataset.control = item.key;
+
+        const valueEl = document.createElement('span');
+        valueEl.className = 'control-value';
+        valueEl.id = `${item.key}Value`;
+
+        const resetBtn = document.createElement('button');
+        resetBtn.type = 'button';
+        resetBtn.className = 'btn-reset';
+        resetBtn.textContent = 'Reset';
+        resetBtn.addEventListener('click', () => {
+          const initialValue = initialState[item.key];
+          if (initialValue === undefined) return;
+          item.element.value = initialValue;
+          renderOverlay();
+          pushHistoryState();
+        });
+
+        meta.appendChild(valueEl);
+        meta.appendChild(resetBtn);
+        label.appendChild(meta);
+      }
+    });
+  }
+
+  function updateControlMetaValues() {
+    controls.forEach((item) => {
+      const valueEl = document.getElementById(`${item.key}Value`);
+      if (!valueEl) return;
+      valueEl.textContent = item.format(item.element.value, item.element);
+    });
+  }
 
   const dragState = {
     mode: null,
@@ -93,6 +260,67 @@ function initBannerCustomizer() {
     guideY.classList.toggle('active', Boolean(showVertical));
   }
 
+  function applyTextStyles(text, color, outline, font, size, spacing, opacity) {
+    textPath.textContent = text.toUpperCase();
+    textNode.setAttribute('fill', color);
+    textNode.setAttribute('stroke', outline);
+    textNode.setAttribute('stroke-width', '2');
+    textNode.style.fontSize = `${size}px`;
+    textNode.style.letterSpacing = `${spacing}px`;
+    textNode.style.fontFamily = font;
+    textNode.style.fontWeight = '900';
+    textNode.style.opacity = String(opacity);
+  }
+
+  function fitDesignToText(text, color, outline, font, size, spacing, curve, opacity) {
+    const minWidth = 160;
+    const minHeight = 90;
+    const maxWidth = Math.max(minWidth, viewer.clientWidth - 18);
+    const maxHeight = Math.max(minHeight, viewer.clientHeight - 18);
+
+    let width = Math.min(
+      Math.max(Math.max(design.offsetWidth, text.length * (size * 0.64)), minWidth),
+      maxWidth
+    );
+    let height = Math.min(
+      Math.max(Math.max(design.offsetHeight, size * 1.9), minHeight),
+      maxHeight
+    );
+
+    for (let i = 0; i < 2; i += 1) {
+      svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      const y = height * 0.62;
+      curvePath.setAttribute('d', `M 20 ${y} Q ${width / 2} ${y + curve} ${width - 20} ${y}`);
+      applyTextStyles(text, color, outline, font, size, spacing, opacity);
+
+      let bbox;
+      try {
+        bbox = textNode.getBBox();
+      } catch {
+        bbox = { width: width - 40, height: size * 1.1 };
+      }
+
+      const padX = Math.max(20, size * 0.34);
+      const padY = Math.max(16, size * 0.3);
+      const nextWidth = Math.min(Math.max(Math.ceil(bbox.width + (padX * 2)), minWidth), maxWidth);
+      const nextHeight = Math.min(Math.max(Math.ceil(bbox.height + (padY * 2)), minHeight), maxHeight);
+
+      if (Math.abs(nextWidth - width) < 1 && Math.abs(nextHeight - height) < 1) {
+        break;
+      }
+
+      width = nextWidth;
+      height = nextHeight;
+    }
+
+    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    const y = height * 0.62;
+    curvePath.setAttribute('d', `M 20 ${y} Q ${width / 2} ${y + curve} ${width - 20} ${y}`);
+    applyTextStyles(text, color, outline, font, size, spacing, opacity);
+
+    return { width, height };
+  }
+
   function renderOverlay() {
     const text = (textInput?.value || 'RENEGADE').trim() || 'RENEGADE';
     const color = colorInput?.value || '#ffffff';
@@ -106,9 +334,16 @@ function initBannerCustomizer() {
     const curve = Number(curveInput?.value || 0);
     const opacity = Number(opacityInput?.value || 100) / 100;
 
-    const textLength = Math.max(text.length, 4);
-    const boxWidth = Math.min(Math.max(textLength * (size * 0.68), 220), Math.max(viewer.clientWidth - 30, 220));
-    const boxHeight = Math.max(120, size * 2.1);
+    const { width: boxWidth, height: boxHeight } = fitDesignToText(
+      text,
+      color,
+      outline,
+      font,
+      size,
+      spacing,
+      curve,
+      opacity
+    );
     design.style.width = `${boxWidth}px`;
     design.style.height = `${boxHeight}px`;
 
@@ -123,20 +358,12 @@ function initBannerCustomizer() {
     const y = boxHeight * 0.62;
     const controlY = y + curve;
     curvePath.setAttribute('d', `M 20 ${y} Q ${boxWidth / 2} ${controlY} ${boxWidth - 20} ${y}`);
-
-    textPath.textContent = text.toUpperCase();
-    textNode.setAttribute('fill', color);
-    textNode.setAttribute('stroke', outline);
-    textNode.setAttribute('stroke-width', '2');
-    textNode.style.fontSize = `${size}px`;
-    textNode.style.letterSpacing = `${spacing}px`;
-    textNode.style.fontFamily = font;
-    textNode.style.fontWeight = '900';
-    textNode.style.opacity = String(opacity);
+    applyTextStyles(text, color, outline, font, size, spacing, opacity);
 
     const offsetXpx = (posX / 100) * Math.max(viewer.clientWidth, 1);
     const offsetYpx = (posY / 100) * Math.max(viewer.clientHeight, 1);
     design.style.transform = `translate(calc(-50% + ${offsetXpx}px), calc(-50% + ${offsetYpx}px)) rotate(${rotate}deg)`;
+    updateControlMetaValues();
   }
 
   function beginDrag(event, mode) {
@@ -199,9 +426,13 @@ function initBannerCustomizer() {
   }
 
   function endPointerAction() {
+    const hadInteraction = Boolean(dragState.mode);
     dragState.mode = null;
     design.classList.remove('dragging');
     setGuideState(false, false);
+    if (hadInteraction) {
+      pushHistoryState();
+    }
   }
 
   design.addEventListener('pointerdown', (event) => {
@@ -211,21 +442,47 @@ function initBannerCustomizer() {
   window.addEventListener('pointermove', onPointerMove);
   window.addEventListener('pointerup', endPointerAction);
 
-  [
-    textInput,
-    colorInput,
-    outlineInput,
-    fontInput,
-    sizeInput,
-    rotateInput,
-    posXInput,
-    posYInput,
-    spacingInput,
-    curveInput,
-    opacityInput
-  ].forEach((control) => {
-    if (!control) return;
-    control.addEventListener('input', renderOverlay);
+  controls.forEach((item) => {
+    item.element.addEventListener('input', () => {
+      renderOverlay();
+    });
+    item.element.addEventListener('change', () => {
+      pushHistoryState();
+    });
+  });
+
+  if (undoBtn) {
+    undoBtn.addEventListener('click', () => {
+      applyHistoryIndex(historyIndex - 1);
+    });
+  }
+
+  if (redoBtn) {
+    redoBtn.addEventListener('click', () => {
+      applyHistoryIndex(historyIndex + 1);
+    });
+  }
+
+  window.addEventListener('keydown', (event) => {
+    const isModifier = event.ctrlKey || event.metaKey;
+    if (!isModifier || event.altKey) return;
+
+    const key = String(event.key || '').toLowerCase();
+    if (key !== 'z') return;
+
+    const target = event.target;
+    const targetTag = String(target?.tagName || '').toLowerCase();
+    const isTypingTarget = targetTag === 'input' || targetTag === 'textarea' || target?.isContentEditable;
+    const isBannerTextInput = target === textInput;
+
+    if (isTypingTarget && !isBannerTextInput) return;
+
+    event.preventDefault();
+    if (event.shiftKey) {
+      applyHistoryIndex(historyIndex + 1);
+    } else {
+      applyHistoryIndex(historyIndex - 1);
+    }
   });
 
   checkoutBtn.addEventListener('click', () => {
@@ -248,6 +505,8 @@ function initBannerCustomizer() {
     window.location.href = `checkout.html?${params.toString()}`;
   });
 
+  ensureControlMetaUI();
+  syncHistoryButtons();
   renderOverlay();
 }
 
