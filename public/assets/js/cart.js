@@ -1,13 +1,32 @@
-function changeQuantity(productId, delta) {
-  const cart = getCart().map(item => item.id === productId ? { ...item, quantity: item.quantity + delta } : item).filter(item => item.quantity > 0);
+function changeQuantityByKey(encodedCartKey, delta) {
+  const cartKey = decodeURIComponent(encodedCartKey || '');
+  const cart = getCart()
+    .map(item => ((item.cartKey || item.id) === cartKey ? { ...item, quantity: item.quantity + delta } : item))
+    .filter(item => item.quantity > 0);
   setCart(cart);
   renderCartPage();
 }
 
-function removeFromCart(productId) {
-  const cart = getCart().filter(item => item.id !== productId);
+function removeFromCartByKey(encodedCartKey) {
+  const cartKey = decodeURIComponent(encodedCartKey || '');
+  const cart = getCart().filter(item => (item.cartKey || item.id) !== cartKey);
   setCart(cart);
   renderCartPage();
+}
+
+function renderStripeOptionLines(item) {
+  const options = item?.options;
+  if (!options || typeof options !== 'object') return '';
+
+  const widths = Array.isArray(options.stripeWidths) ? options.stripeWidths.filter(Boolean) : [];
+  const colors = Array.isArray(options.stripeColors) ? options.stripeColors.filter(Boolean) : [];
+  const lines = [];
+
+  if (widths.length) lines.push(`Stripe Width: ${widths.join(', ')}`);
+  if (colors.length) lines.push(`Stripe Color: ${colors.join(', ')}`);
+  if (!lines.length) return '';
+
+  return `<p class="inline-note">${lines.join(' • ')}</p>`;
 }
 
 function renderCartPage() {
@@ -23,17 +42,20 @@ function renderCartPage() {
     cartItems.innerHTML = cart.map(item => {
       const product = findProductById(item.id);
       if (!product) return '';
+      const cartKey = encodeURIComponent(item.cartKey || item.id);
+      const optionLines = renderStripeOptionLines(item);
       return `
         <div class="cart-item">
           <div class="cart-row"><strong>${product.name}</strong><strong>${formatCurrency(product.price * item.quantity)}</strong></div>
           <p>${product.category} • ${formatCurrency(product.price)} each</p>
+          ${optionLines}
           <div class="cart-row">
             <div class="qty-controls">
-              <button onclick="changeQuantity('${product.id}', -1)">−</button>
+              <button onclick="changeQuantityByKey('${cartKey}', -1)">−</button>
               <span>${item.quantity}</span>
-              <button onclick="changeQuantity('${product.id}', 1)">+</button>
+              <button onclick="changeQuantityByKey('${cartKey}', 1)">+</button>
             </div>
-            <button class="btn btn-outline" onclick="removeFromCart('${product.id}')">Remove</button>
+            <button class="btn btn-outline" onclick="removeFromCartByKey('${cartKey}')">Remove</button>
           </div>
         </div>
       `;

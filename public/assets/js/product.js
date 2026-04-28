@@ -49,6 +49,63 @@ function renderVehicleContextNote() {
   return `<p class="inline-note">Selected vehicle: ${vehicle.label}${vehicle.kitSku ? ` (${vehicle.kitSku})` : ''}</p>`;
 }
 
+function isRacingStripeProduct(product) {
+  if (!product) return false;
+  if (String(product.subSubcategory || '').toLowerCase() === 'racing stripes') return true;
+  const tags = Array.isArray(product.tags) ? product.tags : [];
+  return tags.some(tag => String(tag || '').toLowerCase() === 'racing stripes');
+}
+
+function getRacingStripeOptions(product) {
+  const widthOptions = Array.isArray(product?.stripeOptions?.widths)
+    ? product.stripeOptions.widths
+    : ['8 in / 8 in', '10 in / 10 in', '12 in / 12 in', '10 in center + 2 in pinstripes'];
+  const colorOptions = Array.isArray(product?.stripeOptions?.colors)
+    ? product.stripeOptions.colors
+    : ['Gloss Black', 'Matte Black', 'Satin Charcoal', 'Gloss White', 'Race Red', 'Nardo Gray'];
+
+  return {
+    widths: widthOptions.map(value => String(value || '').trim()).filter(Boolean),
+    colors: colorOptions.map(value => String(value || '').trim()).filter(Boolean)
+  };
+}
+
+function renderRacingStripeOptions(product) {
+  if (!isRacingStripeProduct(product) || product.custom) return '';
+
+  const options = getRacingStripeOptions(product);
+  if (!options.widths.length || !options.colors.length) return '';
+
+  return `
+    <div class="product-option-grid">
+      <label>
+        Stripe Width
+        <select id="stripeWidthSelect" aria-label="Stripe width">
+          ${options.widths.map(width => `<option value="${width}">${width}</option>`).join('')}
+        </select>
+      </label>
+      <label>
+        Stripe Color
+        <select id="stripeColorSelect" aria-label="Stripe color">
+          ${options.colors.map(color => `<option value="${color}">${color}</option>`).join('')}
+        </select>
+      </label>
+    </div>
+  `;
+}
+
+function getSelectedRacingStripeOptions(container, product) {
+  if (!isRacingStripeProduct(product) || product.custom) return null;
+
+  const widthValue = container.querySelector('#stripeWidthSelect')?.value?.trim();
+  const colorValue = container.querySelector('#stripeColorSelect')?.value?.trim();
+
+  return {
+    stripeWidths: widthValue ? [widthValue] : [],
+    stripeColors: colorValue ? [colorValue] : []
+  };
+}
+
 async function initProductPage() {
   const container = document.getElementById('productDetails');
   const related = document.getElementById('relatedProducts');
@@ -75,13 +132,14 @@ async function initProductPage() {
   const customizeUrl = typeof window.buildCustomizeUrl === 'function'
     ? window.buildCustomizeUrl(product)
     : (product.customizeUrl || `mustang-customizer.html?productId=${encodeURIComponent(product.id)}`);
+  const optionsMarkup = renderRacingStripeOptions(product);
   const actions = product.custom
     ? `
         <a class="btn" href="${customizeUrl}">Customize</a>
         <a class="btn btn-outline" href="shop.html">Continue Shopping</a>
       `
     : `
-        <button class="btn" onclick="addToCart('${product.id}')">Add to Cart</button>
+        <button class="btn" id="productAddToCartBtn">Add to Cart</button>
         <a class="btn btn-outline" href="${customizeUrl}">Customize</a>
       `;
 
@@ -96,6 +154,7 @@ async function initProductPage() {
         <h1>${product.name}</h1>
         <p class="price-xl">${formatCurrency(product.price)}</p>
         <p>${product.description}</p>
+        ${optionsMarkup}
         ${renderVehicleContextNote()}
         <p class="inline-note">Open Customize to preview text, color, and layout before checkout.</p>
         <div class="product-actions">
@@ -107,6 +166,14 @@ async function initProductPage() {
 
   if (related) {
     related.innerHTML = PRODUCTS.filter(item => item.id !== product.id).slice(0, 3).map(renderProductCard).join('');
+  }
+
+  const addToCartButton = container.querySelector('#productAddToCartBtn');
+  if (addToCartButton) {
+    addToCartButton.addEventListener('click', () => {
+      const selectedOptions = getSelectedRacingStripeOptions(container, product);
+      addToCart(product.id, 1, selectedOptions);
+    });
   }
 }
 

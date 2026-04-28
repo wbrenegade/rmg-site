@@ -646,6 +646,12 @@ textarea { resize: vertical; }
 .media-fallback { display: none; }
 .price-xl { font-size: 2rem; font-weight: 800; margin: 0; }
 .inline-note { color: var(--warning); font-size: 0.95rem; }
+.product-option-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 8px 0 4px;
+}
 .results-meta { color: var(--muted); margin-bottom: 16px; }
 
 /* Shop / Filters / Decal Taxonomy */
@@ -1234,6 +1240,10 @@ textarea { resize: vertical; }
   .product-actions,
   .customize-actions {
     flex-direction: column;
+  }
+
+  .product-option-grid {
+    grid-template-columns: 1fr;
   }
 
   .product-actions .btn,

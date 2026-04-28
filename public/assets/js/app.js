@@ -177,6 +177,35 @@ function setCart(cart) {
   updateCartCount();
 }
 
+function normalizeCartOptions(options) {
+  if (!options || typeof options !== 'object') return null;
+
+  const normalized = {};
+  const stripeWidths = Array.isArray(options.stripeWidths)
+    ? options.stripeWidths.map(value => String(value || '').trim()).filter(Boolean)
+    : [];
+  const stripeColors = Array.isArray(options.stripeColors)
+    ? options.stripeColors.map(value => String(value || '').trim()).filter(Boolean)
+    : [];
+
+  if (stripeWidths.length) normalized.stripeWidths = stripeWidths;
+  if (stripeColors.length) normalized.stripeColors = stripeColors;
+
+  return Object.keys(normalized).length ? normalized : null;
+}
+
+function buildCartItemKey(productId, options) {
+  const normalizedOptions = normalizeCartOptions(options);
+  if (!normalizedOptions) return productId;
+
+  const optionKey = Object.keys(normalizedOptions)
+    .sort()
+    .map(key => `${key}:${normalizedOptions[key].join('|')}`)
+    .join(';');
+
+  return `${productId}::${optionKey}`;
+}
+
 function findProductById(id) {
   return getProductsList().find(product => product.id === id);
 }
@@ -205,13 +234,20 @@ function setSelectedVehicle(vehicle) {
 window.getSelectedVehicle = getSelectedVehicle;
 window.setSelectedVehicle = setSelectedVehicle;
 
-function addToCart(productId, quantity = 1) {
+function addToCart(productId, quantity = 1, options = null) {
   const cart = getCart();
-  const existing = cart.find(item => item.id === productId);
+  const normalizedOptions = normalizeCartOptions(options);
+  const cartKey = buildCartItemKey(productId, normalizedOptions);
+  const existing = cart.find(item => (item.cartKey || item.id) === cartKey);
   if (existing) {
     existing.quantity += quantity;
   } else {
-    cart.push({ id: productId, quantity });
+    cart.push({
+      id: productId,
+      quantity,
+      cartKey,
+      ...(normalizedOptions ? { options: normalizedOptions } : {})
+    });
   }
   setCart(cart);
   showMessage('Item added to cart.', 'success');

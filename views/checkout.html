@@ -147,14 +147,29 @@
           : null;
       }
 
+      function buildStripeOptionSummary(options) {
+        if (!options || typeof options !== "object") return "";
+        const widths = Array.isArray(options.stripeWidths) ? options.stripeWidths.filter(Boolean) : [];
+        const colors = Array.isArray(options.stripeColors) ? options.stripeColors.filter(Boolean) : [];
+        const details = [];
+
+        if (widths.length) details.push(`Stripe Width: ${widths.join(", ")}`);
+        if (colors.length) details.push(`Stripe Color: ${colors.join(", ")}`);
+
+        return details.join(" | ");
+      }
+
       function normalizeCartItem(cartItem) {
         const product = getProduct(cartItem.id) || {};
+        const optionSummary = buildStripeOptionSummary(cartItem.options);
         return {
           source: "cart",
           productId: cartItem.id,
           name: product.name || cartItem.name || "Custom Decal",
           title: product.name || cartItem.title || "Custom Decal",
           category: product.category || cartItem.category || "Decals",
+          options: cartItem.options || null,
+          optionSummary,
           size: cartItem.size || "Standard",
           price: Number(product.price ?? cartItem.price ?? 0),
           quantity: Number(cartItem.quantity || 1)
@@ -219,6 +234,7 @@
               ${item.previewImage ? `<img src="${escapeHtml(item.previewImage)}" alt="${name} preview" style="width:100%;border-radius:8px;margin-bottom:12px;">` : ""}
               <strong>${name}</strong>
               <p>Size: ${size}</p>
+              ${item.optionSummary ? `<p>${escapeHtml(item.optionSummary)}</p>` : ""}
               <p>Quantity: ${quantity}</p>
               <p>Price: ${formatMoney(price)}</p>
             </div>
