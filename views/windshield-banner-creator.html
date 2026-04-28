@@ -51,8 +51,24 @@
         <article class="card">
           <h3>Live Windshield Preview</h3>
           <div class="customize-viewer" id="bannerViewer">
-            <img src="/assets/imgs/decals/products/windshield_banner.png" alt="Windshield banner preview" />
-            <div class="customize-decal" id="bannerTextOverlay">RENEGADE</div>
+            <img src="/assets/imgs/mockups/windshield-banner-mockup.png" alt="Windshield banner preview" />
+            <div class="banner-grid-overlay" aria-hidden="true"></div>
+            <div class="banner-guide-x" id="bannerGuideX" aria-hidden="true"></div>
+            <div class="banner-guide-y" id="bannerGuideY" aria-hidden="true"></div>
+            <div class="banner-design" id="bannerDesign" aria-label="Draggable and resizable banner text">
+              <svg id="bannerTextSvg" viewBox="0 0 320 180" preserveAspectRatio="none">
+                <defs>
+                  <path id="bannerCurvePath" d="M 20 110 Q 160 110 300 110"></path>
+                </defs>
+                <text id="bannerTextNode" text-anchor="middle">
+                  <textPath id="bannerTextPath" href="#bannerCurvePath" startOffset="50%">RENEGADE</textPath>
+                </text>
+              </svg>
+              <span class="resize-handle top-left" data-handle="top-left"></span>
+              <span class="resize-handle top-right" data-handle="top-right"></span>
+              <span class="resize-handle bottom-left" data-handle="bottom-left"></span>
+              <span class="resize-handle bottom-right" data-handle="bottom-right"></span>
+            </div>
           </div>
           <p class="form-note">This preview helps you finalize your windshield banner before checkout.</p>
         </article>
@@ -68,6 +84,15 @@
           <label>Outline
             <input type="color" id="bannerOutline" value="#000000" />
           </label>
+          <label>Font
+            <select id="bannerFont">
+              <option value="Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif">Impact</option>
+              <option value="'Bebas Neue', 'Arial Narrow Bold', sans-serif">Bebas</option>
+              <option value="'Anton', 'Arial Black', sans-serif">Anton</option>
+              <option value="'Oswald', 'Arial Narrow', sans-serif">Oswald</option>
+              <option value="'Montserrat', 'Arial', sans-serif">Montserrat</option>
+            </select>
+          </label>
           <label>Size
             <input type="range" id="bannerSize" min="28" max="150" value="72" />
           </label>
@@ -82,6 +107,9 @@
           </label>
           <label>Letter Spacing
             <input type="range" id="bannerSpacing" min="0" max="16" value="5" />
+          </label>
+          <label>Curve
+            <input type="range" id="bannerCurve" min="-80" max="80" value="0" />
           </label>
           <label>Opacity
             <input type="range" id="bannerOpacity" min="30" max="100" value="100" />
