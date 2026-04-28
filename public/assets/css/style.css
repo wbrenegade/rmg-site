@@ -323,6 +323,52 @@ textarea { resize: vertical; }
   font-size: 0.9rem;
 }
 
+.hero-collage {
+  margin-top: 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.hero-collage-track {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  width: max-content;
+  animation: hero-collage-scroll 30s linear infinite;
+}
+
+.hero-collage:hover .hero-collage-track {
+  animation-play-state: paused;
+}
+
+.hero-collage-item {
+  width: 120px;
+  height: 80px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: linear-gradient(135deg, #121826, #1c2334);
+  flex: 0 0 auto;
+}
+
+.hero-collage-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@keyframes hero-collage-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-50% - 5px));
+  }
+}
+
 .video-wrap {
   width: 100%;
   max-width: 700px;
@@ -419,6 +465,48 @@ textarea { resize: vertical; }
   display: grid;
   gap: 1rem;
   margin-top: 1.5rem;
+}
+
+.home-hero-panel {
+  background: linear-gradient(160deg, rgba(78,198,255,0.14), rgba(125,255,90,0.09));
+}
+
+.home-focus-grid,
+.home-tools-grid,
+.home-audience-grid {
+  margin-top: 24px;
+}
+
+.home-focus-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.home-tools-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.home-tools-grid .card,
+.home-focus-grid .card,
+.home-audience-grid .card {
+  display: grid;
+  gap: 10px;
+}
+
+.home-tools-grid .btn {
+  margin-top: 6px;
+}
+
+.home-tile-media {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #121826, #1c2334);
+}
+
+.home-tile-media img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
 }
 
 .feature-list h3,
@@ -1437,6 +1525,15 @@ body.modal-open {
   .decal-filter-card-grid.is-compact {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
+  .home-focus-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-tools-grid,
+  .home-audience-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Mobile */
@@ -1485,6 +1582,11 @@ body.modal-open {
   .hero-card,
   .card,
   .cta-wrap { padding: 20px; }
+
+  .hero-collage-item {
+    width: 104px;
+    height: 72px;
+  }
 
   .shop-toolbar,
   .shop-results-header {

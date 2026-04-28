@@ -1,4 +1,4 @@
-# Advanced PNG/JPG/WEBM to SVG Converter
+# Advanced Image to Decal Converter
 
 This bundle includes:
 

@@ -2011,6 +2011,96 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "65ea102a-0470-4fb2-8bd8-108fdc8c898e",
+      "type": "page_view",
+      "pathname": "/tools/windshield-banner-calculator",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/tools",
+      "method": "GET",
+      "timestamp": "2026-04-28T04:19:53.000Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "f7b44f20-b23b-488c-9f8c-647957e91623",
+      "type": "tool_event",
+      "pathname": "/tools/windshield-banner-calculator",
+      "productId": null,
+      "productName": null,
+      "tool": "windshield-banner-calculator",
+      "action": "mode_changed",
+      "referrer": "https://renegademadegraphix.com/tools/windshield-banner-calculator",
+      "method": "POST",
+      "timestamp": "2026-04-28T04:19:53.706Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {
+        "mode": "regular"
+      }
+    },
+    {
+      "id": "5c7a1a9c-b2c1-439d-84b0-a08bdf413e62",
+      "type": "tool_event",
+      "pathname": "/tools/windshield-banner-calculator",
+      "productId": null,
+      "productName": null,
+      "tool": "windshield-banner-calculator",
+      "action": "viewed",
+      "referrer": "https://renegademadegraphix.com/tools/windshield-banner-calculator",
+      "method": "POST",
+      "timestamp": "2026-04-28T04:19:53.744Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "30756854-654b-4d3f-bee8-e82ddd08aad0",
+      "type": "page_view",
+      "pathname": "/tools",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/tools/windshield-banner-calculator",
+      "method": "GET",
+      "timestamp": "2026-04-28T04:20:41.062Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }
