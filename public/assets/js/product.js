@@ -38,7 +38,7 @@ function createVehicleKitFromQuery() {
     imageLabel: `${label} Tint Kit`,
     featured: false,
     custom: true,
-    customizeUrl: `mustang-customizer.html?${query}`,
+    customizeUrl: `customize.html?${query}`,
     selectedVehicle: { year, make, model, trim, kitSku, label }
   };
 }
@@ -131,7 +131,7 @@ async function initProductPage() {
   const imageAlt = product.imageLabel || product.name || 'Product preview';
   const customizeUrl = typeof window.buildCustomizeUrl === 'function'
     ? window.buildCustomizeUrl(product)
-    : (product.customizeUrl || `mustang-customizer.html?productId=${encodeURIComponent(product.id)}`);
+    : (product.customizeUrl || `customize.html?productId=${encodeURIComponent(product.id)}`);
   const optionsMarkup = renderRacingStripeOptions(product);
   const actions = product.custom
     ? `

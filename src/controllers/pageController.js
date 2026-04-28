@@ -7,7 +7,7 @@ const pageRoutes = [
   "shop",
   "product",
   "customize",
-  "mustang-customizer",
+  "windshield-banner-creator",
   "cart",
   "checkout",
   "login",

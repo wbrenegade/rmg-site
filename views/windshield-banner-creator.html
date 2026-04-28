@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mustang Customizer | RenegadeMade Graphix</title>
-  <meta name="description" content="Visualize custom decals and stripes on your Mustang before ordering. Configure graphics to match your build." />
+  <title>Windshield Banner Creator | RenegadeMade Graphix</title>
+  <meta name="description" content="Create your windshield banner with live text, color, size, and placement controls before checkout." />
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="RenegadeMade Graphix" />
-  <meta property="og:url" content="https://renegademadegraphix.com/mustang-customizer" />
-  <meta property="og:title" content="Mustang Customizer | RenegadeMade Graphix" />
-  <meta property="og:description" content="Visualize custom decals and stripes on your Mustang before ordering. Configure graphics to match your build." />
+  <meta property="og:url" content="https://renegademadegraphix.com/windshield-banner-creator" />
+  <meta property="og:title" content="Windshield Banner Creator | RenegadeMade Graphix" />
+  <meta property="og:description" content="Create your windshield banner with live text, color, size, and placement controls before checkout." />
   <meta property="og:image" content="https://renegademadegraphix.com/assets/imgs/main.PNG" />
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Mustang Customizer | RenegadeMade Graphix" />
-  <meta name="twitter:description" content="Visualize custom decals and stripes on your Mustang before ordering. Configure graphics to match your build." />
+  <meta name="twitter:title" content="Windshield Banner Creator | RenegadeMade Graphix" />
+  <meta name="twitter:description" content="Create your windshield banner with live text, color, size, and placement controls before checkout." />
   <meta name="twitter:image" content="https://renegademadegraphix.com/assets/imgs/main.PNG" />
   <link rel="icon" type="image/png" href="/assets/imgs/favicon.png" />
   <link rel="stylesheet" href="assets/css/style.css" />
@@ -40,58 +40,58 @@
   <main class="page-main">
     <section class="page-hero compact">
       <div class="container">
-        <p class="eyebrow">Customizer App</p>
-        <h1>Mustang Decal Live Viewer</h1>
-        <p>Type your own text and tune color, size, and placement live on a Mustang template.</p>
+        <p class="eyebrow">Banner Builder</p>
+        <h1>Windshield Banner Creator</h1>
+        <p>Type your banner text and dial in color, spacing, size, and placement with a live preview.</p>
       </div>
     </section>
 
     <section class="section">
       <div class="container customize-layout">
         <article class="card">
-          <h3>Live Mustang Preview</h3>
-          <div class="mustang-viewer" id="mustangViewer">
-            <img src="/assets/imgs/mustang-template.svg" alt="Mustang side template" />
-            <div class="mustang-text-overlay" id="mustangTextOverlay">RENEGADE</div>
+          <h3>Live Windshield Preview</h3>
+          <div class="customize-viewer" id="bannerViewer">
+            <img src="/assets/imgs/decals/products/windshield_banner.png" alt="Windshield banner preview" />
+            <div class="customize-decal" id="bannerTextOverlay">RENEGADE</div>
           </div>
-          <p class="form-note">This preview helps you visualize your decal before checkout.</p>
+          <p class="form-note">This preview helps you finalize your windshield banner before checkout.</p>
         </article>
 
-        <form class="card form-grid" id="mustangCustomizerForm">
+        <form class="card form-grid" id="bannerCustomizerForm">
           <div class="form-section full-width"><h3>Design Controls</h3></div>
-          <label class="full-width">Decal Text
-            <input type="text" id="mustangText" maxlength="26" value="RENEGADE" />
+          <label class="full-width">Banner Text
+            <input type="text" id="bannerText" maxlength="26" value="RENEGADE" />
           </label>
           <label>Color
-            <input type="color" id="mustangColor" value="#7dff5a" />
+            <input type="color" id="bannerColor" value="#ffffff" />
           </label>
           <label>Outline
-            <input type="color" id="mustangOutline" value="#081108" />
+            <input type="color" id="bannerOutline" value="#000000" />
           </label>
           <label>Size
-            <input type="range" id="mustangSize" min="28" max="150" value="78" />
+            <input type="range" id="bannerSize" min="28" max="150" value="72" />
           </label>
           <label>Rotation
-            <input type="range" id="mustangRotate" min="-25" max="25" value="-4" />
+            <input type="range" id="bannerRotate" min="-25" max="25" value="0" />
           </label>
           <label>Horizontal
-            <input type="range" id="mustangPosX" min="-35" max="35" value="0" />
+            <input type="range" id="bannerPosX" min="-35" max="35" value="0" />
           </label>
           <label>Vertical
-            <input type="range" id="mustangPosY" min="-35" max="35" value="0" />
+            <input type="range" id="bannerPosY" min="-35" max="35" value="-8" />
           </label>
           <label>Letter Spacing
-            <input type="range" id="mustangSpacing" min="0" max="16" value="4" />
+            <input type="range" id="bannerSpacing" min="0" max="16" value="5" />
           </label>
           <label>Opacity
-            <input type="range" id="mustangOpacity" min="30" max="100" value="95" />
+            <input type="range" id="bannerOpacity" min="30" max="100" value="100" />
           </label>
 
           <div class="full-width customize-actions">
             <a href="shop.html" class="btn btn-outline">Back to Shop</a>
-            <button type="button" class="btn" id="mustangCheckoutBtn">Customize</button>
+            <button type="button" class="btn" id="bannerCheckoutBtn">Use This Design</button>
           </div>
-          <p class="form-note full-width">Use This Design sends your custom settings into checkout notes.</p>
+          <p class="form-note full-width">This sends your windshield banner settings into checkout notes.</p>
         </form>
       </div>
     </section>
@@ -104,7 +104,7 @@
   <script src="assets/js/products.js"></script>
   <script src="assets/js/app.js"></script>
   <script src="/assets/js/nav-auth.js"></script>
-  <script src="assets/js/mustang-customizer.js"></script>
+  <script src="assets/js/windshield-banner-creator.js"></script>
 </body>
 </html>
 

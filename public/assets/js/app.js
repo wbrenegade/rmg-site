@@ -270,10 +270,10 @@ function calculateCartTotals() {
 }
 
 function buildCustomizeUrl(product) {
-  if (!product) return 'mustang-customizer.html';
+  if (!product) return 'customize.html';
   if (product.customizeUrl) return product.customizeUrl;
   const params = new URLSearchParams({ productId: product.id });
-  return `mustang-customizer.html?${params.toString()}`;
+  return `customize.html?${params.toString()}`;
 }
 
 window.buildCustomizeUrl = buildCustomizeUrl;
@@ -283,9 +283,10 @@ function renderProductCard(product) {
   const imageAlt = product.imageLabel || product.name || 'Product preview';
   const detailsUrl = product.productUrl || `product.html?id=${product.id}`;
   const customizeUrl = buildCustomizeUrl(product);
+  const customizeLabel = product.customizeCtaLabel || 'Customize';
   const primaryAction = `<a href="${detailsUrl}" class="btn btn-outline">View Details</a>`;
   const secondaryAction = product.custom
-    ? `<a href="${customizeUrl}" class="btn">Customize</a>`
+    ? `<a href="${customizeUrl}" class="btn">${customizeLabel}</a>`
     : `<button class="btn" onclick="addToCart('${product.id}')">Add to Cart</button>`;
   return `
     <article class="card product-card">

@@ -14,7 +14,29 @@ const defaultProducts = [
         "imagePath":  "/assets/imgs/product-cards/windshield_banner.png",
         "imageLabel":  "Windshield Banner Preview",
         "description":  "Aggressive custom windshield banner in your choice of text and color.",
+        "customizeUrl":  "/windshield-banner-creator?productId=rmg-windshield-banner",
         "featured":  true,
+        "custom":  true
+    },
+    {
+        "id":  "rmg-custom-banner",
+        "name":  "Custom Banner Design",
+        "slug":  "custom-banner-design",
+        "category":  "Decals",
+        "subcategory":  "Windshield/Rear Window Banners",
+        "subSubcategory":  null,
+        "price":  59.99,
+        "tags":  [
+                     "Decals",
+                     "Windshield/Rear Window Banners",
+                     "Custom"
+                 ],
+        "imagePath":  "/assets/imgs/decals/products/custom/custom-banner.png",
+        "imageLabel":  "Custom Banner Preview",
+        "description":  "Fully custom windshield or rear window banner design with your text, color, and spacing dialed in before production.",
+        "customizeUrl":  "/windshield-banner-creator?productId=rmg-custom-banner",
+        "customizeCtaLabel":  "Customize Now",
+        "featured":  false,
         "custom":  true
     },
     {

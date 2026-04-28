@@ -610,7 +610,7 @@ async function initShop() {
     if (vehicle.trim) params.set("trim", vehicle.trim);
     if (vehicle.kitSku) params.set("sku", vehicle.kitSku);
 
-    return `/mustang-customizer?${params.toString()}`;
+    return `/customize?${params.toString()}`;
   }
 
   function buildVehicleProductUrl(vehicle) {
