@@ -56,17 +56,90 @@ function isRacingStripeProduct(product) {
   return tags.some(tag => String(tag || '').toLowerCase() === 'racing stripes');
 }
 
+function inferMultipleStripeLayout(product, widths) {
+  if (typeof product?.stripeOptions?.hasMultipleStripes === 'boolean') {
+    return product.stripeOptions.hasMultipleStripes;
+  }
+
+  const searchable = [
+    product?.name,
+    product?.slug,
+    product?.id,
+    ...(Array.isArray(product?.tags) ? product.tags : []),
+    ...widths
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  return (
+    searchable.includes('dual')
+    || searchable.includes('double')
+    || searchable.includes('multi')
+    || searchable.includes('staggered')
+    || searchable.includes('pinstripe')
+    || searchable.includes('center +')
+    || searchable.includes('/')
+    || searchable.includes('pair')
+  );
+}
+
+function inferOutlinedStripe(product, outlineColors) {
+  if (typeof product?.stripeOptions?.hasOutline === 'boolean') {
+    return product.stripeOptions.hasOutline;
+  }
+
+  if (outlineColors.length) return true;
+
+  const searchable = [
+    product?.name,
+    product?.slug,
+    product?.id,
+    ...(Array.isArray(product?.tags) ? product.tags : [])
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  return searchable.includes('outline') || searchable.includes('outlined');
+}
+
 function getRacingStripeOptions(product) {
+  const subcategory = String(product?.subcategory || '').toLowerCase();
+  const widthFallback = subcategory.includes('rocker')
+    ? ['3 in', '4 in', '5 in', '6 in']
+    : ['8 in / 8 in', '10 in / 10 in', '12 in / 12 in', '10 in center + 2 in pinstripes'];
+
   const widthOptions = Array.isArray(product?.stripeOptions?.widths)
     ? product.stripeOptions.widths
-    : ['8 in / 8 in', '10 in / 10 in', '12 in / 12 in', '10 in center + 2 in pinstripes'];
+    : widthFallback;
   const colorOptions = Array.isArray(product?.stripeOptions?.colors)
     ? product.stripeOptions.colors
     : ['Gloss Black', 'Matte Black', 'Satin Charcoal', 'Gloss White', 'Race Red', 'Nardo Gray'];
 
+  const spacingOptions = Array.isArray(product?.stripeOptions?.spacings)
+    ? product.stripeOptions.spacings
+    : ['0.25 in', '0.5 in', '0.75 in', '1.0 in', '1.5 in'];
+
+  const outlineColorOptions = Array.isArray(product?.stripeOptions?.outlineColors)
+    ? product.stripeOptions.outlineColors
+    : ['Gloss Black', 'Matte Black', 'Gloss White', 'Race Red', 'Nardo Gray'];
+
+  const widths = widthOptions.map(value => String(value || '').trim()).filter(Boolean);
+  const colors = colorOptions.map(value => String(value || '').trim()).filter(Boolean);
+  const spacings = spacingOptions.map(value => String(value || '').trim()).filter(Boolean);
+  const outlineColors = outlineColorOptions.map(value => String(value || '').trim()).filter(Boolean);
+
+  const hasMultipleStripes = inferMultipleStripeLayout(product, widths);
+  const hasOutline = inferOutlinedStripe(product, outlineColors);
+
   return {
-    widths: widthOptions.map(value => String(value || '').trim()).filter(Boolean),
-    colors: colorOptions.map(value => String(value || '').trim()).filter(Boolean)
+    widths,
+    colors,
+    spacings,
+    outlineColors,
+    hasMultipleStripes,
+    hasOutline
   };
 }
 
@@ -75,6 +148,28 @@ function renderRacingStripeOptions(product) {
 
   const options = getRacingStripeOptions(product);
   if (!options.widths.length || !options.colors.length) return '';
+
+  const spacingMarkup = options.hasMultipleStripes && options.spacings.length
+    ? `
+      <label>
+        Stripe Spacing
+        <select id="stripeSpacingSelect" aria-label="Stripe spacing">
+          ${options.spacings.map(spacing => `<option value="${spacing}">${spacing}</option>`).join('')}
+        </select>
+      </label>
+    `
+    : '';
+
+  const outlineMarkup = options.hasOutline && options.outlineColors.length
+    ? `
+      <label>
+        Outline Color
+        <select id="stripeOutlineColorSelect" aria-label="Stripe outline color">
+          ${options.outlineColors.map(color => `<option value="${color}">${color}</option>`).join('')}
+        </select>
+      </label>
+    `
+    : '';
 
   return `
     <div class="product-option-grid">
@@ -90,6 +185,8 @@ function renderRacingStripeOptions(product) {
           ${options.colors.map(color => `<option value="${color}">${color}</option>`).join('')}
         </select>
       </label>
+      ${spacingMarkup}
+      ${outlineMarkup}
     </div>
   `;
 }
@@ -97,13 +194,144 @@ function renderRacingStripeOptions(product) {
 function getSelectedRacingStripeOptions(container, product) {
   if (!isRacingStripeProduct(product) || product.custom) return null;
 
+  const options = getRacingStripeOptions(product);
   const widthValue = container.querySelector('#stripeWidthSelect')?.value?.trim();
   const colorValue = container.querySelector('#stripeColorSelect')?.value?.trim();
+  const spacingValue = options.hasMultipleStripes
+    ? container.querySelector('#stripeSpacingSelect')?.value?.trim()
+    : '';
+  const outlineColorValue = options.hasOutline
+    ? container.querySelector('#stripeOutlineColorSelect')?.value?.trim()
+    : '';
 
   return {
     stripeWidths: widthValue ? [widthValue] : [],
-    stripeColors: colorValue ? [colorValue] : []
+    stripeColors: colorValue ? [colorValue] : [],
+    stripeSpacings: spacingValue ? [spacingValue] : [],
+    stripeOutlineColors: outlineColorValue ? [outlineColorValue] : []
   };
+}
+
+function parseInchValue(input, fallback) {
+  const match = String(input || '').match(/\d+(?:\.\d+)?/);
+  if (!match) return fallback;
+  const parsed = Number(match[0]);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function parseStripeWidths(widthLabel, hasMultipleStripes) {
+  const label = String(widthLabel || '');
+  const values = label.match(/\d+(?:\.\d+)?/g) || [];
+  const parsed = values.map((value) => Number(value)).filter((value) => Number.isFinite(value) && value > 0);
+
+  if (!hasMultipleStripes) {
+    return [parsed[0] || 4];
+  }
+
+  if (parsed.length >= 2) return [parsed[0], parsed[1]];
+  const fallback = parsed[0] || 4;
+  return [fallback, fallback];
+}
+
+function stripeColorToHex(colorValue) {
+  const name = String(colorValue || '').trim().toLowerCase();
+  const palette = {
+    'gloss black': '#111111',
+    'matte black': '#2a2a2a',
+    'satin charcoal': '#4e545c',
+    'gloss white': '#f5f5f5',
+    'race red': '#cf1f2b',
+    'nardo gray': '#9ca1a6'
+  };
+
+  if (palette[name]) return palette[name];
+  if (/^#([a-f0-9]{3}|[a-f0-9]{6})$/i.test(colorValue || '')) return colorValue;
+  return '#111111';
+}
+
+function renderRacingStripeLivePreview(container, product) {
+  const options = getRacingStripeOptions(product);
+  const previewCanvas = container.querySelector('#stripeLivePreviewCanvas');
+  const previewMeta = container.querySelector('#stripeLivePreviewMeta');
+  const widthSelect = container.querySelector('#stripeWidthSelect');
+  const colorSelect = container.querySelector('#stripeColorSelect');
+  const spacingSelect = container.querySelector('#stripeSpacingSelect');
+  const outlineColorSelect = container.querySelector('#stripeOutlineColorSelect');
+
+  if (!(previewCanvas && previewMeta && widthSelect && colorSelect)) return;
+
+  const update = () => {
+    const selectedWidth = widthSelect.value || options.widths[0] || '4 in';
+    const selectedColor = colorSelect.value || options.colors[0] || 'Gloss Black';
+    const selectedSpacing = spacingSelect?.value || options.spacings[0] || '0.5 in';
+    const selectedOutline = outlineColorSelect?.value || options.outlineColors[0] || 'Gloss White';
+
+    const stripeWidths = parseStripeWidths(selectedWidth, options.hasMultipleStripes);
+    const spacingInches = parseInchValue(selectedSpacing, 0.5);
+    const maxWidth = Math.max(...stripeWidths, 1);
+
+    const stripeColorHex = stripeColorToHex(selectedColor);
+    const outlineColorHex = stripeColorToHex(selectedOutline);
+    const laneHeight = 112;
+    const gapPx = options.hasMultipleStripes ? Math.max(8, Math.min(30, spacingInches * 18)) : 0;
+
+    const stripeHeights = stripeWidths.map((value) => {
+      const normalized = value / maxWidth;
+      return Math.max(10, Math.round(normalized * 28));
+    });
+
+    const totalStripeHeight = stripeHeights.reduce((sum, value) => sum + value, 0) + gapPx;
+    let top = Math.max(10, Math.round((laneHeight - totalStripeHeight) / 2));
+
+    const outlinePadding = options.hasOutline ? 3 : 0;
+    const stripeRects = stripeHeights.map((height, index) => {
+      const rect = {
+        y: top,
+        height
+      };
+
+      top += height;
+      if (index === 0 && options.hasMultipleStripes) top += gapPx;
+      return rect;
+    });
+
+    const stripesMarkup = stripeRects.map((rect) => {
+      const outlineRect = options.hasOutline
+        ? `<rect x="22" y="${rect.y - outlinePadding}" width="496" height="${rect.height + outlinePadding * 2}" rx="3" fill="${outlineColorHex}" />`
+        : '';
+
+      return `${outlineRect}<rect x="28" y="${rect.y}" width="484" height="${rect.height}" rx="2" fill="${stripeColorHex}" />`;
+    }).join('');
+
+    previewCanvas.innerHTML = `
+      <svg viewBox="0 0 540 132" role="img" aria-label="Live stripe preview">
+        <defs>
+          <linearGradient id="stripePreviewBg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0f1520"/>
+            <stop offset="100%" stop-color="#1f2e39"/>
+          </linearGradient>
+        </defs>
+        <rect x="8" y="8" width="524" height="116" rx="10" fill="url(#stripePreviewBg)" />
+        ${stripesMarkup}
+      </svg>
+    `;
+
+    const metaParts = [
+      `Width: ${selectedWidth}`,
+      `Color: ${selectedColor}`
+    ];
+    if (options.hasMultipleStripes) metaParts.push(`Spacing: ${selectedSpacing}`);
+    if (options.hasOutline) metaParts.push(`Outline: ${selectedOutline}`);
+    previewMeta.textContent = metaParts.join(' • ');
+  };
+
+  [widthSelect, colorSelect, spacingSelect, outlineColorSelect].forEach((input) => {
+    if (!input) return;
+    input.addEventListener('change', update);
+    input.addEventListener('input', update);
+  });
+
+  update();
 }
 
 async function initProductPage() {
@@ -155,8 +383,13 @@ async function initProductPage() {
         <p class="price-xl">${formatCurrency(product.price)}</p>
         <p>${product.description}</p>
         ${optionsMarkup}
+        <div class="stripe-live-preview" id="stripeLivePreview" ${isRacingStripeProduct(product) && !product.custom ? '' : 'hidden'}>
+          <p class="stripe-live-preview__title">Live Preview</p>
+          <div class="stripe-live-preview__canvas" id="stripeLivePreviewCanvas"></div>
+          <p class="inline-note stripe-live-preview__meta" id="stripeLivePreviewMeta"></p>
+        </div>
         ${renderVehicleContextNote()}
-        <p class="inline-note">Open Customize to preview text, color, and layout before checkout.</p>
+        <p class="inline-note">Use Customize to dial in stripe width, color, spacing, and outline options before checkout.</p>
         <div class="product-actions">
           ${actions}
         </div>
@@ -169,6 +402,10 @@ async function initProductPage() {
   }
 
   const addToCartButton = container.querySelector('#productAddToCartBtn');
+  if (isRacingStripeProduct(product) && !product.custom) {
+    renderRacingStripeLivePreview(container, product);
+  }
+
   if (addToCartButton) {
     addToCartButton.addEventListener('click', () => {
       const selectedOptions = getSelectedRacingStripeOptions(container, product);

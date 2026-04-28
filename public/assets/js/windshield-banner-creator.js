@@ -1,4 +1,26 @@
 function initBannerCustomizer() {
+  const BANNER_MOCKUPS = {
+    windshield: {
+      mustang: '/assets/imgs/mockups/banner-mockup/windshield/mustang.png',
+      charger: '/assets/imgs/mockups/banner-mockup/windshield/charger.png',
+      challenger: '/assets/imgs/mockups/banner-mockup/windshield/challeneger.png',
+      subaru: '/assets/imgs/mockups/banner-mockup/windshield/subaru.png'
+    },
+    'rear-window': {
+      mustang: '/assets/imgs/mockups/banner-mockup/rear-window/mustang.png',
+      charger: '/assets/imgs/mockups/banner-mockup/rear-window/charger.png',
+      challenger: '/assets/imgs/mockups/banner-mockup/rear-window/challenger.png',
+      subaru: '/assets/imgs/mockups/banner-mockup/rear-window/subaru.png'
+    }
+  };
+
+  const BANNER_VEHICLES = [
+    { key: 'mustang', label: 'Mustang' },
+    { key: 'charger', label: 'Charger' },
+    { key: 'challenger', label: 'Challenger' },
+    { key: 'subaru', label: 'Subaru' }
+  ];
+
   const viewer = document.getElementById('bannerViewer');
   const vehicleImage = document.getElementById('bannerVehicleImage');
   const design = document.getElementById('bannerDesign');
@@ -16,6 +38,7 @@ function initBannerCustomizer() {
   const colorInput = document.getElementById('bannerColor');
   const outlineInput = document.getElementById('bannerOutline');
   const fontInput = document.getElementById('bannerFont');
+  const mockupTypeInput = document.getElementById('bannerMockupType');
   const vehicleInput = document.getElementById('bannerVehicle');
   const sizeInput = document.getElementById('bannerSize');
   const rotateInput = document.getElementById('bannerRotate');
@@ -49,6 +72,13 @@ function initBannerCustomizer() {
       showMeta: false,
       showValue: false,
       format: (_, element) => element?.selectedOptions?.[0]?.textContent || 'Impact'
+    },
+    {
+      key: 'bannerMockupType',
+      element: mockupTypeInput,
+      showMeta: false,
+      showValue: false,
+      format: (_, element) => element?.selectedOptions?.[0]?.textContent || 'Windshield'
     },
     {
       key: 'bannerVehicle',
@@ -204,6 +234,39 @@ function initBannerCustomizer() {
     });
   }
 
+  function getCurrentMockupType() {
+    const value = String(mockupTypeInput?.value || 'windshield').trim();
+    return BANNER_MOCKUPS[value] ? value : 'windshield';
+  }
+
+  function populateVehicleOptions(preferredVehicleKey = 'mustang') {
+    if (!vehicleInput) return;
+
+    const activeType = getCurrentMockupType();
+    const available = BANNER_MOCKUPS[activeType] || BANNER_MOCKUPS.windshield;
+    const options = BANNER_VEHICLES.filter((item) => Boolean(available[item.key]));
+
+    vehicleInput.innerHTML = options
+      .map((item) => `<option value="${item.key}">${item.label}</option>`)
+      .join('');
+
+    const selectedKey = options.some((item) => item.key === preferredVehicleKey)
+      ? preferredVehicleKey
+      : (options[0]?.key || 'mustang');
+    vehicleInput.value = selectedKey;
+  }
+
+  function getSelectedMockupImage() {
+    const activeType = getCurrentMockupType();
+    const selectedVehicle = String(vehicleInput?.value || 'mustang').trim();
+    const typeMap = BANNER_MOCKUPS[activeType] || BANNER_MOCKUPS.windshield;
+    const fallbackTypeMap = BANNER_MOCKUPS.windshield;
+
+    return typeMap[selectedVehicle]
+      || fallbackTypeMap[selectedVehicle]
+      || fallbackTypeMap.mustang;
+  }
+
   const dragState = {
     mode: null,
     startX: 0,
@@ -348,9 +411,11 @@ function initBannerCustomizer() {
     const curve = Number(curveInput?.value || 0);
     const opacity = Number(opacityInput?.value || 100) / 100;
 
-    const selectedVehicleImage = vehicleInput?.value || '/assets/imgs/mockups/windshield-banner/mustang.png';
+    const selectedType = getCurrentMockupType();
+    const selectedVehicleImage = getSelectedMockupImage();
     vehicleImage.src = selectedVehicleImage;
-    vehicleImage.alt = `${vehicleInput?.selectedOptions?.[0]?.textContent || 'Mustang'} windshield banner preview`;
+    const selectedTypeLabel = mockupTypeInput?.selectedOptions?.[0]?.textContent || 'Windshield';
+    vehicleImage.alt = `${vehicleInput?.selectedOptions?.[0]?.textContent || 'Mustang'} ${selectedTypeLabel.toLowerCase()} banner preview`;
 
     const { width: boxWidth, height: boxHeight } = fitDesignToText(
       text,
@@ -460,6 +525,15 @@ function initBannerCustomizer() {
   window.addEventListener('pointermove', onPointerMove);
   window.addEventListener('pointerup', endPointerAction);
 
+  if (mockupTypeInput) {
+    mockupTypeInput.addEventListener('change', () => {
+      const priorVehicle = String(vehicleInput?.value || 'mustang').trim();
+      populateVehicleOptions(priorVehicle);
+      renderOverlay();
+      pushHistoryState();
+    });
+  }
+
   controls.forEach((item) => {
     item.element.addEventListener('input', () => {
       renderOverlay();
@@ -505,11 +579,12 @@ function initBannerCustomizer() {
 
   checkoutBtn.addEventListener('click', () => {
     const summary = [
-      `Windshield banner customizer`,
+      `Banner customizer`,
       `Text: ${(textInput?.value || 'RENEGADE').trim() || 'RENEGADE'}`,
       `Color: ${colorInput?.value || '#ffffff'}`,
       `Outline: ${outlineInput?.value || '#000000'}`,
       `Font: ${fontInput?.selectedOptions?.[0]?.textContent || 'Impact'}`,
+      `Mockup Type: ${mockupTypeInput?.selectedOptions?.[0]?.textContent || 'Windshield'}`,
       `Vehicle: ${vehicleInput?.selectedOptions?.[0]?.textContent || 'Mustang'}`,
       `Size: ${sizeInput?.value || '72'}`,
       `Rotation: ${rotateInput?.value || '0'}deg`,
@@ -526,6 +601,7 @@ function initBannerCustomizer() {
 
   ensureControlMetaUI();
   syncHistoryButtons();
+  populateVehicleOptions(String(vehicleInput?.value || 'mustang').trim());
   renderOverlay();
 }
 

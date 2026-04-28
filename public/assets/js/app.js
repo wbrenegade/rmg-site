@@ -187,9 +187,17 @@ function normalizeCartOptions(options) {
   const stripeColors = Array.isArray(options.stripeColors)
     ? options.stripeColors.map(value => String(value || '').trim()).filter(Boolean)
     : [];
+  const stripeSpacings = Array.isArray(options.stripeSpacings)
+    ? options.stripeSpacings.map(value => String(value || '').trim()).filter(Boolean)
+    : [];
+  const stripeOutlineColors = Array.isArray(options.stripeOutlineColors)
+    ? options.stripeOutlineColors.map(value => String(value || '').trim()).filter(Boolean)
+    : [];
 
   if (stripeWidths.length) normalized.stripeWidths = stripeWidths;
   if (stripeColors.length) normalized.stripeColors = stripeColors;
+  if (stripeSpacings.length) normalized.stripeSpacings = stripeSpacings;
+  if (stripeOutlineColors.length) normalized.stripeOutlineColors = stripeOutlineColors;
 
   return Object.keys(normalized).length ? normalized : null;
 }
@@ -291,18 +299,35 @@ function buildCustomizeUrl(product) {
 
 window.buildCustomizeUrl = buildCustomizeUrl;
 
+function isRacingStripeProduct(product) {
+  if (!product) return false;
+  if (String(product.subSubcategory || '').toLowerCase() === 'racing stripes') return true;
+  const tags = Array.isArray(product.tags) ? product.tags : [];
+  return tags.some(tag => String(tag || '').toLowerCase() === 'racing stripes');
+}
+
 function renderProductCard(product) {
   const imagePath = product.imagePath || '/assets/imgs/main.PNG';
   const imageAlt = product.imageLabel || product.name || 'Product preview';
   const detailsUrl = product.productUrl || `product.html?id=${product.id}`;
   const customizeUrl = buildCustomizeUrl(product);
   const customizeLabel = product.customizeCtaLabel || 'Customize';
+  const isDecalProduct = String(product.category || '').toLowerCase() === 'decals';
+  const isRacingStripe = isRacingStripeProduct(product);
+  const previewUrl = `/tools/decal-preview?productId=${encodeURIComponent(product.id)}`;
   const primaryAction = `<a href="${detailsUrl}" class="btn btn-outline">View Details</a>`;
   const secondaryAction = product.custom
     ? `<a href="${customizeUrl}" class="btn">${customizeLabel}</a>`
     : `<button class="btn" onclick="addToCart('${product.id}')">Add to Cart</button>`;
+  const customizeAction = (!product.custom && isRacingStripe)
+    ? `<a href="${detailsUrl}" class="btn btn-outline racing-stripe-customize-link" data-product-id="${encodeURIComponent(product.id)}">Customize</a>`
+    : '';
+  const previewAction = isDecalProduct
+    ? `<a href="${previewUrl}" class="btn btn-outline">Send to Previewer</a>`
+    : '';
+  const productIdAttr = String(product.id || '').replace(/"/g, '&quot;');
   return `
-    <article class="card product-card">
+    <article class="card product-card" data-product-id="${productIdAttr}" data-racing-stripe="${isRacingStripe ? 'true' : 'false'}" data-custom="${product.custom ? 'true' : 'false'}">
       <div class="product-media">
         <img src="${imagePath}" alt="${imageAlt}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
         <span class="media-fallback">${imageAlt}</span>
@@ -317,6 +342,8 @@ function renderProductCard(product) {
         <div class="product-actions">
           ${primaryAction}
           ${secondaryAction}
+          ${customizeAction}
+          ${previewAction}
         </div>
       </div>
     </article>

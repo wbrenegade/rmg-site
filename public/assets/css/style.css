@@ -821,6 +821,99 @@ textarea { resize: vertical; }
   gap: 12px;
   margin: 8px 0 4px;
 }
+.stripe-live-preview {
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(145deg, rgba(10, 15, 24, 0.95), rgba(22, 30, 43, 0.95));
+}
+.stripe-live-preview__title {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.stripe-live-preview__canvas {
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.stripe-live-preview__canvas svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.stripe-live-preview__meta {
+  margin: 8px 0 0;
+}
+
+.order-summary-line-wrap {
+  margin-bottom: 10px;
+}
+.order-summary-line-wrap .inline-note {
+  margin: 4px 0 0;
+}
+
+.stripe-quick-modal[hidden] {
+  display: none;
+}
+
+.stripe-quick-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.stripe-quick-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.62);
+}
+
+.stripe-quick-modal__dialog {
+  position: relative;
+  width: min(760px, 100%);
+  max-height: calc(100vh - 36px);
+  overflow: auto;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--panel);
+  padding: 16px;
+}
+
+.stripe-quick-modal__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.stripe-quick-modal__header h3 {
+  margin: 0;
+}
+
+.stripe-quick-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.stripe-quick-actions {
+  margin-top: 10px;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
 .results-meta { color: var(--muted); margin-bottom: 16px; }
 
 /* Shop / Filters / Decal Taxonomy */
@@ -1424,6 +1517,10 @@ textarea { resize: vertical; }
 
   .product-option-grid {
     grid-template-columns: 1fr;
+  }
+
+  .stripe-quick-modal__dialog {
+    padding: 12px;
   }
 
   .product-actions .btn,

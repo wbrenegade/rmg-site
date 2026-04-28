@@ -884,6 +884,87 @@ function loadDecalImageFromUrl(url, revoke) {
   img.src = url;
 }
 
+function getPreviewProductIdFromQuery() {
+  const params = new URLSearchParams(window.location.search);
+  const productId = params.get("productId");
+  return productId ? String(productId).trim() : "";
+}
+
+function inferPlacementPresetFromProduct(product) {
+  const textParts = [
+    product?.name,
+    product?.slug,
+    product?.id,
+    product?.subcategory,
+    product?.subSubcategory,
+    ...(Array.isArray(product?.tags) ? product.tags : [])
+  ];
+  const haystack = textParts
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  if (haystack.includes("windshield")) return "windshield_banner";
+  if (haystack.includes("rear window") || haystack.includes("back window")) return "rear_window";
+  if (haystack.includes("rear quarter")) return "rear_quarter";
+  if (haystack.includes("rocker") || haystack.includes("side")) return "rocker";
+  if (haystack.includes("front fender") || haystack.includes("fender")) return "front_fender";
+  if (haystack.includes("door")) return "door";
+  if (haystack.includes("hood") || haystack.includes("full body") || haystack.includes("half body") || haystack.includes("racing stripe")) return "hood";
+
+  return "custom";
+}
+
+function applyInferredPresetForProduct(product) {
+  const presetSelect = document.getElementById("placementPreset");
+  if (!presetSelect) return;
+
+  const inferredPreset = inferPlacementPresetFromProduct(product);
+  presetSelect.value = inferredPreset;
+
+  if (carImage) applyPlacementPreset();
+
+  trackDecalPreview("placement_preset_inferred", {
+    productId: product?.id,
+    inferredPreset
+  });
+}
+
+async function loadDecalFromProductQuery() {
+  const productId = getPreviewProductIdFromQuery();
+  if (!productId) return;
+
+  let products = [];
+  try {
+    if (typeof window.RMGApi?.getProducts === "function") {
+      products = await window.RMGApi.getProducts();
+    }
+  } catch {
+    products = [];
+  }
+
+  if (!Array.isArray(products) || !products.length) return;
+
+  const product = products.find((item) => String(item?.id || "") === productId);
+  if (!product) return;
+
+  const imagePath = String(product.imagePath || "").trim();
+  if (!imagePath) return;
+
+  const imageUrl = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
+
+  decalFileName = `${product.name || "Selected Decal"}.png`;
+  document.getElementById("decalNameInput").value = product.name || "Selected Decal";
+  applyInferredPresetForProduct(product);
+
+  loadDecalImageFromUrl(imageUrl, false);
+  setStatus(`Loaded ${product.name || "selected decal"}. Upload a car image to place and preview it.`, "success");
+  trackDecalPreview("decal_loaded_from_product", {
+    productId: product.id,
+    productName: product.name || product.id
+  });
+}
+
 function applyPlacementPreset() {
   if (!canvas.width || !canvas.height) return;
 
@@ -1437,6 +1518,7 @@ updateLivePriceDisplay();
 restoreSavedDesign();
 shrinkPreviewOnScroll();
 render();
+loadDecalFromProductQuery();
 </script>
 </body>
 </html>

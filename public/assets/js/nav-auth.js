@@ -3,7 +3,7 @@
   var TOOL_ITEMS = [
     { label: 'SVG Converter', href: '/tools/svg-converter' },
     { label: 'Decal Preview', href: '/tools/decal-preview' },
-    { label: 'Windshield Banner Calculator', href: '/tools/windshield-banner-calculator' },
+    { label: 'Banner Calculator', href: '/tools/windshield-banner-calculator' },
     { label: 'Windshield Mockup Tool', href: '/windshield-banner-creator' }
   ];
 

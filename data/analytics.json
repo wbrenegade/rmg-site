@@ -1629,6 +1629,208 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "43e075bf-953e-4cb8-9f38-19ad6c89db22",
+      "type": "page_view",
+      "pathname": "/tools",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/tools/svg-converter",
+      "method": "GET",
+      "timestamp": "2026-04-28T03:51:00.888Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "e3575ea5-1278-495c-b262-b127580bec7e",
+      "type": "page_view",
+      "pathname": "/",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/tools",
+      "method": "GET",
+      "timestamp": "2026-04-28T03:51:39.948Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "4e1fa558-de0e-4b83-b3a7-1ee3e11a25af",
+      "type": "page_view",
+      "pathname": "/tools/decal-preview",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/",
+      "method": "GET",
+      "timestamp": "2026-04-28T03:52:14.821Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "7dbc9602-6cb6-4be7-a966-78e89533d489",
+      "type": "page_view",
+      "pathname": "/shop",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/tools/decal-preview",
+      "method": "GET",
+      "timestamp": "2026-04-28T03:54:12.218Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "3a2f933b-e6bb-4cfa-9caf-aace0e304f68",
+      "type": "page_view",
+      "pathname": "/windshield-banner-creator",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/shop",
+      "method": "GET",
+      "timestamp": "2026-04-28T03:59:21.114Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "d0cc3cee-5e07-4bff-ab4e-60e0ec062971",
+      "type": "page_view",
+      "pathname": "/tools/windshield-banner-calculator",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/windshield-banner-creator",
+      "method": "GET",
+      "timestamp": "2026-04-28T04:12:06.074Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "ac2bbec4-4bf6-4d4e-84b8-906c5151ba06",
+      "type": "tool_event",
+      "pathname": "/tools/windshield-banner-calculator",
+      "productId": null,
+      "productName": null,
+      "tool": "windshield-banner-calculator",
+      "action": "mode_changed",
+      "referrer": "https://renegademadegraphix.com/tools/windshield-banner-calculator",
+      "method": "POST",
+      "timestamp": "2026-04-28T04:12:06.851Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {
+        "mode": "regular"
+      }
+    },
+    {
+      "id": "264c3fa2-5a92-44fc-b737-a30c6fc5d8a7",
+      "type": "tool_event",
+      "pathname": "/tools/windshield-banner-calculator",
+      "productId": null,
+      "productName": null,
+      "tool": "windshield-banner-calculator",
+      "action": "viewed",
+      "referrer": "https://renegademadegraphix.com/tools/windshield-banner-calculator",
+      "method": "POST",
+      "timestamp": "2026-04-28T04:12:06.877Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "202f8d40-5fb9-4a81-a929-c2dcb6ad6f04",
+      "type": "tool_event",
+      "pathname": "/tools/windshield-banner-calculator",
+      "productId": null,
+      "productName": null,
+      "tool": "windshield-banner-calculator",
+      "action": "mode_changed",
+      "referrer": "https://renegademadegraphix.com/tools/windshield-banner-calculator",
+      "method": "POST",
+      "timestamp": "2026-04-28T04:12:17.024Z",
+      "date": "2026-04-28",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {
+        "mode": "advanced"
+      }
     }
   ]
 }

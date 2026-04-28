@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Windshield Banner Calculator | RenegadeMade Graphix</title>
-  <meta name="description" content="Calculate windshield banner letter spacing, margins, and placement before you cut or order." />
+  <title>Banner Calculator | RenegadeMade Graphix</title>
+  <meta name="description" content="Calculate banner letter spacing, margins, and placement before you cut or order." />
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="RenegadeMade Graphix" />
   <meta property="og:url" content="https://renegademadegraphix.com/windshield-banner-calculator" />
-  <meta property="og:title" content="Windshield Banner Calculator | RenegadeMade Graphix" />
-  <meta property="og:description" content="Calculate windshield banner letter spacing, margins, and placement before you cut or order." />
+  <meta property="og:title" content="Banner Calculator | RenegadeMade Graphix" />
+  <meta property="og:description" content="Calculate banner letter spacing, margins, and placement before you cut or order." />
   <meta property="og:image" content="https://renegademadegraphix.com/assets/imgs/main.PNG" />
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Windshield Banner Calculator | RenegadeMade Graphix" />
-  <meta name="twitter:description" content="Calculate windshield banner letter spacing, margins, and placement before you cut or order." />
+  <meta name="twitter:title" content="Banner Calculator | RenegadeMade Graphix" />
+  <meta name="twitter:description" content="Calculate banner letter spacing, margins, and placement before you cut or order." />
   <meta name="twitter:image" content="https://renegademadegraphix.com/assets/imgs/main.PNG" />
   <link rel="icon" type="image/png" href="/assets/imgs/favicon.png" />
   <link rel="stylesheet" href="/assets/css/style.css" />
@@ -382,8 +382,8 @@
     <section class="page-hero compact">
       <div class="container">
         <p class="eyebrow">Tools</p>
-        <h1>Windshield Banner Calculator</h1>
-        <p>This tool is for planning windshield banner vinyl layouts before cutting or installing. Enter your exact text, font, banner size, and letter height to calculate precise letter widths, spacing, and side margins so your banner fits correctly on the first try.</p>
+        <h1>Banner Calculator</h1>
+        <p>This tool is for planning banner vinyl layouts before cutting or installing. Enter your exact text, font, banner size, and letter height to calculate precise letter widths, spacing, and side margins so your banner fits correctly on the first try.</p>
       </div>
     </section>
 
@@ -427,6 +427,18 @@
                 </span>
                 <input id="bannerLength" type="number" value="38" min="1" />
               </label>
+
+              <label>
+                <span class="label-row">
+                  Window Size (in)
+                  <span class="help" tabindex="0" data-tip="Available window span where the banner can fit.">?</span>
+                </span>
+                <input id="windowSize" type="number" value="42" min="1" />
+              </label>
+
+            </div>
+
+            <div class="form-row">
 
               <label>
                 <span class="label-row">
@@ -483,6 +495,10 @@
                   <option value="bottom-lr">Bottom of windshield - Left to Right</option>
                   <option value="left-ttb">Left side - Top to Bottom</option>
                   <option value="right-ttb">Right side - Top to Bottom</option>
+                  <option value="rear-top-lr">Top of rear window - Left to Right</option>
+                  <option value="rear-bottom-lr">Bottom of rear window - Left to Right</option>
+                  <option value="rear-left-ttb">Left side of rear window - Top to Bottom</option>
+                  <option value="rear-right-ttb">Right side of rear window - Top to Bottom</option>
                 </select>
               </label>
 
@@ -623,6 +639,7 @@
       const text = document.getElementById("bannerText").value.trim().toUpperCase();
       const placement = isAdvanced ? document.getElementById("placement").value : "top-lr";
       const bannerLength = parseFloat(document.getElementById("bannerLength").value);
+      const windowSize = parseFloat(document.getElementById("windowSize").value);
       const bannerDepth = isAdvanced ? parseFloat(document.getElementById("bannerDepth").value) : 0;
       const letterHeight = parseFloat(document.getElementById("letterHeight").value);
       const layoutMode = document.getElementById("layoutMode").value;
@@ -631,9 +648,15 @@
       const fontFamily = document.getElementById("fontFamily").value;
       let sideMargin = parseFloat(document.getElementById("sideMargin").value) || 0;
 
-      if (!text || bannerLength <= 0 || letterHeight <= 0 || wordMultiplier <= 0 || Number.isNaN(curveAmount) || (isAdvanced && bannerDepth <= 0)) {
+      if (!text || bannerLength <= 0 || windowSize <= 0 || letterHeight <= 0 || wordMultiplier <= 0 || Number.isNaN(curveAmount) || (isAdvanced && bannerDepth <= 0)) {
         showError("<strong>Invalid input</strong>Please check all fields are filled in with valid values.");
         trackBannerCalculator("validation_failed", { mode: currentMode });
+        return;
+      }
+
+      if (bannerLength > windowSize) {
+        showError(`<strong>Banner Too Long</strong>Banner length (${bannerLength.toFixed(2)}\") is larger than window size (${windowSize.toFixed(2)}\"). Reduce banner length or increase window size.`);
+        trackBannerCalculator("layout_failed", { reason: "banner_exceeds_window", mode: currentMode });
         return;
       }
 
@@ -752,13 +775,14 @@
       const endMargin = bannerLength - currentPos;
 
       latestResult = {
-        project: "Windshield Banner Layout",
+        project: "Banner Layout",
         createdAt: new Date().toISOString(),
         mode: currentMode,
         input: {
           text,
           placement: isAdvanced ? placement : null,
           bannerLengthInches: bannerLength,
+          windowSizeInches: windowSize,
           bannerDepthInches: isAdvanced ? bannerDepth : null,
           letterHeightInches: letterHeight,
           layoutMode,
@@ -807,16 +831,16 @@
 
     function convertPlacementToXY(placement, along, curveOffset, length, depth) {
       const centerDepth = depth / 2;
-      if (placement === "top-lr") {
+      if (placement === "top-lr" || placement === "rear-top-lr") {
         return { x: along, y: centerDepth - curveOffset, baseRotation: 0 };
       }
-      if (placement === "bottom-lr") {
+      if (placement === "bottom-lr" || placement === "rear-bottom-lr") {
         return { x: along, y: centerDepth + curveOffset, baseRotation: 0 };
       }
-      if (placement === "left-ttb") {
+      if (placement === "left-ttb" || placement === "rear-left-ttb") {
         return { x: centerDepth - curveOffset, y: along, baseRotation: 90 };
       }
-      if (placement === "right-ttb") {
+      if (placement === "right-ttb" || placement === "rear-right-ttb") {
         return { x: centerDepth + curveOffset, y: along, baseRotation: 90 };
       }
       return { x: along, y: centerDepth, baseRotation: 0 };
@@ -827,7 +851,11 @@
         "top-lr": "Top of windshield - Left to Right",
         "bottom-lr": "Bottom of windshield - Left to Right",
         "left-ttb": "Left side - Top to Bottom",
-        "right-ttb": "Right side - Top to Bottom"
+        "right-ttb": "Right side - Top to Bottom",
+        "rear-top-lr": "Top of rear window - Left to Right",
+        "rear-bottom-lr": "Bottom of rear window - Left to Right",
+        "rear-left-ttb": "Left side of rear window - Top to Bottom",
+        "rear-right-ttb": "Right side of rear window - Top to Bottom"
       };
 
       return names[value] || value;
@@ -841,7 +869,8 @@
         `Text: ${escapeHTML(result.input.text)}`,
         `Font: ${result.input.fontFamily}`,
         `Letter Height: ${result.input.letterHeightInches}\"`,
-        `Banner Length: ${result.input.bannerLengthInches}\"`
+        `Banner Length: ${result.input.bannerLengthInches}\"`,
+        `Window Size: ${result.input.windowSizeInches}\"`
       ];
 
       if (isAdvanced) {
@@ -904,7 +933,7 @@
       const result = latestResult;
       const canvas = document.getElementById("previewCanvas");
       const ctx = canvas.getContext("2d");
-      const isVertical = result.input.placement === "left-ttb" || result.input.placement === "right-ttb";
+      const isVertical = ["left-ttb", "right-ttb", "rear-left-ttb", "rear-right-ttb"].includes(result.input.placement);
       const length = result.input.bannerLengthInches;
       const depth = result.input.bannerDepthInches;
       const scale = isVertical ? Math.min(800 / depth, 1000 / length) : Math.min(900 / length, 220 / depth);
@@ -940,14 +969,14 @@
 
     function resultToText(result) {
       const isAdvanced = result.mode === "advanced";
-      let text = "Windshield Banner Layout Results\n================================\n\n";
+      let text = "Banner Layout Results\n================================\n\n";
       text += `Created: ${result.createdAt}\nMode: ${isAdvanced ? "Advanced" : "Regular"}\nText: ${result.input.text}\n`;
 
       if (isAdvanced) {
         text += `Placement: ${getPlacementName(result.input.placement)}\nStrip Depth: ${result.input.bannerDepthInches}\"\nCurve: ${result.input.curveAmountInches}\"\n`;
       }
 
-      text += `Banner Length: ${result.input.bannerLengthInches}\"\nLetter Height: ${result.input.letterHeightInches}\"\nFont: ${result.input.fontFamily}\nWord Spacing Multiplier: ${result.input.wordSpacingMultiplier}\n`;
+      text += `Banner Length: ${result.input.bannerLengthInches}\"\nWindow Size: ${result.input.windowSizeInches}\"\nLetter Height: ${result.input.letterHeightInches}\"\nFont: ${result.input.fontFamily}\nWord Spacing Multiplier: ${result.input.wordSpacingMultiplier}\n`;
 
       if (result.input.layoutMode === "fixed") {
         text += `Fixed Margin: ${result.input.fixedMarginInches}\"\n`;
@@ -1039,7 +1068,7 @@
       }
 
       trackBannerCalculator("email_results");
-      window.location.href = `mailto:?subject=${encodeURIComponent("Windshield Banner Layout")}&body=${encodeURIComponent(resultToText(latestResult))}`;
+      window.location.href = `mailto:?subject=${encodeURIComponent("Banner Layout")}&body=${encodeURIComponent(resultToText(latestResult))}`;
     }
 
     async function shareResults() {
@@ -1049,7 +1078,7 @@
 
       if (navigator.share) {
         try {
-          await navigator.share({ title: "Windshield Banner Layout", text: resultToText(latestResult) });
+          await navigator.share({ title: "Banner Layout", text: resultToText(latestResult) });
           trackBannerCalculator("share_results");
         } catch {
           return;

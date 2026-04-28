@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Windshield Banner Creator | RenegadeMade Graphix</title>
-  <meta name="description" content="Create your windshield banner with live text, color, size, and placement controls before checkout." />
+  <title>Banner Creator | RenegadeMade Graphix</title>
+  <meta name="description" content="Create your banner mockup with live text, color, size, and placement controls before checkout." />
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="RenegadeMade Graphix" />
   <meta property="og:url" content="https://renegademadegraphix.com/windshield-banner-creator" />
-  <meta property="og:title" content="Windshield Banner Creator | RenegadeMade Graphix" />
-  <meta property="og:description" content="Create your windshield banner with live text, color, size, and placement controls before checkout." />
+  <meta property="og:title" content="Banner Creator | RenegadeMade Graphix" />
+  <meta property="og:description" content="Create your banner mockup with live text, color, size, and placement controls before checkout." />
   <meta property="og:image" content="https://renegademadegraphix.com/assets/imgs/main.PNG" />
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Windshield Banner Creator | RenegadeMade Graphix" />
-  <meta name="twitter:description" content="Create your windshield banner with live text, color, size, and placement controls before checkout." />
+  <meta name="twitter:title" content="Banner Creator | RenegadeMade Graphix" />
+  <meta name="twitter:description" content="Create your banner mockup with live text, color, size, and placement controls before checkout." />
   <meta name="twitter:image" content="https://renegademadegraphix.com/assets/imgs/main.PNG" />
   <link rel="icon" type="image/png" href="/assets/imgs/favicon.png" />
   <link rel="stylesheet" href="assets/css/style.css" />
@@ -41,7 +41,7 @@
     <section class="page-hero compact">
       <div class="container">
         <p class="eyebrow">Banner Builder</p>
-        <h1>Windshield Banner Creator</h1>
+        <h1>Banner Creator</h1>
         <p>Type your banner text and dial in color, spacing, size, and placement with a live preview.</p>
       </div>
     </section>
@@ -49,9 +49,9 @@
     <section class="section">
       <div class="container customize-layout">
         <article class="card">
-          <h3>Live Windshield Preview</h3>
+          <h3>Live Banner Preview</h3>
           <div class="customize-viewer" id="bannerViewer">
-            <img id="bannerVehicleImage" src="/assets/imgs/mockups/windshield-banner/mustang.png" alt="Mustang windshield banner preview" />
+            <img id="bannerVehicleImage" src="/assets/imgs/mockups/banner-mockup/windshield/mustang.png" alt="Mustang windshield banner preview" />
             <div class="banner-grid-overlay" aria-hidden="true"></div>
             <div class="banner-guide-x" id="bannerGuideX" aria-hidden="true"></div>
             <div class="banner-guide-y" id="bannerGuideY" aria-hidden="true"></div>
@@ -71,16 +71,22 @@
             </div>
           </div>
           <div class="preview-option-row">
+            <label class="full-width">Banner Mockup Type
+              <select id="bannerMockupType">
+                <option value="windshield">Windshield</option>
+                <option value="rear-window">Rear Window</option>
+              </select>
+            </label>
             <label class="full-width">Vehicle Mockup
               <select id="bannerVehicle">
-                <option value="/assets/imgs/mockups/windshield-banner/mustang.png">Mustang</option>
-                <option value="/assets/imgs/mockups/windshield-banner/charger.png">Charger</option>
-                <option value="/assets/imgs/mockups/windshield-banner/challeneger.png">Challenger</option>
-                <option value="/assets/imgs/mockups/windshield-banner/subaru.png">Subaru</option>
+                <option value="mustang">Mustang</option>
+                <option value="charger">Charger</option>
+                <option value="challenger">Challenger</option>
+                <option value="subaru">Subaru</option>
               </select>
             </label>
           </div>
-          <p class="form-note">This preview helps you finalize your windshield banner before checkout.</p>
+          <p class="form-note">This preview helps you finalize your banner mockup before checkout.</p>
         </article>
 
         <form class="card form-grid" id="bannerCustomizerForm">
@@ -134,7 +140,7 @@
             <a href="shop.html" class="btn btn-outline">Back to Shop</a>
             <button type="button" class="btn" id="bannerCheckoutBtn">Use This Design</button>
           </div>
-          <p class="form-note full-width">This sends your windshield banner settings into checkout notes.</p>
+          <p class="form-note full-width">This sends your banner settings into checkout notes.</p>
         </form>
       </div>
     </section>

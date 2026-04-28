@@ -112,16 +112,32 @@ const PRODUCTS = [
         "imageLabel":  "Racing Stripe Kit",
         "description":  "Center stripe kit for hood, roof, and trunk with pre-matched widths.",
         "stripeOptions": {
+            "hasMultipleStripes": true,
+            "hasOutline": true,
             "widths": [
                 "8 in / 8 in",
                 "10 in / 10 in",
                 "12 in / 12 in",
                 "10 in center + 2 in pinstripes"
             ],
+            "spacings": [
+                "0.25 in",
+                "0.5 in",
+                "0.75 in",
+                "1.0 in",
+                "1.5 in"
+            ],
             "colors": [
                 "Gloss Black",
                 "Matte Black",
                 "Satin Charcoal",
+                "Gloss White",
+                "Race Red",
+                "Nardo Gray"
+            ],
+            "outlineColors": [
+                "Gloss Black",
+                "Matte Black",
                 "Gloss White",
                 "Race Red",
                 "Nardo Gray"
@@ -165,6 +181,8 @@ const PRODUCTS = [
         "imageLabel":  "Rocker Stripe Set",
         "description":  "Long rocker panel graphics with side-specific cuts and alignment marks.",
         "stripeOptions": {
+            "hasMultipleStripes": false,
+            "hasOutline": false,
             "widths": [
                 "3 in",
                 "4 in",

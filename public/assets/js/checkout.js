@@ -5,16 +5,39 @@ function renderCheckoutSummary() {
   const cart = getCart();
   const totals = calculateCartTotals();
 
+  const renderStripeOptionLines = (item) => {
+    const options = item?.options;
+    if (!options || typeof options !== 'object') return '';
+
+    const widths = Array.isArray(options.stripeWidths) ? options.stripeWidths.filter(Boolean) : [];
+    const colors = Array.isArray(options.stripeColors) ? options.stripeColors.filter(Boolean) : [];
+    const spacings = Array.isArray(options.stripeSpacings) ? options.stripeSpacings.filter(Boolean) : [];
+    const outlineColors = Array.isArray(options.stripeOutlineColors) ? options.stripeOutlineColors.filter(Boolean) : [];
+    const lines = [];
+
+    if (widths.length) lines.push(`Stripe Width: ${widths.join(', ')}`);
+    if (colors.length) lines.push(`Stripe Color: ${colors.join(', ')}`);
+    if (spacings.length) lines.push(`Stripe Spacing: ${spacings.join(', ')}`);
+    if (outlineColors.length) lines.push(`Outline Color: ${outlineColors.join(', ')}`);
+
+    if (!lines.length) return '';
+    return `<p class="inline-note">${lines.join(' • ')}</p>`;
+  };
+
   if (!cart.length) {
     summaryEl.innerHTML = '<div class="empty-state">Your cart is empty.</div>';
   } else {
     summaryEl.innerHTML = cart.map(item => {
       const product = findProductById(item.id);
       if (!product) return '';
+      const optionLines = renderStripeOptionLines(item);
       return `
-        <div class="order-summary-line">
-          <span>${product.name} × ${item.quantity}</span>
-          <strong>${formatCurrency(product.price * item.quantity)}</strong>
+        <div class="order-summary-line-wrap">
+          <div class="order-summary-line">
+            <span>${product.name} × ${item.quantity}</span>
+            <strong>${formatCurrency(product.price * item.quantity)}</strong>
+          </div>
+          ${optionLines}
         </div>
       `;
     }).join('');
