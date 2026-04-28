@@ -150,8 +150,9 @@
       wrapper.classList.remove('open');
     });
 
-    toolsLink.addEventListener('click', function () {
+    toolsLink.addEventListener('click', function (event) {
       if (window.innerWidth <= 760) {
+        event.preventDefault();
         wrapper.classList.toggle('open');
       }
     });
