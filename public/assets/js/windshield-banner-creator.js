@@ -32,11 +32,38 @@ function initBannerCustomizer() {
     startSize: 0
   };
 
-  function clampPosition(value) {
-    return Math.max(-35, Math.min(35, value));
+  function getDragBounds() {
+    const viewerWidth = Math.max(viewer.clientWidth, 1);
+    const viewerHeight = Math.max(viewer.clientHeight, 1);
+    const designWidth = Math.max(design.offsetWidth, 1);
+    const designHeight = Math.max(design.offsetHeight, 1);
+
+    const maxXByEdge = ((viewerWidth - designWidth) / 2 / designWidth) * 100;
+    const maxYByEdge = ((viewerHeight - designHeight) / 2 / designHeight) * 100;
+
+    const maxX = Math.max(35, Math.min(220, Math.floor(maxXByEdge)));
+    const maxY = Math.max(35, Math.min(220, Math.floor(maxYByEdge)));
+
+    return {
+      minX: -maxX,
+      maxX,
+      minY: -maxY,
+      maxY
+    };
   }
 
-  function snapPosition(value) {
+  function syncPositionInputBounds(bounds) {
+    posXInput.min = String(bounds.minX);
+    posXInput.max = String(bounds.maxX);
+    posYInput.min = String(bounds.minY);
+    posYInput.max = String(bounds.maxY);
+  }
+
+  function clampPosition(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  function snapPosition(value, min, max) {
     const centerThreshold = 2;
     const gridStep = 5;
     const gridThreshold = 1.4;
@@ -54,7 +81,7 @@ function initBannerCustomizer() {
     }
 
     return {
-      value: clampPosition(snappedValue),
+      value: clampPosition(snappedValue, min, max),
       center: snappedToCenter
     };
   }
@@ -71,8 +98,8 @@ function initBannerCustomizer() {
     const font = fontInput?.value || "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif";
     const size = Number(sizeInput?.value || 72);
     const rotate = Number(rotateInput?.value || 0);
-    const posX = Number(posXInput?.value || 0);
-    const posY = Number(posYInput?.value || -8);
+    let posX = Number(posXInput?.value || 0);
+    let posY = Number(posYInput?.value || -8);
     const spacing = Number(spacingInput?.value || 5);
     const curve = Number(curveInput?.value || 0);
     const opacity = Number(opacityInput?.value || 100) / 100;
@@ -82,6 +109,13 @@ function initBannerCustomizer() {
     const boxHeight = Math.max(120, size * 2.1);
     design.style.width = `${boxWidth}px`;
     design.style.height = `${boxHeight}px`;
+
+    const bounds = getDragBounds();
+    syncPositionInputBounds(bounds);
+    posX = clampPosition(posX, bounds.minX, bounds.maxX);
+    posY = clampPosition(posY, bounds.minY, bounds.maxY);
+    posXInput.value = String(Math.round(posX));
+    posYInput.value = String(Math.round(posY));
 
     svg.setAttribute('viewBox', `0 0 ${boxWidth} ${boxHeight}`);
     const y = boxHeight * 0.62;
@@ -117,18 +151,20 @@ function initBannerCustomizer() {
     const dx = event.clientX - dragState.startX;
     const dy = event.clientY - dragState.startY;
     const disableSnap = Boolean(event.altKey);
+    const bounds = getDragBounds();
+    syncPositionInputBounds(bounds);
 
     if (dragState.mode === 'move') {
       const nextX = dragState.startPosX + ((dx / Math.max(viewer.clientWidth, 1)) * 100);
       const nextY = dragState.startPosY + ((dy / Math.max(viewer.clientHeight, 1)) * 100);
 
       if (disableSnap) {
-        posXInput.value = String(Math.round(clampPosition(nextX)));
-        posYInput.value = String(Math.round(clampPosition(nextY)));
+        posXInput.value = String(Math.round(clampPosition(nextX, bounds.minX, bounds.maxX)));
+        posYInput.value = String(Math.round(clampPosition(nextY, bounds.minY, bounds.maxY)));
         setGuideState(false, false);
       } else {
-        const snappedX = snapPosition(nextX);
-        const snappedY = snapPosition(nextY);
+        const snappedX = snapPosition(nextX, bounds.minX, bounds.maxX);
+        const snappedY = snapPosition(nextY, bounds.minY, bounds.maxY);
         posXInput.value = String(Math.round(snappedX.value));
         posYInput.value = String(Math.round(snappedY.value));
         setGuideState(snappedY.center, snappedX.center);
