@@ -1,5 +1,11 @@
 (function () {
   var CURRENT_USER_KEY = 'rmg_current_user';
+  var TOOL_ITEMS = [
+    { label: 'SVG Converter', href: '/tools/svg-converter' },
+    { label: 'Decal Preview', href: '/tools/decal-preview' },
+    { label: 'Windshield Banner Calculator', href: '/tools/windshield-banner-calculator' },
+    { label: 'Windshield Mockup Tool', href: '/windshield-banner-creator' }
+  ];
 
   function getUser() {
     try {
@@ -99,12 +105,69 @@
     }
   }
 
+  function isToolsHref(href) {
+    if (!href) return false;
+    var h = href.replace(/^.*\//, '').split('?')[0];
+    return h === 'tools' || h === 'tools.html';
+  }
+
+  function enhanceToolsDropdown(nav) {
+    if (!nav || nav.querySelector('.tools-nav-item')) return;
+
+    var directAnchors = Array.from(nav.children).filter(function (node) {
+      return node.tagName === 'A';
+    });
+    var toolsLink = directAnchors.find(function (a) {
+      return isToolsHref(a.getAttribute('href'));
+    });
+
+    if (!toolsLink) return;
+
+    var wrapper = document.createElement('div');
+    wrapper.className = 'tools-nav-item';
+
+    var dropdown = document.createElement('div');
+    dropdown.className = 'tools-dropdown';
+
+    TOOL_ITEMS.forEach(function (tool) {
+      var link = document.createElement('a');
+      link.href = tool.href;
+      link.textContent = tool.label;
+      if (window.location.pathname === tool.href) {
+        link.classList.add('active');
+      }
+      dropdown.appendChild(link);
+    });
+
+    toolsLink.setAttribute('aria-haspopup', 'true');
+    toolsLink.setAttribute('aria-expanded', 'false');
+
+    wrapper.addEventListener('mouseenter', function () {
+      toolsLink.setAttribute('aria-expanded', 'true');
+    });
+    wrapper.addEventListener('mouseleave', function () {
+      toolsLink.setAttribute('aria-expanded', 'false');
+      wrapper.classList.remove('open');
+    });
+
+    toolsLink.addEventListener('click', function () {
+      if (window.innerWidth <= 760) {
+        wrapper.classList.toggle('open');
+      }
+    });
+
+    nav.insertBefore(wrapper, toolsLink);
+    wrapper.appendChild(toolsLink);
+    wrapper.appendChild(dropdown);
+  }
+
   function init() {
     var user = getUser();
     updateAccountLinks(user);
     var navs = document.querySelectorAll('.site-nav');
     navs.forEach(function (nav) {
       updateNav(nav, user);
+      enhanceToolsDropdown(nav);
     });
   }
 
