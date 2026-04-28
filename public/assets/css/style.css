@@ -530,16 +530,17 @@ textarea { resize: vertical; }
 }
 
 .home-tools-grid .home-tile-media {
-  height: 170px;
+  aspect-ratio: 1606 / 979;
+  height: auto;
   display: grid;
   place-items: center;
-  padding: 8px;
+  padding: 0;
 }
 
 .home-tools-grid .home-tile-media img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
 }
 
@@ -1630,9 +1631,7 @@ body.modal-open {
     grid-template-columns: 1fr;
   }
 
-  .home-tools-grid .home-tile-media {
-    height: 190px;
-  }
+  .home-tools-grid .home-tile-media { aspect-ratio: 1606 / 979; }
 
   .home-products-shell {
     padding: 16px;
@@ -1704,9 +1703,7 @@ body.modal-open {
     min-height: 170px;
   }
 
-  .home-tools-grid .home-tile-media {
-    height: 160px;
-  }
+  .home-tools-grid .home-tile-media { aspect-ratio: 1606 / 979; }
 
   .home-browse-media img,
   .product-card .product-media img {
