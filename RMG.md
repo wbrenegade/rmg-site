@@ -31,9 +31,6 @@
     - Rips/Scratches/Tears
     - Sponsor Stacks/Rows
 
-- Window Tint
-    - Full Rolls
-    - Precut Kits
 - Lettering
     - Business Info
     - Business Name

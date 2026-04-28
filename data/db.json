@@ -168,28 +168,6 @@
       ]
     },
     {
-      "name": "Window Tint",
-      "hasSubcategories": true,
-      "subcategoryCount": 2,
-      "imagePath": "/assets/imgs/main.PNG",
-      "subcategories": [
-        {
-          "name": "Full Rolls",
-          "hasSubcategories": false,
-          "subcategoryCount": null,
-          "imagePath": "/assets/imgs/main.PNG",
-          "subcategories": null
-        },
-        {
-          "name": "Precut Kits",
-          "hasSubcategories": false,
-          "subcategoryCount": null,
-          "imagePath": "/assets/imgs/main.PNG",
-          "subcategories": null
-        }
-      ]
-    },
-    {
       "name": "Lettering",
       "hasSubcategories": true,
       "subcategoryCount": 2,
@@ -651,6 +629,6 @@
   "siteSettings": {
     "homeEyebrow": "Custom Vinyl That Fits Your Build",
     "homeTitle": "Decals and kits built for real cars and real brands.",
-    "homePhrase": "We sell decals, car-specific decal kits, pre-cut window tint kits, and fully custom decals/graphics made to match your exact style."
+    "homePhrase": "We sell decals, car-specific decal kits, and fully custom decals/graphics made to match your exact style."
   }
 }

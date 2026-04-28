@@ -8,7 +8,6 @@ async function initHomePage() {
   const homePhrase = document.getElementById('homePhrase');
   const preferredCategoryOrder = [
     'Decals',
-    'Window Tint',
     'Lettering',
     'Wraps'
   ];
@@ -120,7 +119,6 @@ async function initHomePage() {
     if (category === 'featured') return '★';
     if (category === 'all') return '▦';
     if (category === 'Decals') return '🏁';
-    if (category === 'Window Tint') return '◼';
     if (category === 'Lettering') return 'A';
     if (category === 'Wraps') return '▤';
     return '•';

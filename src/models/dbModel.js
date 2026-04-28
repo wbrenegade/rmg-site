@@ -9,7 +9,7 @@ const dbFilePath = path.join(dataDir, "db.json");
 const defaultSiteSettings = {
   homeEyebrow: "Custom Vinyl That Fits Your Build",
   homeTitle: "Decals and kits built for real cars and real brands.",
-  homePhrase: "We sell decals, car-specific decal kits, pre-cut window tint kits, and fully custom decals/graphics made to match your exact style."
+  homePhrase: "We sell decals, car-specific decal kits, and fully custom decals/graphics made to match your exact style."
 };
 
 const defaultCategories = [
@@ -26,16 +26,6 @@ const defaultCategories = [
       { name: "Rear Quarter Panel", hasSubcategories: true, subcategoryCount: 4, imagePath: "/assets/imgs/decal-cats/rear_quarter_panel.png", subcategories: [{ name: "Geometrical Patterns", hasSubcategories: false, subcategoryCount: null, imagePath: "/assets/imgs/main.PNG", subcategories: null }, { name: "Graphics", hasSubcategories: false, subcategoryCount: null, imagePath: "/assets/imgs/main.PNG", subcategories: null }, { name: "Racing Stripes", hasSubcategories: false, subcategoryCount: null, imagePath: "/assets/imgs/decal-sub-cats/racing_Stripes.png", subcategories: null }, { name: "Rips/Scratches/Tears", hasSubcategories: false, subcategoryCount: null, imagePath: "/assets/imgs/main.PNG", subcategories: null }] },
       { name: "Rocker Panel/Side", hasSubcategories: true, subcategoryCount: 3, imagePath: "/assets/imgs/decal-cats/rocker_panel_side.png", subcategories: [{ name: "Brands", hasSubcategories: false, subcategoryCount: null, imagePath: "/assets/imgs/main.PNG", subcategories: null }, { name: "Racing Stripes", hasSubcategories: false, subcategoryCount: null, imagePath: "/assets/imgs/decal-sub-cats/racing_Stripes.png", subcategories: null }, { name: "Sponsor Rows", hasSubcategories: false, subcategoryCount: null, imagePath: "/assets/imgs/main.PNG", subcategories: null }] },
       { name: "Windshield/Rear Window Banners", hasSubcategories: false, subcategoryCount: null, imagePath: "/assets/imgs/decal-cats/windshield.png", subcategories: null }
-    ]
-  },
-  {
-    name: "Window Tint",
-    hasSubcategories: true,
-    subcategoryCount: 2,
-    imagePath: "/assets/imgs/main.PNG",
-    subcategories: [
-      { name: "Full Rolls", hasSubcategories: false, subcategoryCount: null, imagePath: "/assets/imgs/main.PNG", subcategories: null },
-      { name: "Precut Kits", hasSubcategories: false, subcategoryCount: null, imagePath: "/assets/imgs/main.PNG", subcategories: null }
     ]
   },
   {
