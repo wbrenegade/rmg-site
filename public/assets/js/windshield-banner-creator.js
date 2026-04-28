@@ -1,5 +1,6 @@
 function initBannerCustomizer() {
   const viewer = document.getElementById('bannerViewer');
+  const vehicleImage = document.getElementById('bannerVehicleImage');
   const design = document.getElementById('bannerDesign');
   const guideX = document.getElementById('bannerGuideX');
   const guideY = document.getElementById('bannerGuideY');
@@ -9,12 +10,13 @@ function initBannerCustomizer() {
   const textNode = document.getElementById('bannerTextNode');
   const form = document.getElementById('bannerCustomizerForm');
   const checkoutBtn = document.getElementById('bannerCheckoutBtn');
-  if (!(viewer && design && svg && curvePath && textPath && textNode && form && checkoutBtn && guideX && guideY)) return;
+  if (!(viewer && vehicleImage && design && svg && curvePath && textPath && textNode && form && checkoutBtn && guideX && guideY)) return;
 
   const textInput = document.getElementById('bannerText');
   const colorInput = document.getElementById('bannerColor');
   const outlineInput = document.getElementById('bannerOutline');
   const fontInput = document.getElementById('bannerFont');
+  const vehicleInput = document.getElementById('bannerVehicle');
   const sizeInput = document.getElementById('bannerSize');
   const rotateInput = document.getElementById('bannerRotate');
   const posXInput = document.getElementById('bannerPosX');
@@ -44,7 +46,16 @@ function initBannerCustomizer() {
     {
       key: 'bannerFont',
       element: fontInput,
+      showMeta: false,
+      showValue: false,
       format: (_, element) => element?.selectedOptions?.[0]?.textContent || 'Impact'
+    },
+    {
+      key: 'bannerVehicle',
+      element: vehicleInput,
+      showMeta: false,
+      showValue: false,
+      format: (_, element) => element?.selectedOptions?.[0]?.textContent || 'Mustang'
     },
     {
       key: 'bannerSize',
@@ -150,6 +161,7 @@ function initBannerCustomizer() {
 
   function ensureControlMetaUI() {
     controls.forEach((item) => {
+      if (item.showMeta === false) return;
       const label = item.element.closest('label');
       if (!label) return;
 
@@ -159,9 +171,12 @@ function initBannerCustomizer() {
         meta.className = 'control-meta';
         meta.dataset.control = item.key;
 
-        const valueEl = document.createElement('span');
-        valueEl.className = 'control-value';
-        valueEl.id = `${item.key}Value`;
+        if (item.showValue !== false) {
+          const valueEl = document.createElement('span');
+          valueEl.className = 'control-value';
+          valueEl.id = `${item.key}Value`;
+          meta.appendChild(valueEl);
+        }
 
         const resetBtn = document.createElement('button');
         resetBtn.type = 'button';
@@ -175,7 +190,6 @@ function initBannerCustomizer() {
           pushHistoryState();
         });
 
-        meta.appendChild(valueEl);
         meta.appendChild(resetBtn);
         label.appendChild(meta);
       }
@@ -333,6 +347,10 @@ function initBannerCustomizer() {
     const spacing = Number(spacingInput?.value || 5);
     const curve = Number(curveInput?.value || 0);
     const opacity = Number(opacityInput?.value || 100) / 100;
+
+    const selectedVehicleImage = vehicleInput?.value || '/assets/imgs/mockups/windshield-banner/mustang.png';
+    vehicleImage.src = selectedVehicleImage;
+    vehicleImage.alt = `${vehicleInput?.selectedOptions?.[0]?.textContent || 'Mustang'} windshield banner preview`;
 
     const { width: boxWidth, height: boxHeight } = fitDesignToText(
       text,
@@ -492,6 +510,7 @@ function initBannerCustomizer() {
       `Color: ${colorInput?.value || '#ffffff'}`,
       `Outline: ${outlineInput?.value || '#000000'}`,
       `Font: ${fontInput?.selectedOptions?.[0]?.textContent || 'Impact'}`,
+      `Vehicle: ${vehicleInput?.selectedOptions?.[0]?.textContent || 'Mustang'}`,
       `Size: ${sizeInput?.value || '72'}`,
       `Rotation: ${rotateInput?.value || '0'}deg`,
       `Position: X ${posXInput?.value || '0'}, Y ${posYInput?.value || '0'}`,

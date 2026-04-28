@@ -51,7 +51,7 @@
         <article class="card">
           <h3>Live Windshield Preview</h3>
           <div class="customize-viewer" id="bannerViewer">
-            <img src="/assets/imgs/mockups/windshield-banner-mockup.png" alt="Windshield banner preview" />
+            <img id="bannerVehicleImage" src="/assets/imgs/mockups/windshield-banner/mustang.png" alt="Mustang windshield banner preview" />
             <div class="banner-grid-overlay" aria-hidden="true"></div>
             <div class="banner-guide-x" id="bannerGuideX" aria-hidden="true"></div>
             <div class="banner-guide-y" id="bannerGuideY" aria-hidden="true"></div>
@@ -91,6 +91,14 @@
               <option value="'Anton', 'Arial Black', sans-serif">Anton</option>
               <option value="'Oswald', 'Arial Narrow', sans-serif">Oswald</option>
               <option value="'Montserrat', 'Arial', sans-serif">Montserrat</option>
+            </select>
+          </label>
+          <label>Vehicle Mockup
+            <select id="bannerVehicle">
+              <option value="/assets/imgs/mockups/windshield-banner/mustang.png">Mustang</option>
+              <option value="/assets/imgs/mockups/windshield-banner/charger.png">Charger</option>
+              <option value="/assets/imgs/mockups/windshield-banner/challeneger.png">Challenger</option>
+              <option value="/assets/imgs/mockups/windshield-banner/subaru.png">Subaru</option>
             </select>
           </label>
           <label>Size
