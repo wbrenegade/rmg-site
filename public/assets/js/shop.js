@@ -311,9 +311,6 @@ function openStripeQuickModal(product) {
   currentStripeQuickProduct = product;
   title.textContent = product.name || "Racing Stripe";
   const fullProductUrl = product.productUrl || `/product?id=${encodeURIComponent(product.id)}`;
-  const fullCustomizerUrl = typeof window.buildCustomizeUrl === "function"
-    ? window.buildCustomizeUrl(product)
-    : `/customize?productId=${encodeURIComponent(product.id)}`;
 
   body.innerHTML = `
     <div class="stripe-quick-grid">
@@ -343,7 +340,6 @@ function openStripeQuickModal(product) {
 
     <div class="product-actions stripe-quick-actions">
       <a class="btn btn-outline" href="${fullProductUrl}">Open Full Product</a>
-      <a class="btn btn-outline" href="${fullCustomizerUrl}">Open Full Customizer</a>
       <button type="button" class="btn" id="quickStripeAddToCartBtn">Add To Cart</button>
     </div>
   `;
