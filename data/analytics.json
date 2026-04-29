@@ -4433,6 +4433,50 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "9e8b5855-593d-4d1c-8156-a1585801f759",
+      "type": "page_view",
+      "pathname": "/tools/decal-idea-generator",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/windshield-banner-creator",
+      "method": "GET",
+      "timestamp": "2026-04-29T06:32:56.552Z",
+      "date": "2026-04-29",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "312df74a-3cd6-40e7-b04b-bd8ac41225b4",
+      "type": "page_view",
+      "pathname": "/tools/svg-converter",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": null,
+      "method": "GET",
+      "timestamp": "2026-04-29T06:33:34.013Z",
+      "date": "2026-04-29",
+      "ip": "43.156.71.177",
+      "visitorKey": "c2a32b87959ac6da",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }

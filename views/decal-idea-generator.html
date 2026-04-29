@@ -788,6 +788,7 @@
       renderLoadingCards();
 
       const requestId = createRequestId();
+      const generationStartedAt = Date.now();
       const formData = new FormData();
       formData.append("vehicleImage", uploadedVehicleFile);
       formData.append("requestId", requestId);
@@ -815,7 +816,7 @@
         if (!response.ok || !data?.success) {
           if (response.status === 504) {
             statusChip.textContent = "Still Working...";
-            data = await waitForMockupJob(requestId);
+            data = await waitForMockupJob(requestId, null, generationStartedAt);
           } else {
             throw new Error((data && data.message) || `Mockup generation failed (HTTP ${response.status}).`);
           }
@@ -827,7 +828,7 @@
 
         if (data.jobId) {
           statusChip.textContent = "Working...";
-          data = await waitForMockupJob(data.requestId || requestId, data.jobId);
+          data = await waitForMockupJob(data.requestId || requestId, data.jobId, generationStartedAt);
         }
 
         if (data.status === "failed" || data.success === false) {
@@ -852,7 +853,7 @@
       }
     });
 
-    async function waitForMockupJob(primaryId, secondaryId) {
+    async function waitForMockupJob(primaryId, secondaryId, generationStartedAt) {
       const startedAt = Date.now();
       const timeoutMs = 6 * 60 * 1000;
       const pollDelayMs = 3000;
@@ -860,6 +861,11 @@
 
       while (Date.now() - startedAt < timeoutMs) {
         await delay(pollDelayMs);
+
+        const recentResult = await fetchRecentMockups(generationStartedAt);
+        if (recentResult.mockups.length) {
+          return recentResult;
+        }
 
         for (const statusId of statusIds) {
           const response = await fetch(`/api/ai-decal-mockup/${encodeURIComponent(statusId)}`, {
@@ -894,6 +900,38 @@
       }
 
       throw new Error("Mockup generation is taking longer than expected. Try one mockup at a time or check back shortly.");
+    }
+
+    async function fetchRecentMockups(generationStartedAt) {
+      const since = Math.max(0, Number(generationStartedAt || Date.now()) - 5000);
+      const response = await fetch(`/api/ai-decal-mockups/recent?since=${encodeURIComponent(since)}`, {
+        method: "GET",
+        headers: {
+          "Accept": "application/json"
+        }
+      });
+
+      let data = null;
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
+      }
+
+      if (!response.ok) {
+        return {
+          success: false,
+          status: "pending",
+          mockups: [],
+        };
+      }
+
+      return {
+        success: true,
+        status: data?.mockups?.length ? "succeeded" : "pending",
+        mockups: data?.mockups || [],
+        message: data?.message || "",
+      };
     }
 
     function delay(ms) {

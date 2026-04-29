@@ -45,6 +45,27 @@ function findGeneratedMockupsByRequestId(requestId) {
     .map((fileName) => `/generated-mockups/${fileName}`);
 }
 
+function findRecentGeneratedMockups(sinceMs) {
+  const since = Number(sinceMs || 0);
+  if (!Number.isFinite(since) || since <= 0 || !fs.existsSync(generatedMockupsDir)) return [];
+
+  return fs.readdirSync(generatedMockupsDir)
+    .filter((fileName) => fileName.startsWith("mockup-") && fileName.endsWith(".png"))
+    .map((fileName) => {
+      const filePath = path.join(generatedMockupsDir, fileName);
+      const stat = fs.statSync(filePath);
+      return {
+        fileName,
+        createdAt: stat.mtimeMs,
+        url: `/generated-mockups/${fileName}`,
+      };
+    })
+    .filter((file) => file.createdAt >= since)
+    .sort((left, right) => left.createdAt - right.createdAt)
+    .map((file) => file.url)
+    .slice(-3);
+}
+
 async function runAIDecalMockupJob(jobId, { imagePath, preferences, outputDir, mockupCount, requestId }) {
   try {
     setJob(jobId, {
@@ -186,7 +207,19 @@ function getAIDecalMockupJob(req, res) {
   });
 }
 
+function listRecentAIDecalMockups(req, res) {
+  const mockups = findRecentGeneratedMockups(req.query.since);
+
+  return res.status(200).json({
+    success: true,
+    status: mockups.length ? "succeeded" : "pending",
+    mockups,
+    message: mockups.length ? "Recent mockups found." : "No recent mockups found yet.",
+  });
+}
+
 module.exports = {
   createAIDecalMockup,
   getAIDecalMockupJob,
+  listRecentAIDecalMockups,
 };
