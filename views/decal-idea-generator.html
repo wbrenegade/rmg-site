@@ -787,8 +787,10 @@
       generateBtn.textContent = "Generating...";
       renderLoadingCards();
 
+      const requestId = createRequestId();
       const formData = new FormData();
       formData.append("vehicleImage", uploadedVehicleFile);
+      formData.append("requestId", requestId);
       formData.append("vehicleNotes", document.getElementById("vehicleNotes").value);
       formData.append("decalStyle", document.getElementById("decalStyle").value);
       formData.append("colors", document.getElementById("colors").value);
@@ -811,6 +813,15 @@
         }
 
         if (!response.ok || !data?.success) {
+          if (response.status === 504) {
+            statusChip.textContent = "Still Working...";
+            data = await waitForMockupJob(requestId);
+          } else {
+            throw new Error((data && data.message) || `Mockup generation failed (HTTP ${response.status}).`);
+          }
+        }
+
+        if (!data?.success) {
           throw new Error((data && data.message) || `Mockup generation failed (HTTP ${response.status}).`);
         }
 
@@ -879,6 +890,14 @@
 
     function delay(ms) {
       return new Promise((resolve) => window.setTimeout(resolve, ms));
+    }
+
+    function createRequestId() {
+      if (window.crypto?.randomUUID) {
+        return window.crypto.randomUUID();
+      }
+
+      return `mockup-${Date.now()}-${Math.random().toString(16).slice(2)}`;
     }
 
     function renderPlaceholderCards() {

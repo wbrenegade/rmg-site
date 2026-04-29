@@ -32,6 +32,15 @@ function shouldTryNextModel(error) {
   );
 }
 
+function createSafeId(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 80);
+}
+
 async function editImageWithFallback({ client, rgbaBuffer, prompt }) {
   const models = getImageEditModels();
 
@@ -109,6 +118,7 @@ async function generateVehicleDecalMockup({
   preferences = {},
   outputDir = "./generated-mockups",
   mockupCount = 1,
+  requestId = "",
 }) {
   if (!process.env.OPENAI_API_KEY) {
     throw new Error("OPENAI_API_KEY is not configured.");
@@ -138,6 +148,8 @@ async function generateVehicleDecalMockup({
 
   const created = [];
   const targetCount = Math.max(1, Math.min(Number(mockupCount) || 1, 3));
+  const safeRequestId = createSafeId(requestId);
+  const filePrefix = safeRequestId ? `mockup-${safeRequestId}` : `mockup-${Date.now()}`;
 
   for (let i = 0; i < targetCount; i += 1) {
     const imageBase64 = await editImageWithFallback({
@@ -146,7 +158,7 @@ async function generateVehicleDecalMockup({
       prompt,
     });
 
-    const fileName = `mockup-${Date.now()}-${i + 1}.png`;
+    const fileName = `${filePrefix}-${Date.now()}-${i + 1}.png`;
     const outputPath = path.join(outputDir, fileName);
     const imageBuffer = Buffer.from(imageBase64, "base64");
     await sharp(imageBuffer).metadata();

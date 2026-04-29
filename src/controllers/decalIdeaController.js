@@ -5,6 +5,16 @@ const { generateVehicleDecalMockup } = require("../../tools/decal_idea_generator
 
 const jobs = new Map();
 const JOB_TTL_MS = 30 * 60 * 1000;
+const generatedMockupsDir = path.join(__dirname, "..", "..", "public", "generated-mockups");
+
+function createSafeRequestId(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 80);
+}
 
 function cleanupOldJobs() {
   const now = Date.now();
@@ -25,7 +35,17 @@ function setJob(jobId, updates) {
   });
 }
 
-async function runAIDecalMockupJob(jobId, { imagePath, preferences, outputDir, mockupCount }) {
+function findGeneratedMockupsByRequestId(requestId) {
+  const safeRequestId = createSafeRequestId(requestId);
+  if (!safeRequestId || !fs.existsSync(generatedMockupsDir)) return [];
+
+  return fs.readdirSync(generatedMockupsDir)
+    .filter((fileName) => fileName.startsWith(`mockup-${safeRequestId}-`) && fileName.endsWith(".png"))
+    .sort()
+    .map((fileName) => `/generated-mockups/${fileName}`);
+}
+
+async function runAIDecalMockupJob(jobId, { imagePath, preferences, outputDir, mockupCount, requestId }) {
   try {
     setJob(jobId, {
       status: "generating",
@@ -37,6 +57,7 @@ async function runAIDecalMockupJob(jobId, { imagePath, preferences, outputDir, m
       preferences,
       outputDir,
       mockupCount,
+      requestId,
     });
 
     const mockups = (result.files || []).map((file) => `/generated-mockups/${file.fileName}`);
@@ -74,7 +95,8 @@ function createAIDecalMockup(req, res, next) {
       });
     }
 
-    const outputDir = path.join(__dirname, "..", "..", "public", "generated-mockups");
+    const outputDir = generatedMockupsDir;
+    const requestId = createSafeRequestId(req.body.requestId || crypto.randomUUID());
     const preferences = {
       vehicleNotes: req.body.vehicleNotes,
       decalStyle: req.body.decalStyle,
@@ -89,6 +111,7 @@ function createAIDecalMockup(req, res, next) {
       id: jobId,
       status: "queued",
       success: true,
+      requestId,
       mockups: [],
       message: "Mockup generation queued.",
       createdAt: Date.now(),
@@ -100,11 +123,13 @@ function createAIDecalMockup(req, res, next) {
       preferences,
       outputDir,
       mockupCount: req.body.mockupCount,
+      requestId,
     });
 
     return res.status(202).json({
       success: true,
       jobId,
+      requestId,
       status: "queued",
       message: "Mockup generation started.",
     });
@@ -129,6 +154,18 @@ function getAIDecalMockupJob(req, res) {
 
   const jobId = String(req.params.jobId || "");
   const job = jobs.get(jobId);
+  const generatedMockups = findGeneratedMockupsByRequestId(jobId);
+
+  if (!job && generatedMockups.length) {
+    return res.status(200).json({
+      success: true,
+      jobId,
+      requestId: jobId,
+      status: "succeeded",
+      mockups: generatedMockups,
+      message: "Mockup generation complete.",
+    });
+  }
 
   if (!job) {
     return res.status(404).json({
@@ -141,8 +178,9 @@ function getAIDecalMockupJob(req, res) {
   return res.status(200).json({
     success: job.status !== "failed",
     jobId: job.id,
+    requestId: job.requestId,
     status: job.status,
-    mockups: job.mockups || [],
+    mockups: (job.mockups && job.mockups.length) ? job.mockups : generatedMockups,
     message: job.message,
     error: job.error,
   });
