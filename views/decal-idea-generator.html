@@ -871,11 +871,6 @@
       while (Date.now() - startedAt < timeoutMs) {
         await delay(pollDelayMs);
 
-        const recentResult = await fetchRecentMockups(generationStartedAt);
-        if (recentResult.mockups.length) {
-          return recentResult;
-        }
-
         for (const statusId of statusIds) {
           const response = await fetch(`/api/ai-decal-mockup/${encodeURIComponent(statusId)}`, {
             method: "GET",
@@ -917,66 +912,7 @@
         return true;
       }
 
-      const recentResult = await fetchRecentMockups(generationStartedAt);
-      if (recentResult.mockups.length) {
-        renderMockups(recentResult.mockups);
-        return true;
-      }
-
-      const latestResult = await fetchRecentMockups(0);
-      if (latestResult.mockups.length) {
-        renderMockups(latestResult.mockups);
-        return true;
-      }
-
       return false;
-    }
-
-    async function fetchRecentMockups(generationStartedAt) {
-      const since = Number(generationStartedAt || 0) > 0
-        ? Math.max(0, Number(generationStartedAt) - 5000)
-        : 0;
-      const paths = [
-        `/api/ai-decal-mockups/recent?since=${encodeURIComponent(since)}`,
-        `/api/ai-decal-mockup/recent?since=${encodeURIComponent(since)}`
-      ];
-
-      for (const path of paths) {
-        const response = await fetch(path, {
-          method: "GET",
-          headers: {
-            "Accept": "application/json"
-          }
-        });
-
-        if (response.status === 404) {
-          continue;
-        }
-
-        let data = null;
-        try {
-          data = await response.json();
-        } catch {
-          data = null;
-        }
-
-        if (!response.ok) {
-          continue;
-        }
-
-        return {
-          success: true,
-          status: data?.mockups?.length ? "succeeded" : "pending",
-          mockups: data?.mockups || [],
-          message: data?.message || "",
-        };
-      }
-
-      return {
-        success: false,
-        status: "pending",
-        mockups: [],
-      };
     }
 
     function delay(ms) {

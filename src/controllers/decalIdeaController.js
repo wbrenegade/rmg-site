@@ -241,10 +241,13 @@ function getAIDecalMockupJob(req, res) {
   }
 
   if (!job) {
-    return res.status(404).json({
-      success: false,
-      status: "not_found",
-      message: "Mockup job was not found or has expired.",
+    return res.status(200).json({
+      success: true,
+      jobId,
+      requestId: jobId,
+      status: "pending",
+      mockups: [],
+      message: "Mockup generation is still pending.",
     });
   }
 
