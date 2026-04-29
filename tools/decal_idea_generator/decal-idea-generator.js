@@ -2,6 +2,7 @@ const OpenAI = require("openai");
 const { toFile } = require("openai");
 const fs = require("fs");
 const path = require("path");
+const sharp = require("sharp");
 
 function buildPrompt(preferences = {}) {
   const {
@@ -61,7 +62,10 @@ async function generateVehicleDecalMockup({
   const targetCount = Math.max(1, Math.min(Number(mockupCount) || 1, 3));
 
   for (let i = 0; i < targetCount; i += 1) {
-    const imageFile = await toFile(fs.createReadStream(imagePath), null, {
+    // gpt-image-2 requires RGBA PNG; convert upload in-memory
+    const rgbaBuffer = await sharp(imagePath).ensureAlpha().png().toBuffer();
+
+    const imageFile = await toFile(rgbaBuffer, "vehicle.png", {
       type: "image/png",
     });
 

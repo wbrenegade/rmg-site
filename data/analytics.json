@@ -4037,6 +4037,94 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "5d317535-ad1b-4ae4-8f86-d5733811c63f",
+      "type": "page_view",
+      "pathname": "/",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": null,
+      "method": "GET",
+      "timestamp": "2026-04-29T05:43:34.455Z",
+      "date": "2026-04-29",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "cf08a03f-be81-4d27-9181-737b7d903ae7",
+      "type": "page_view",
+      "pathname": "/tools/decal-idea-generator",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/",
+      "method": "GET",
+      "timestamp": "2026-04-29T05:43:42.189Z",
+      "date": "2026-04-29",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "8f245764-9d4e-4c6f-bb2c-08a6abf27ca6",
+      "type": "page_view",
+      "pathname": "/cart",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": null,
+      "method": "GET",
+      "timestamp": "2026-04-29T05:47:39.140Z",
+      "date": "2026-04-29",
+      "ip": "43.134.188.114",
+      "visitorKey": "6eb9cba2b0107822",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "1a927ce1-a13b-4820-81de-acc7441dec6b",
+      "type": "page_view",
+      "pathname": "/",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/index.html",
+      "method": "GET",
+      "timestamp": "2026-04-29T05:53:44.945Z",
+      "date": "2026-04-29",
+      "ip": "129.226.93.97",
+      "visitorKey": "3efafa2172bf4008",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }
