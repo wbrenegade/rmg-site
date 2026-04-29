@@ -4,10 +4,36 @@ const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
 
+const DEFAULT_IMAGE_MODELS = ["gpt-image-1.5", "gpt-image-1", "gpt-image-1-mini"];
+
+function getImageEditModels() {
+  const configuredModels = [
+    process.env.OPENAI_IMAGE_MODEL,
+    process.env.OPENAI_IMAGE_FALLBACK_MODEL,
+    process.env.OPENAI_IMAGE_SECOND_FALLBACK_MODEL,
+  ];
+
+  return [...new Set([...configuredModels, ...DEFAULT_IMAGE_MODELS].filter(Boolean))];
+}
+
+function shouldTryNextModel(error) {
+  const status = Number(error?.status || 0);
+  const message = String(error?.message || "").toLowerCase();
+  const code = String(error?.code || "").toLowerCase();
+  const type = String(error?.type || "").toLowerCase();
+
+  return (
+    status === 404 ||
+    code.includes("model") ||
+    type.includes("model") ||
+    message.includes("model") ||
+    message.includes("unsupported") ||
+    message.includes("must be verified")
+  );
+}
+
 async function editImageWithFallback({ client, rgbaBuffer, prompt }) {
-  const configuredPrimary = process.env.OPENAI_IMAGE_MODEL || "gpt-image-2";
-  const configuredFallback = process.env.OPENAI_IMAGE_FALLBACK_MODEL || "gpt-image-1";
-  const models = [...new Set([configuredPrimary, configuredFallback])];
+  const models = getImageEditModels();
 
   let lastError;
 
@@ -23,6 +49,7 @@ async function editImageWithFallback({ client, rgbaBuffer, prompt }) {
         prompt,
         size: "1536x1024",
         quality: "medium",
+        input_fidelity: "high",
       });
 
       const imageBase64 = result?.data?.[0]?.b64_json;
@@ -33,11 +60,9 @@ async function editImageWithFallback({ client, rgbaBuffer, prompt }) {
       return imageBase64;
     } catch (error) {
       lastError = error;
-      const message = String(error?.message || "");
-      const isOrgVerificationError = Number(error?.status) === 403 && message.includes("must be verified");
       const isLastModel = model === models[models.length - 1];
 
-      if (!isOrgVerificationError || isLastModel) {
+      if (!shouldTryNextModel(error) || isLastModel) {
         throw error;
       }
     }
@@ -99,13 +124,22 @@ async function generateVehicleDecalMockup({
 
   fs.mkdirSync(outputDir, { recursive: true });
   const prompt = buildPrompt(preferences);
+  const rgbaBuffer = await sharp(imagePath)
+    .rotate()
+    .resize({
+      width: 1536,
+      height: 1536,
+      fit: "inside",
+      withoutEnlargement: true,
+    })
+    .ensureAlpha()
+    .png()
+    .toBuffer();
 
   const created = [];
   const targetCount = Math.max(1, Math.min(Number(mockupCount) || 1, 3));
 
   for (let i = 0; i < targetCount; i += 1) {
-    // gpt-image-2 requires RGBA PNG; convert upload in-memory
-    const rgbaBuffer = await sharp(imagePath).ensureAlpha().png().toBuffer();
     const imageBase64 = await editImageWithFallback({
       client,
       rgbaBuffer,
@@ -114,7 +148,9 @@ async function generateVehicleDecalMockup({
 
     const fileName = `mockup-${Date.now()}-${i + 1}.png`;
     const outputPath = path.join(outputDir, fileName);
-    fs.writeFileSync(outputPath, Buffer.from(imageBase64, "base64"));
+    const imageBuffer = Buffer.from(imageBase64, "base64");
+    await sharp(imageBuffer).metadata();
+    fs.writeFileSync(outputPath, imageBuffer);
     created.push({ fileName, outputPath });
   }
 

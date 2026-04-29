@@ -594,6 +594,15 @@
           </div>
 
           <div class="field">
+            <label for="mockupCount">Number of Ideas</label>
+            <select id="mockupCount" name="mockupCount">
+              <option value="1" selected>1 mockup</option>
+              <option value="2">2 mockups</option>
+              <option value="3">3 mockups</option>
+            </select>
+          </div>
+
+          <div class="field">
             <label for="extraInstructions">Extra Instructions</label>
             <textarea
               id="extraInstructions"
@@ -602,7 +611,7 @@
             ></textarea>
           </div>
 
-          <button type="submit" class="btn-rmg btn-primary-rmg" style="width:100%;">
+          <button type="submit" class="btn-rmg btn-primary-rmg" id="generateMockupsBtn" style="width:100%;">
             Generate AI Mockups
           </button>
 
@@ -663,6 +672,8 @@
     const imageStage = document.getElementById("imageStage");
     const form = document.getElementById("aiMockupForm");
     const statusChip = document.getElementById("mockupStatus");
+    const results = document.getElementById("mockupResults");
+    const generateBtn = document.getElementById("generateMockupsBtn");
     const stylePills = document.querySelectorAll(".style-pill");
     const decalStyleInput = document.getElementById("decalStyle");
 
@@ -760,6 +771,7 @@
       `;
 
       statusChip.textContent = `Photo Loaded (${formatMb(uploadedVehicleFile.size)})`;
+      renderPlaceholderCards();
     });
 
     form.addEventListener("submit", async (event) => {
@@ -771,6 +783,9 @@
       }
 
       statusChip.textContent = "Generating...";
+      generateBtn.disabled = true;
+      generateBtn.textContent = "Generating...";
+      renderLoadingCards();
 
       const formData = new FormData();
       formData.append("vehicleImage", uploadedVehicleFile);
@@ -779,6 +794,7 @@
       formData.append("colors", document.getElementById("colors").value);
       formData.append("placement", document.getElementById("placement").value);
       formData.append("intensity", document.getElementById("intensity").value);
+      formData.append("mockupCount", document.getElementById("mockupCount").value);
       formData.append("extraInstructions", document.getElementById("extraInstructions").value);
 
       try {
@@ -804,39 +820,95 @@
       } catch (error) {
         console.error(error);
         statusChip.textContent = "Error";
+        renderErrorCards(error.message || "Could not generate mockups.");
         if (String(error.message || "").includes("HTTP 413")) {
           alert("Your photo is still too large for upload. Try a smaller image or screenshot, then generate again.");
           return;
         }
         alert(error.message || "Could not generate mockups.");
+      } finally {
+        generateBtn.disabled = false;
+        generateBtn.textContent = "Generate AI Mockups";
       }
     });
 
-    function renderMockups(mockups) {
-      const results = document.getElementById("mockupResults");
+    function renderPlaceholderCards() {
+      results.innerHTML = `
+        <div class="mockup-card">AI Mockup 1</div>
+        <div class="mockup-card">AI Mockup 2</div>
+        <div class="mockup-card">AI Mockup 3</div>
+      `;
+    }
 
-      if (!mockups.length) {
+    function renderLoadingCards() {
+      results.innerHTML = `
+        <div class="mockup-card">Generating mockup...</div>
+        <div class="mockup-card">Preparing preview...</div>
+        <div class="mockup-card">Saving image...</div>
+      `;
+    }
+
+    function renderErrorCards(message) {
+      results.innerHTML = `
+        <div class="mockup-card">${escapeHtml(message)}</div>
+      `;
+    }
+
+    function renderMockups(mockups) {
+      const urls = mockups.filter(Boolean);
+
+      if (!urls.length) {
         results.innerHTML = `
           <div class="mockup-card">No generated images returned yet.</div>
         `;
         return;
       }
 
-      results.innerHTML = mockups.map((url, index) => {
-        return `
-          <button class="mockup-card" type="button" onclick="setMainMockup('${url}')">
-            <img src="${url}" alt="AI decal mockup ${index + 1}">
-          </button>
-        `;
-      }).join("");
+      results.innerHTML = "";
+      urls.forEach((url, index) => {
+        const button = document.createElement("button");
+        button.className = "mockup-card";
+        button.type = "button";
 
-      setMainMockup(mockups[0]);
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = `AI decal mockup ${index + 1}`;
+        img.loading = "lazy";
+        img.onerror = () => {
+          button.textContent = "Image saved, but preview failed to load.";
+        };
+
+        button.appendChild(img);
+        button.addEventListener("click", () => setMainMockup(url));
+        results.appendChild(button);
+      });
+
+      setMainMockup(urls[0]);
     }
 
     function setMainMockup(url) {
-      imageStage.innerHTML = `
-        <img src="${url}" alt="Selected AI decal mockup">
-      `;
+      imageStage.innerHTML = "";
+      const img = document.createElement("img");
+      img.src = url;
+      img.alt = "Selected AI decal mockup";
+      img.onerror = () => {
+        imageStage.innerHTML = `
+          <div class="empty-state">
+            <strong>Preview could not load</strong>
+            The mockup was generated, but the browser could not display the saved image.
+          </div>
+        `;
+      };
+      imageStage.appendChild(img);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
     document.getElementById("requestQuoteBtn").addEventListener("click", () => {
