@@ -26,10 +26,7 @@ const {
 	updateCmsSettings
 } = require("../controllers/cmsController");
 const { requireCmsAuth } = require("../middleware/requireCmsAuth");
-const {
-  createAIDecalMockup,
-  getAIDecalMockupJob,
-} = require("../controllers/aiDecalMockupController");
+
 
 const router = express.Router();
 
@@ -55,8 +52,6 @@ router.post("/auth/login", login);
 router.get("/orders", listOrders);
 router.post("/orders", createNewOrder);
 router.post("/messages", createNewMessage);
-router.post("/api/ai-decal-mockup", upload.single("vehicleImage"), createAIDecalMockup);
-router.get("/api/ai-decal-mockup/:jobId", getAIDecalMockupJob);
 
 router.post("/cms/login", cmsLogin);
 router.get("/cms/products", requireCmsAuth, listCmsProducts);
