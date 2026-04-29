@@ -279,6 +279,12 @@ function calculateCartTotals() {
 
 function buildCustomizeUrl(product) {
   if (!product) return 'customize.html';
+
+  if (isRacingStripeProduct(product)) {
+    const params = new URLSearchParams({ productId: product.id });
+    return `customize.html?${params.toString()}`;
+  }
+
   if (product.customizeUrl) return product.customizeUrl;
 
   const id = String(product.id || '').trim();

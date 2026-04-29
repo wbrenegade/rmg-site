@@ -594,15 +594,6 @@
           </div>
 
           <div class="field">
-            <label for="mockupCount">Number of Ideas</label>
-            <select id="mockupCount" name="mockupCount">
-              <option value="1" selected>1 mockup</option>
-              <option value="2">2 mockups</option>
-              <option value="3">3 mockups</option>
-            </select>
-          </div>
-
-          <div class="field">
             <label for="extraInstructions">Extra Instructions</label>
             <textarea
               id="extraInstructions"
@@ -611,7 +602,7 @@
             ></textarea>
           </div>
 
-          <button type="submit" class="btn-rmg btn-primary-rmg" id="generateMockupsBtn" style="width:100%;">
+          <button type="submit" class="btn-rmg btn-primary-rmg" style="width:100%;">
             Generate AI Mockups
           </button>
 
@@ -667,358 +658,115 @@
 
   </main>
 
-<script>
-  const vehicleImageInput = document.getElementById("vehicleImage");
-  const imageStage = document.getElementById("imageStage");
-  const form = document.getElementById("aiMockupForm");
-  const statusChip = document.getElementById("mockupStatus");
-  const results = document.getElementById("mockupResults");
-  const generateBtn = document.getElementById("generateMockupsBtn");
-  const stylePills = document.querySelectorAll(".style-pill");
-  const decalStyleInput = document.getElementById("decalStyle");
-  const requestQuoteBtn = document.getElementById("requestQuoteBtn");
-  const saveFavoriteBtn = document.getElementById("saveFavoriteBtn");
+  <script>
+    const vehicleImageInput = document.getElementById("vehicleImage");
+    const imageStage = document.getElementById("imageStage");
+    const form = document.getElementById("aiMockupForm");
+    const statusChip = document.getElementById("mockupStatus");
+    const stylePills = document.querySelectorAll(".style-pill");
+    const decalStyleInput = document.getElementById("decalStyle");
 
-  let uploadedVehicleFile = null;
-  let selectedMockupUrl = "";
+    let uploadedVehicleFile = null;
 
-  stylePills.forEach((pill) => {
-    pill.addEventListener("click", () => {
-      stylePills.forEach((p) => p.classList.remove("active"));
-      pill.classList.add("active");
-      decalStyleInput.value = pill.dataset.style || "";
+    stylePills.forEach((pill) => {
+      pill.addEventListener("click", () => {
+        stylePills.forEach((p) => p.classList.remove("active"));
+        pill.classList.add("active");
+        decalStyleInput.value = pill.dataset.style;
+      });
     });
-  });
 
-  vehicleImageInput.addEventListener("change", async () => {
-    const file = vehicleImageInput.files[0];
-    if (!file) return;
+    vehicleImageInput.addEventListener("change", () => {
+      const file = vehicleImageInput.files[0];
+      if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      alert("Please upload an image file.");
-      vehicleImageInput.value = "";
-      return;
-    }
-
-    statusChip.textContent = "Preparing Photo...";
-
-    try {
-      uploadedVehicleFile = await compressImage(file);
-    } catch (error) {
-      console.error("Image compression failed:", error);
       uploadedVehicleFile = file;
-    }
 
-    selectedMockupUrl = "";
+      const previewUrl = URL.createObjectURL(file);
 
-    const previewUrl = URL.createObjectURL(uploadedVehicleFile);
-
-    imageStage.innerHTML = `
-      <img src="${previewUrl}" alt="Uploaded vehicle preview">
-    `;
-
-    statusChip.textContent = `Photo Loaded (${formatMb(uploadedVehicleFile.size)})`;
-
-    results.innerHTML = `
-      <div class="mockup-card">Ready to generate</div>
-    `;
-  });
-
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    if (!uploadedVehicleFile) {
-      alert("Upload a vehicle photo first.");
-      return;
-    }
-
-    setLoading(true);
-
-    const formData = new FormData();
-    formData.append("vehicleImage", uploadedVehicleFile);
-    formData.append("vehicleNotes", getValue("vehicleNotes"));
-    formData.append("decalStyle", getValue("decalStyle"));
-    formData.append("colors", getValue("colors"));
-    formData.append("placement", getValue("placement"));
-    formData.append("intensity", getValue("intensity"));
-    formData.append("mockupCount", getValue("mockupCount") || "1");
-    formData.append("extraInstructions", getValue("extraInstructions"));
-
-    try {
-      const response = await fetch("/api/ai-decal-mockup", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json().catch(() => null);
-
-      if (!response.ok || !data?.success || !data?.jobId) {
-        throw new Error(data?.message || getHttpErrorMessage(response.status));
-      }
-
-      statusChip.textContent = "Queued...";
-      results.innerHTML = `
-        <div class="mockup-card">Job started...</div>
-        <div class="mockup-card">AI is designing...</div>
-        <div class="mockup-card">Waiting for image...</div>
-      `;
-
-      const finishedJob = await pollMockupJob(data.jobId);
-
-      if (!finishedJob.success || finishedJob.status === "failed") {
-        throw new Error(finishedJob.message || finishedJob.error || "Mockup generation failed.");
-      }
-
-      renderMockups(finishedJob.mockups || []);
-      statusChip.textContent = "Generated";
-    } catch (error) {
-      console.error(error);
-
-      statusChip.textContent = "Error";
-
-      results.innerHTML = `
-        <div class="mockup-card">${escapeHtml(error.message || "Mockup generation failed.")}</div>
-      `;
-
-      alert(error.message || "Mockup generation failed.");
-    } finally {
-      setLoading(false);
-    }
-  });
-
-  async function pollMockupJob(jobId) {
-    const timeoutMs = 6 * 60 * 1000;
-    const delayMs = 3000;
-    const startedAt = Date.now();
-
-    while (Date.now() - startedAt < timeoutMs) {
-      await delay(delayMs);
-
-      const response = await fetch(`/api/ai-decal-mockup/${encodeURIComponent(jobId)}`, {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-        },
-      });
-
-      const data = await response.json().catch(() => null);
-
-      if (!response.ok || !data) {
-        throw new Error(data?.message || `Status check failed. HTTP ${response.status}`);
-      }
-
-      if (data.status === "succeeded") {
-        return data;
-      }
-
-      if (data.status === "failed") {
-        throw new Error(data.message || data.error || "Mockup generation failed.");
-      }
-
-      statusChip.textContent = getPollingStatusText(data.status);
-    }
-
-    throw new Error("Mockup generation timed out. Try generating 1 mockup at a time.");
-  }
-
-  function getPollingStatusText(status) {
-    if (status === "queued") return "Queued...";
-    if (status === "generating") return "Generating...";
-    if (status === "saving") return "Saving...";
-    return "Working...";
-  }
-
-  async function compressImage(file) {
-    const maxDimension = 1600;
-    const targetBytes = 4 * 1024 * 1024;
-    const minQuality = 0.58;
-    let quality = 0.84;
-
-    const img = await loadImage(file);
-
-    const scale = Math.min(1, maxDimension / Math.max(img.width, img.height));
-
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.max(1, Math.round(img.width * scale));
-    canvas.height = Math.max(1, Math.round(img.height * scale));
-
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-    let blob = null;
-
-    while (quality >= minQuality) {
-      blob = await canvasToBlob(canvas, "image/jpeg", quality);
-
-      if (blob && blob.size <= targetBytes) break;
-
-      quality -= 0.08;
-    }
-
-    if (!blob) {
-      throw new Error("Could not prepare image.");
-    }
-
-    return new File([blob], "vehicle-upload.jpg", {
-      type: "image/jpeg",
-    });
-  }
-
-  function loadImage(file) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      const objectUrl = URL.createObjectURL(file);
-
-      img.onload = () => {
-        URL.revokeObjectURL(objectUrl);
-        resolve(img);
-      };
-
-      img.onerror = () => {
-        URL.revokeObjectURL(objectUrl);
-        reject(new Error("Could not read image."));
-      };
-
-      img.src = objectUrl;
-    });
-  }
-
-  function canvasToBlob(canvas, type, quality) {
-    return new Promise((resolve) => {
-      canvas.toBlob(resolve, type, quality);
-    });
-  }
-
-  function delay(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
-  function setLoading(isLoading) {
-    generateBtn.disabled = isLoading;
-    generateBtn.textContent = isLoading ? "Generating..." : "Generate AI Mockups";
-
-    if (isLoading) {
-      statusChip.textContent = "Starting...";
-
-      results.innerHTML = `
-        <div class="mockup-card">Uploading photo...</div>
-        <div class="mockup-card">Starting AI job...</div>
-        <div class="mockup-card">Preparing mockup...</div>
-      `;
-    }
-  }
-
-  function renderMockups(mockups) {
-    const urls = mockups.filter(Boolean);
-
-    if (!urls.length) {
-      results.innerHTML = `
-        <div class="mockup-card">No mockup image was returned.</div>
-      `;
-      return;
-    }
-
-    results.innerHTML = "";
-
-    urls.forEach((url, index) => {
-      const button = document.createElement("button");
-      button.className = "mockup-card";
-      button.type = "button";
-
-      const img = document.createElement("img");
-      img.src = addCacheBust(url);
-      img.alt = `AI decal mockup ${index + 1}`;
-      img.loading = "lazy";
-
-      button.appendChild(img);
-      button.addEventListener("click", () => setMainMockup(url));
-
-      results.appendChild(button);
-    });
-
-    setMainMockup(urls[0]);
-  }
-
-  function setMainMockup(url) {
-    selectedMockupUrl = url;
-    imageStage.innerHTML = "";
-
-    const img = document.createElement("img");
-    img.src = addCacheBust(url);
-    img.alt = "Selected AI decal mockup";
-
-    img.onerror = () => {
       imageStage.innerHTML = `
-        <div class="empty-state">
-          <strong>Preview could not load</strong>
-          The mockup was generated, but the browser could not display it.
-        </div>
+        <img src="${previewUrl}" alt="Uploaded vehicle preview">
       `;
-    };
 
-    imageStage.appendChild(img);
-  }
+      statusChip.textContent = "Photo Loaded";
+    });
 
-  function addCacheBust(url) {
-    const separator = url.includes("?") ? "&" : "?";
-    return `${url}${separator}v=${Date.now()}`;
-  }
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
 
-  function getValue(id) {
-    return document.getElementById(id)?.value?.trim() || "";
-  }
+      if (!uploadedVehicleFile) {
+        alert("Upload a vehicle photo first.");
+        return;
+      }
 
-  function formatMb(bytes) {
-    return `${(bytes / (1024 * 1024)).toFixed(2)}MB`;
-  }
+      statusChip.textContent = "Generating...";
 
-  function getHttpErrorMessage(status) {
-    if (status === 413) {
-      return "Uploaded image is too large. Try a smaller photo or screenshot.";
+      const formData = new FormData();
+      formData.append("vehicleImage", uploadedVehicleFile);
+      formData.append("vehicleNotes", document.getElementById("vehicleNotes").value);
+      formData.append("decalStyle", document.getElementById("decalStyle").value);
+      formData.append("colors", document.getElementById("colors").value);
+      formData.append("placement", document.getElementById("placement").value);
+      formData.append("intensity", document.getElementById("intensity").value);
+      formData.append("extraInstructions", document.getElementById("extraInstructions").value);
+
+      try {
+        const response = await fetch("/api/ai-decal-mockup", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.message || "Mockup generation failed.");
+        }
+
+        renderMockups(data.mockups || []);
+
+        statusChip.textContent = "Generated";
+      } catch (error) {
+        console.error(error);
+        statusChip.textContent = "Error";
+        alert("Could not generate mockups. Check your backend route.");
+      }
+    });
+
+    function renderMockups(mockups) {
+      const results = document.getElementById("mockupResults");
+
+      if (!mockups.length) {
+        results.innerHTML = `
+          <div class="mockup-card">No generated images returned yet.</div>
+        `;
+        return;
+      }
+
+      results.innerHTML = mockups.map((url, index) => {
+        return `
+          <button class="mockup-card" type="button" onclick="setMainMockup('${url}')">
+            <img src="${url}" alt="AI decal mockup ${index + 1}">
+          </button>
+        `;
+      }).join("");
+
+      setMainMockup(mockups[0]);
     }
 
-    if (status === 429) {
-      return "Too many requests. Try again in a minute.";
+    function setMainMockup(url) {
+      imageStage.innerHTML = `
+        <img src="${url}" alt="Selected AI decal mockup">
+      `;
     }
 
-    if (status === 504) {
-      return "Server timed out while starting the AI job. Make sure your backend returns a jobId immediately.";
-    }
+    document.getElementById("requestQuoteBtn").addEventListener("click", () => {
+      window.location.href = "/contact?service=ai-decal-mockup";
+    });
 
-    if (status === 500) {
-      return "Server error while generating the mockup.";
-    }
-
-    return `Mockup generation failed. HTTP ${status}`;
-  }
-
-  function escapeHtml(value) {
-    return String(value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
-
-  requestQuoteBtn.addEventListener("click", () => {
-    const quoteUrl = selectedMockupUrl
-      ? `/contact?service=ai-decal-mockup&mockup=${encodeURIComponent(selectedMockupUrl)}`
-      : "/contact?service=ai-decal-mockup";
-
-    window.location.href = quoteUrl;
-  });
-
-  saveFavoriteBtn.addEventListener("click", () => {
-    if (!selectedMockupUrl) {
-      alert("Generate and select a mockup first.");
-      return;
-    }
-
-    localStorage.setItem("rmgSavedAIMockup", selectedMockupUrl);
-    alert("Saved this mockup on this device.");
-  });
-</script>
+    document.getElementById("saveFavoriteBtn").addEventListener("click", () => {
+      alert("Next step: connect this to user accounts or local saved designs.");
+    });
+  </script>
 
 </body>
 </html>
