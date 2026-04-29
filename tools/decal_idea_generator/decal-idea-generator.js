@@ -158,7 +158,7 @@ async function generateVehicleDecalMockup({
       prompt,
     });
 
-    const fileName = `${filePrefix}-${Date.now()}-${i + 1}.png`;
+    const fileName = `${filePrefix}-${i + 1}.png`;
     const outputPath = path.join(outputDir, fileName);
     const imageBuffer = Buffer.from(imageBase64, "base64");
     await sharp(imageBuffer).metadata();

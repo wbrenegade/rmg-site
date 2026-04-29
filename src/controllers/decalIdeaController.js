@@ -151,7 +151,7 @@ async function runAIDecalMockupJob(jobId, { imagePath, preferences, outputDir, m
   }
 }
 
-function createAIDecalMockup(req, res, next) {
+async function createAIDecalMockup(req, res, next) {
   try {
     cleanupOldJobs();
 
@@ -186,7 +186,7 @@ function createAIDecalMockup(req, res, next) {
       updatedAt: Date.now(),
     });
 
-    runAIDecalMockupJob(jobId, {
+    const result = await runAIDecalMockupJob(jobId, {
       imagePath: req.file.path,
       preferences,
       outputDir,
@@ -194,13 +194,7 @@ function createAIDecalMockup(req, res, next) {
       requestId,
     });
 
-    return res.status(202).json({
-      success: true,
-      jobId,
-      requestId,
-      status: "queued",
-      message: "Mockup generation started.",
-    });
+    return res.status(result.success ? 200 : 500).json(result);
   } catch (error) {
     if (req.file?.path) {
       try {

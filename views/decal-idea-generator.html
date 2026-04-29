@@ -789,6 +789,7 @@
 
       const requestId = createRequestId();
       const generationStartedAt = Date.now();
+      const requestedMockupCount = Math.max(1, Math.min(Number(document.getElementById("mockupCount").value) || 1, 3));
       const formData = new FormData();
       formData.append("vehicleImage", uploadedVehicleFile);
       formData.append("requestId", requestId);
@@ -816,7 +817,7 @@
         if (!response.ok || !data?.success) {
           if (response.status === 504) {
             statusChip.textContent = "Still Working...";
-            data = await waitForMockupJob(requestId, null, generationStartedAt);
+            data = await waitForExpectedMockupImages(requestId, requestedMockupCount);
           } else {
             throw new Error((data && data.message) || `Mockup generation failed (HTTP ${response.status}).`);
           }
@@ -826,9 +827,20 @@
           throw new Error((data && data.message) || `Mockup generation failed (HTTP ${response.status}).`);
         }
 
+        if (data.mockups?.length) {
+          renderMockups(data.mockups);
+          statusChip.textContent = "Generated";
+          return;
+        }
+
         if (data.jobId) {
           statusChip.textContent = "Working...";
-          data = await waitForMockupJob(data.requestId || requestId, data.jobId, generationStartedAt);
+          const directImageResult = await waitForExpectedMockupImages(data.requestId || requestId, requestedMockupCount);
+          if (directImageResult.mockups.length) {
+            data = directImageResult;
+          } else {
+            data = await waitForMockupJob(data.requestId || requestId, data.jobId, generationStartedAt);
+          }
         }
 
         if (data.status === "failed" || data.success === false) {
@@ -904,6 +916,54 @@
       }
 
       throw new Error("Mockup generation is taking longer than expected. Try one mockup at a time or check back shortly.");
+    }
+
+    async function waitForExpectedMockupImages(requestId, mockupCount) {
+      const startedAt = Date.now();
+      const timeoutMs = 6 * 60 * 1000;
+      const pollDelayMs = 2000;
+      const expectedUrls = Array.from({ length: mockupCount }, (_, index) => {
+        return `/generated-mockups/mockup-${requestId}-${index + 1}.png`;
+      });
+
+      while (Date.now() - startedAt < timeoutMs) {
+        const existingUrls = [];
+
+        for (const url of expectedUrls) {
+          if (await imageExists(url)) {
+            existingUrls.push(url);
+          }
+        }
+
+        if (existingUrls.length) {
+          return {
+            success: true,
+            status: "succeeded",
+            mockups: existingUrls,
+            message: "Mockup generation complete.",
+          };
+        }
+
+        statusChip.textContent = "Waiting For Image...";
+        await delay(pollDelayMs);
+      }
+
+      return {
+        success: true,
+        status: "pending",
+        mockups: [],
+        message: "Mockup image is not available yet.",
+      };
+    }
+
+    function imageExists(url) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        const testUrl = `${url}?v=${Date.now()}`;
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = testUrl;
+      });
     }
 
     async function displayMockupsOrRecover(mockups, generationStartedAt) {
