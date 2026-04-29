@@ -5787,6 +5787,97 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "f9fd0e18-cfa4-4ed9-8353-cb772aa34b39",
+      "type": "page_view",
+      "pathname": "/",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/customize?productId=decal-rocker-panel-side-stripes-dual-top-outlined-stripes",
+      "method": "GET",
+      "timestamp": "2026-04-29T14:37:35.629Z",
+      "date": "2026-04-29",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "d974eb51-c330-452f-8b9d-e1085da20fe1",
+      "type": "page_view",
+      "pathname": "/shop",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/",
+      "method": "GET",
+      "timestamp": "2026-04-29T14:37:37.032Z",
+      "date": "2026-04-29",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "a49c3f88-8924-4f06-a104-3c04f74e857c",
+      "type": "page_view",
+      "pathname": "/product",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/shop",
+      "method": "GET",
+      "timestamp": "2026-04-29T14:37:46.574Z",
+      "date": "2026-04-29",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "13edfd59-0684-4cb7-a642-1a0a6aa3c88e",
+      "type": "product_view",
+      "pathname": "/product",
+      "productId": "decal-rocker-panel-side-stripes-dual-top-outlined-stripes",
+      "productName": "Dual Top Outlined Stripes",
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/product?id=decal-rocker-panel-side-stripes-dual-top-outlined-stripes",
+      "method": "POST",
+      "timestamp": "2026-04-29T14:37:47.018Z",
+      "date": "2026-04-29",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {
+        "category": "Decals",
+        "subcategory": "Rocker Panel/Side"
+      }
     }
   ]
 }

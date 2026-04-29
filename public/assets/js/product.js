@@ -104,6 +104,24 @@ function inferOutlinedStripe(product, outlineColors) {
   return searchable.includes('outline') || searchable.includes('outlined');
 }
 
+function inferTopStripe(product) {
+  if (typeof product?.stripeOptions?.hasTopStripe === 'boolean') {
+    return product.stripeOptions.hasTopStripe;
+  }
+
+  const searchable = [
+    product?.name,
+    product?.slug,
+    product?.id,
+    ...(Array.isArray(product?.tags) ? product.tags : [])
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  return searchable.includes('dual top outlined');
+}
+
 function getRacingStripeOptions(product) {
   const subcategory = String(product?.subcategory || '').toLowerCase();
   const widthFallback = subcategory.includes('rocker')
@@ -132,6 +150,7 @@ function getRacingStripeOptions(product) {
 
   const hasMultipleStripes = inferMultipleStripeLayout(product, widths);
   const hasOutline = inferOutlinedStripe(product, outlineColors);
+  const hasTopStripe = inferTopStripe(product);
 
   return {
     widths,
@@ -139,7 +158,8 @@ function getRacingStripeOptions(product) {
     spacings,
     outlineColors,
     hasMultipleStripes,
-    hasOutline
+    hasOutline,
+    hasTopStripe
   };
 }
 
@@ -299,6 +319,10 @@ function renderRacingStripeLivePreview(container, product) {
       return rect;
     });
 
+    const topStripeMarkup = options.hasTopStripe && stripeRects[0]
+      ? `<rect x="28" y="${Math.max(10, stripeRects[0].y - 9)}" width="484" height="4" rx="2" fill="${outlineColorHex}" />`
+      : '';
+
     const stripesMarkup = stripeRects.map((rect) => {
       const outlineRect = options.hasOutline
         ? `<rect x="22" y="${rect.y - outlinePadding}" width="496" height="${rect.height + outlinePadding * 2}" rx="3" fill="${outlineColorHex}" />`
@@ -316,6 +340,7 @@ function renderRacingStripeLivePreview(container, product) {
           </linearGradient>
         </defs>
         <rect x="8" y="8" width="524" height="116" rx="10" fill="url(#stripePreviewBg)" />
+        ${topStripeMarkup}
         ${stripesMarkup}
       </svg>
     `;
