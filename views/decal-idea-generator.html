@@ -827,7 +827,7 @@
 
         if (data.jobId) {
           statusChip.textContent = "Working...";
-          data = await waitForMockupJob(data.jobId);
+          data = await waitForMockupJob(data.requestId || requestId, data.jobId);
         }
 
         if (data.status === "failed" || data.success === false) {
@@ -852,37 +852,45 @@
       }
     });
 
-    async function waitForMockupJob(jobId) {
+    async function waitForMockupJob(primaryId, secondaryId) {
       const startedAt = Date.now();
       const timeoutMs = 6 * 60 * 1000;
       const pollDelayMs = 3000;
+      const statusIds = [...new Set([primaryId, secondaryId].filter(Boolean))];
 
       while (Date.now() - startedAt < timeoutMs) {
         await delay(pollDelayMs);
 
-        const response = await fetch(`/api/ai-decal-mockup/${encodeURIComponent(jobId)}`, {
-          method: "GET",
-          headers: {
-            "Accept": "application/json"
+        for (const statusId of statusIds) {
+          const response = await fetch(`/api/ai-decal-mockup/${encodeURIComponent(statusId)}`, {
+            method: "GET",
+            headers: {
+              "Accept": "application/json"
+            }
+          });
+
+          let data = null;
+          try {
+            data = await response.json();
+          } catch {
+            data = null;
           }
-        });
 
-        let data = null;
-        try {
-          data = await response.json();
-        } catch {
-          data = null;
+          if (response.status === 404) {
+            statusChip.textContent = "Waiting For File...";
+            continue;
+          }
+
+          if (!response.ok) {
+            throw new Error((data && data.message) || `Mockup status check failed (HTTP ${response.status}).`);
+          }
+
+          if (data.status === "succeeded" || data.status === "failed") {
+            return data;
+          }
         }
 
-        if (!response.ok) {
-          throw new Error((data && data.message) || `Mockup status check failed (HTTP ${response.status}).`);
-        }
-
-        if (data.status === "succeeded" || data.status === "failed") {
-          return data;
-        }
-
-        statusChip.textContent = data.status === "queued" ? "Queued..." : "Generating...";
+        statusChip.textContent = "Generating...";
       }
 
       throw new Error("Mockup generation is taking longer than expected. Try one mockup at a time or check back shortly.");
