@@ -1855,6 +1855,18 @@ body.modal-open {
     flex-direction: column;
   }
 
+  .banner-creator-page .customize-layout > .card:first-child {
+    position: sticky;
+    top: 76px;
+    z-index: 12;
+    align-self: stretch;
+  }
+
+  .banner-creator-page .customize-layout > .card:first-child .customize-viewer {
+    position: relative;
+    top: auto;
+  }
+
   /* PREVIEW - always visible */
   .customize-viewer,
   .preview-area,

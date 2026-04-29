@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>AI Decal Ideas Tool | RenegadeMade Graphix</title>
+
+  <link rel="stylesheet" href="/assets/css/style.css" />
+
+  <style>
+    :root {
+      --rmg-bg: #070907;
+      --rmg-panel: #101510;
+      --rmg-panel-2: #151d15;
+      --rmg-green: #8cff00;
+      --rmg-green-soft: rgba(140, 255, 0, 0.15);
+      --rmg-text: #f4f7f2;
+      --rmg-muted: #aab3a5;
+      --rmg-border: rgba(140, 255, 0, 0.22);
+      --rmg-danger: #ff4d4d;
+      --rmg-radius: 22px;
+      --rmg-shadow: 0 20px 70px rgba(0, 0, 0, 0.45);
+    }
+
+    body {
+      background:
+        radial-gradient(circle at top left, rgba(140,255,0,.12), transparent 34rem),
+        radial-gradient(circle at bottom right, rgba(255,255,255,.06), transparent 28rem),
+        var(--rmg-bg);
+      color: var(--rmg-text);
+    }
+
+    .ai-tool-page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 42px 0 80px;
+    }
+
+    .ai-hero {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 28px;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--rmg-green);
+      background: var(--rmg-green-soft);
+      border: 1px solid var(--rmg-border);
+      padding: 9px 14px;
+      border-radius: 999px;
+      font-size: .82rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .ai-hero h1 {
+      font-size: clamp(2.2rem, 6vw, 5rem);
+      line-height: .92;
+      margin: 0 0 18px;
+      letter-spacing: -0.07em;
+      text-transform: uppercase;
+    }
+
+    .ai-hero p {
+      color: var(--rmg-muted);
+      font-size: 1.08rem;
+      line-height: 1.7;
+      max-width: 680px;
+      margin: 0 0 24px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-rmg {
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 20px;
+      font-weight: 900;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: transform .2s ease, opacity .2s ease;
+    }
+
+    .btn-rmg:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-primary-rmg {
+      background: var(--rmg-green);
+      color: #071007;
+      box-shadow: 0 0 28px rgba(140, 255, 0, .22);
+    }
+
+    .btn-secondary-rmg {
+      background: rgba(255,255,255,.08);
+      color: var(--rmg-text);
+      border: 1px solid rgba(255,255,255,.14);
+    }
+
+    .hero-preview-card {
+      background:
+        linear-gradient(145deg, rgba(140,255,0,.12), transparent 42%),
+        var(--rmg-panel);
+      border: 1px solid var(--rmg-border);
+      border-radius: var(--rmg-radius);
+      box-shadow: var(--rmg-shadow);
+      padding: 18px;
+      overflow: hidden;
+    }
+
+    .fake-preview {
+      aspect-ratio: 4 / 3;
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(140,255,0,.14), transparent 40%),
+        linear-gradient(160deg, #1f2b1f, #080b08);
+      border: 1px solid rgba(255,255,255,.1);
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fake-car {
+      width: 82%;
+      height: 34%;
+      border-radius: 50px 90px 34px 34px;
+      background: linear-gradient(90deg, #67d900, #a7ff2d);
+      box-shadow: 0 28px 44px rgba(0,0,0,.55);
+      position: relative;
+    }
+
+    .fake-car:before {
+      content: "";
+      position: absolute;
+      width: 38%;
+      height: 45%;
+      left: 28%;
+      top: -38%;
+      border-radius: 70px 80px 0 0;
+      background: linear-gradient(90deg, #273027, #6bff00);
+    }
+
+    .fake-car:after {
+      content: "";
+      position: absolute;
+      inset: 40% 8% auto 44%;
+      height: 12px;
+      background: #050705;
+      transform: skewX(-22deg);
+      box-shadow: -48px 28px 0 #050705, 156px 28px 0 #050705;
+    }
+
+    .ai-badge {
+      position: absolute;
+      left: 18px;
+      bottom: 18px;
+      background: rgba(0,0,0,.58);
+      border: 1px solid rgba(140,255,0,.28);
+      color: var(--rmg-green);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: .82rem;
+      font-weight: 900;
+      backdrop-filter: blur(10px);
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: 390px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(16,21,16,.9);
+      border: 1px solid var(--rmg-border);
+      border-radius: var(--rmg-radius);
+      box-shadow: var(--rmg-shadow);
+      padding: 22px;
+    }
+
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: 1.35rem;
+      text-transform: uppercase;
+      letter-spacing: -0.03em;
+    }
+
+    .panel-intro {
+      color: var(--rmg-muted);
+      line-height: 1.55;
+      margin: 0 0 22px;
+      font-size: .96rem;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 900;
+      font-size: .9rem;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      background: #080b08;
+      color: var(--rmg-text);
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 14px;
+      padding: 13px 14px;
+      outline: none;
+      font: inherit;
+    }
+
+    .field textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--rmg-green);
+      box-shadow: 0 0 0 4px var(--rmg-green-soft);
+    }
+
+    .upload-box {
+      border: 1.5px dashed rgba(140,255,0,.38);
+      border-radius: 18px;
+      background: rgba(140,255,0,.06);
+      padding: 18px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .upload-box strong {
+      display: block;
+      color: var(--rmg-green);
+      margin-bottom: 6px;
+    }
+
+    .upload-box span {
+      display: block;
+      color: var(--rmg-muted);
+      font-size: .88rem;
+    }
+
+    .style-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .style-pill {
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: var(--rmg-text);
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: .85rem;
+    }
+
+    .style-pill.active {
+      color: #061006;
+      background: var(--rmg-green);
+      border-color: var(--rmg-green);
+    }
+
+    .preview-area {
+      min-height: 640px;
+    }
+
+    .preview-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .status-chip {
+      color: var(--rmg-green);
+      border: 1px solid var(--rmg-border);
+      background: var(--rmg-green-soft);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 900;
+      font-size: .8rem;
+      white-space: nowrap;
+    }
+
+    .image-stage {
+      border-radius: 20px;
+      background: #070907;
+      border: 1px solid rgba(255,255,255,.1);
+      min-height: 390px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      margin-bottom: 18px;
+      position: relative;
+    }
+
+    .image-stage img {
+      width: 100%;
+      height: 100%;
+      max-height: 520px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--rmg-muted);
+    }
+
+    .empty-state strong {
+      color: var(--rmg-text);
+      display: block;
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+    }
+
+    .mockup-results {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .mockup-card {
+      background: var(--rmg-panel-2);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      min-height: 130px;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      color: var(--rmg-muted);
+      font-size: .85rem;
+      text-align: center;
+      padding: 12px;
+    }
+
+    .mockup-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .tool-footer-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .fine-print {
+      color: var(--rmg-muted);
+      font-size: .82rem;
+      line-height: 1.5;
+      margin-top: 14px;
+    }
+
+    .steps-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 24px 0;
+    }
+
+    .step-card {
+      background: rgba(255,255,255,.045);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .step-card strong {
+      display: block;
+      color: var(--rmg-green);
+      margin-bottom: 6px;
+    }
+
+    .step-card span {
+      color: var(--rmg-muted);
+      font-size: .9rem;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 920px) {
+      .ai-hero,
+      .tool-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .steps-strip {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .preview-area {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .ai-tool-page {
+        width: min(100% - 22px, 1180px);
+        padding-top: 24px;
+      }
+
+      .panel {
+        padding: 16px;
+      }
+
+      .steps-strip,
+      .mockup-results {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-top {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .btn-rmg {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Use your existing site header/nav here -->
+  <!-- Example:
+  <div id="site-header"></div>
+  -->
+
+  <main class="ai-tool-page">
+
+    <section class="ai-hero">
+      <div>
+        <div class="eyebrow">AI Design Tool</div>
+
+        <h1>AI Decal Ideas For Your Vehicle</h1>
+
+        <p>
+          Upload a photo of your car, truck, SUV, or bike. Pick a style, placement,
+          and colors, then generate realistic decal ideas before ordering a custom design.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#aiDecalTool" class="btn-rmg btn-primary-rmg">Start Mockup</a>
+          <a href="/tools/decal-preview" class="btn-rmg btn-secondary-rmg">Open Manual Preview</a>
+        </div>
+      </div>
+
+      <div class="hero-preview-card">
+        <div class="fake-preview">
+          <div class="fake-car"></div>
+          <div class="ai-badge">Upload → Generate → Quote</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="steps-strip">
+      <div class="step-card">
+        <strong>1. Upload</strong>
+        <span>Use a clear side, front, rear, or angled photo of the vehicle.</span>
+      </div>
+
+      <div class="step-card">
+        <strong>2. Choose Style</strong>
+        <span>Select stripes, honeycomb, sponsor row, tear graphics, or custom ideas.</span>
+      </div>
+
+      <div class="step-card">
+        <strong>3. Generate</strong>
+        <span>AI creates decal concepts directly on the uploaded vehicle photo.</span>
+      </div>
+
+      <div class="step-card">
+        <strong>4. Request Quote</strong>
+        <span>Send your favorite mockup to RenegadeMade Graphix for pricing.</span>
+      </div>
+    </section>
+
+    <section class="tool-grid" id="aiDecalTool">
+
+      <aside class="panel">
+        <h2>Build Your Mockup</h2>
+        <p class="panel-intro">
+          Preferences are optional. The more details you add, the closer the AI gets to your style.
+        </p>
+
+        <form id="aiMockupForm">
+
+          <div class="field">
+            <label>Vehicle Photo</label>
+
+            <label class="upload-box" for="vehicleImage">
+              <strong>Tap to upload vehicle photo</strong>
+              <span>PNG, JPG, or WEBP works best</span>
+            </label>
+
+            <input
+              id="vehicleImage"
+              name="vehicleImage"
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              hidden
+            />
+          </div>
+
+          <div class="field">
+            <label for="vehicleNotes">Vehicle Notes</label>
+            <input
+              id="vehicleNotes"
+              name="vehicleNotes"
+              placeholder="Example: 2020 Mustang GT, venom green"
+            />
+          </div>
+
+          <div class="field">
+            <label>Quick Style</label>
+
+            <div class="style-pills" id="stylePills">
+              <button type="button" class="style-pill active" data-style="aggressive racing stripe decals">Racing</button>
+              <button type="button" class="style-pill" data-style="honeycomb fade vinyl graphics">Honeycomb</button>
+              <button type="button" class="style-pill" data-style="sponsor row rocker panel decals">Sponsor Row</button>
+              <button type="button" class="style-pill" data-style="sharp torn vinyl graphic effects">Tear Effect</button>
+              <button type="button" class="style-pill" data-style="dark street style custom graphics">Street</button>
+              <button type="button" class="style-pill" data-style="clean subtle OEM plus accents">Subtle</button>
+            </div>
+
+            <input type="hidden" id="decalStyle" name="decalStyle" value="aggressive racing stripe decals" />
+          </div>
+
+          <div class="field">
+            <label for="colors">Color Ideas</label>
+            <input
+              id="colors"
+              name="colors"
+              placeholder="Example: gloss black with copper accents"
+            />
+          </div>
+
+          <div class="field">
+            <label for="placement">Placement</label>
+            <select id="placement" name="placement">
+              <option value="hood and front bumper accents">Hood / Front</option>
+              <option value="doors and side body graphics">Door / Side</option>
+              <option value="rear quarter panel graphics">Rear Quarter</option>
+              <option value="rocker panel and lower side skirt graphics">Rocker / Side Skirt</option>
+              <option value="windshield banner and rear window banner">Window Banners</option>
+              <option value="full vehicle graphic package">Full Vehicle Concept</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="intensity">Intensity</label>
+            <select id="intensity" name="intensity">
+              <option value="subtle and clean">Subtle</option>
+              <option value="medium, noticeable but not too loud" selected>Medium</option>
+              <option value="aggressive show car style">Aggressive</option>
+              <option value="wild, attention grabbing, full custom look">Wild</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="extraInstructions">Extra Instructions</label>
+            <textarea
+              id="extraInstructions"
+              name="extraInstructions"
+              placeholder="Example: no flames, no fake logos, keep it cut-vinyl style"
+            ></textarea>
+          </div>
+
+          <button type="submit" class="btn-rmg btn-primary-rmg" style="width:100%;">
+            Generate AI Mockups
+          </button>
+
+          <p class="fine-print">
+            AI mockups are for visual ideas only. Final decal sizing, panel fitment,
+            and production files should be confirmed before cutting.
+          </p>
+
+        </form>
+      </aside>
+
+      <section class="panel preview-area">
+        <div class="preview-top">
+          <div>
+            <h2>Mockup Preview</h2>
+            <p class="panel-intro">
+              Your uploaded photo and generated ideas will appear here.
+            </p>
+          </div>
+
+          <div class="status-chip" id="mockupStatus">Ready</div>
+        </div>
+
+        <div class="image-stage" id="imageStage">
+          <div class="empty-state">
+            <strong>No vehicle uploaded yet</strong>
+            Upload a clear photo to start building AI decal ideas.
+          </div>
+        </div>
+
+        <div class="mockup-results" id="mockupResults">
+          <div class="mockup-card">AI Mockup 1</div>
+          <div class="mockup-card">AI Mockup 2</div>
+          <div class="mockup-card">AI Mockup 3</div>
+        </div>
+
+        <div class="tool-footer-actions">
+          <button class="btn-rmg btn-secondary-rmg" type="button" id="saveFavoriteBtn">
+            Save Favorite
+          </button>
+
+          <button class="btn-rmg btn-primary-rmg" type="button" id="requestQuoteBtn">
+            Request This Design
+          </button>
+
+          <a class="btn-rmg btn-secondary-rmg" href="/contact">
+            Contact Designer
+          </a>
+        </div>
+      </section>
+
+    </section>
+
+  </main>
+
+  <script>
+    const vehicleImageInput = document.getElementById("vehicleImage");
+    const imageStage = document.getElementById("imageStage");
+    const form = document.getElementById("aiMockupForm");
+    const statusChip = document.getElementById("mockupStatus");
+    const stylePills = document.querySelectorAll(".style-pill");
+    const decalStyleInput = document.getElementById("decalStyle");
+
+    let uploadedVehicleFile = null;
+
+    stylePills.forEach((pill) => {
+      pill.addEventListener("click", () => {
+        stylePills.forEach((p) => p.classList.remove("active"));
+        pill.classList.add("active");
+        decalStyleInput.value = pill.dataset.style;
+      });
+    });
+
+    vehicleImageInput.addEventListener("change", () => {
+      const file = vehicleImageInput.files[0];
+      if (!file) return;
+
+      uploadedVehicleFile = file;
+
+      const previewUrl = URL.createObjectURL(file);
+
+      imageStage.innerHTML = `
+        <img src="${previewUrl}" alt="Uploaded vehicle preview">
+      `;
+
+      statusChip.textContent = "Photo Loaded";
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      if (!uploadedVehicleFile) {
+        alert("Upload a vehicle photo first.");
+        return;
+      }
+
+      statusChip.textContent = "Generating...";
+
+      const formData = new FormData();
+      formData.append("vehicleImage", uploadedVehicleFile);
+      formData.append("vehicleNotes", document.getElementById("vehicleNotes").value);
+      formData.append("decalStyle", document.getElementById("decalStyle").value);
+      formData.append("colors", document.getElementById("colors").value);
+      formData.append("placement", document.getElementById("placement").value);
+      formData.append("intensity", document.getElementById("intensity").value);
+      formData.append("extraInstructions", document.getElementById("extraInstructions").value);
+
+      try {
+        const response = await fetch("/api/ai-decal-mockup", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.message || "Mockup generation failed.");
+        }
+
+        renderMockups(data.mockups || []);
+
+        statusChip.textContent = "Generated";
+      } catch (error) {
+        console.error(error);
+        statusChip.textContent = "Error";
+        alert("Could not generate mockups. Check your backend route.");
+      }
+    });
+
+    function renderMockups(mockups) {
+      const results = document.getElementById("mockupResults");
+
+      if (!mockups.length) {
+        results.innerHTML = `
+          <div class="mockup-card">No generated images returned yet.</div>
+        `;
+        return;
+      }
+
+      results.innerHTML = mockups.map((url, index) => {
+        return `
+          <button class="mockup-card" type="button" onclick="setMainMockup('${url}')">
+            <img src="${url}" alt="AI decal mockup ${index + 1}">
+          </button>
+        `;
+      }).join("");
+
+      setMainMockup(mockups[0]);
+    }
+
+    function setMainMockup(url) {
+      imageStage.innerHTML = `
+        <img src="${url}" alt="Selected AI decal mockup">
+      `;
+    }
+
+    document.getElementById("requestQuoteBtn").addEventListener("click", () => {
+      window.location.href = "/contact?service=ai-decal-mockup";
+    });
+
+    document.getElementById("saveFavoriteBtn").addEventListener("click", () => {
+      alert("Next step: connect this to user accounts or local saved designs.");
+    });
+  </script>
+
+</body>
+</html>

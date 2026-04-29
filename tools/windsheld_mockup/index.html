@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Windshield Banner Mockup Studio v4</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <div class="app-shell">
+        <aside class="controls">
+            <h1>Windshield Banner Mockup</h1>
+            <p class="subtext">Uses <code>assets/imgs/mockup.png</code> by default. Upload another car image any time,
+                then click and drag the banner right on the windshield.</p>
+
+            <label>
+                <span>Replace Car Image</span>
+                <input type="file" id="imageUpload" accept="image/*" />
+            </label>
+
+            <label>
+                <span>Banner Text</span>
+                <input type="text" id="textInput" value="RENEGADE MADE" maxlength="60" />
+            </label>
+
+            <div class="row two-up">
+                <label>
+                    <span>Text Color</span>
+                    <input type="color" id="colorInput" value="#ffffff" />
+                </label>
+                <label>
+                    <span>Outline Color</span>
+                    <input type="color" id="strokeColorInput" value="#000000" />
+                </label>
+            </div>
+
+            <div class="row two-up">
+                <label>
+                    <span>Font</span>
+                    <select id="fontSelect">
+                        <option value="Arial Black, Arial, sans-serif">Arial Black</option>
+                        <option value="Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif">Impact</option>
+                        <option value="Trebuchet MS, sans-serif">Trebuchet</option>
+                        <option value="Verdana, sans-serif">Verdana</option>
+                        <option value="Tahoma, sans-serif">Tahoma</option>
+                        <option value="Georgia, serif">Georgia</option>
+                        <option value="Courier New, monospace">Courier New</option>
+                    </select>
+                </label>
+                <label>
+                    <span>Weight</span>
+                    <select id="weightSelect">
+                        <option value="700">Bold</option>
+                        <option value="800">Extra Bold</option>
+                        <option value="900" selected>Black</option>
+                        <option value="600">Semi Bold</option>
+                        <option value="400">Regular</option>
+                    </select>
+                </label>
+            </div>
+
+            <label>
+                <span>Font Size: <strong id="sizeValue">72</strong> px</span>
+                <input type="range" id="sizeInput" min="18" max="220" value="72" />
+            </label>
+
+            <label>
+                <span>Letter Spacing: <strong id="letterSpacingValue">4</strong> px</span>
+                <input type="range" id="letterSpacingInput" min="-4" max="30" value="4" />
+            </label>
+
+            <label>
+                <span>Word Spacing: <strong id="wordSpacingValue">8</strong> px</span>
+                <input type="range" id="wordSpacingInput" min="-10" max="60" value="8" />
+            </label>
+
+            <label>
+                <span>Outline Width: <strong id="strokeValue">2</strong> px</span>
+                <input type="range" id="strokeWidthInput" min="0" max="12" value="2" />
+            </label>
+
+            <label>
+                <span>Curve Amount: <strong id="curveValue">-36</strong> px</span>
+                <input type="range" id="curveInput" min="-220" max="220" value="-36" />
+            </label>
+
+            <label>
+                <span>Curve Width: <strong id="pathWidthValue">640</strong> px</span>
+                <input type="range" id="pathWidthInput" min="140" max="1100" value="640" />
+            </label>
+
+            <label>
+                <span>Up / Down Position: <strong id="yValue">120</strong> px</span>
+                <input type="range" id="yInput" min="0" max="600" value="120" />
+            </label>
+
+            <label>
+                <span>Left / Right Position: <strong id="xValue">600</strong> px</span>
+                <input type="range" id="xInput" min="0" max="1200" value="600" />
+            </label>
+
+            <label>
+                <span>Rotate: <strong id="rotateValue">0</strong>°</span>
+                <input type="range" id="rotateInput" min="-60" max="60" value="0" />
+            </label>
+
+            <label>
+                <span>Skew Left / Right: <strong id="skewXValue">0</strong>°</span>
+                <input type="range" id="skewXInput" min="-45" max="45" value="0" />
+            </label>
+
+            <label>
+                <span>Skew Up / Down: <strong id="skewYValue">0</strong>°</span>
+                <input type="range" id="skewYInput" min="-25" max="25" value="0" />
+            </label>
+
+            <label>
+                <span>Scale Width: <strong id="scaleXValue">1.00</strong>x</span>
+                <input type="range" id="scaleXInput" min="0.4" max="2.8" step="0.01" value="1" />
+            </label>
+
+            <label>
+                <span>Scale Height: <strong id="scaleYValue">1.00</strong>x</span>
+                <input type="range" id="scaleYInput" min="0.4" max="2.8" step="0.01" value="1" />
+            </label>
+
+            <div class="button-row">
+                <button id="centerBtn" type="button">Center Text</button>
+                <button id="resetBtn" type="button">Reset Text</button>
+            </div>
+
+            <div class="button-row single">
+                <button id="downloadBtn" type="button" class="primary">Download Mockup</button>
+            </div>
+
+            <p class="hint">Drag the banner by clicking directly on the text. Use the corner or edge handles to resize. The X and Y sliders still work too.</p>
+        </aside>
+
+        <main class="preview-panel">
+            <div class="stage-wrap">
+                <div class="stage" id="stage">
+                    <img id="carImage" alt="Car preview" src="assets/imgs/mockup.png" />
+
+                    <svg id="overlay" class="overlay" viewBox="0 0 1200 675" preserveAspectRatio="none"
+                        aria-hidden="true">
+                        <g id="bannerTransformGroup" class="draggable-group" tabindex="0" role="img"
+                            aria-label="Draggable windshield banner text">
+                            <rect id="selectionBox" class="selection-box" x="-320" y="-80" width="640" height="160"
+                                rx="14" ry="14"></rect>
+                            <path id="bannerPath" fill="none" stroke="transparent"></path>
+                            <text id="bannerTextNode" class="svg-banner">
+                                <textPath id="bannerTextPath" href="#bannerPath" startOffset="50%" text-anchor="middle">
+                                    RENEGADE MADE</textPath>
+                            </text>
+                            <rect id="dragHitbox" class="drag-hitbox" x="-420" y="-110" width="840" height="220" rx="18"
+                                ry="18"></rect>
+                            <g id="resizeHandles" class="resize-handles">
+                                <circle id="resizeNW" class="resize-handle resize-corner" cx="-320" cy="-80" r="8" data-corner="nw" />
+                                <circle id="resizeNE" class="resize-handle resize-corner" cx="320" cy="-80" r="8" data-corner="ne" />
+                                <circle id="resizeSW" class="resize-handle resize-corner" cx="-320" cy="80" r="8" data-corner="sw" />
+                                <circle id="resizeSE" class="resize-handle resize-corner" cx="320" cy="80" r="8" data-corner="se" />
+                                <circle id="resizeN" class="resize-handle resize-edge" cx="0" cy="-80" r="6" data-edge="n" />
+                                <circle id="resizeS" class="resize-handle resize-edge" cx="0" cy="80" r="6" data-edge="s" />
+                                <circle id="resizeW" class="resize-handle resize-edge" cx="-320" cy="0" r="6" data-edge="w" />
+                                <circle id="resizeE" class="resize-handle resize-edge" cx="320" cy="0" r="6" data-edge="e" />
+                            </g>
+                        </g>
+                    </svg>
+
+                    <div id="placeholder" class="placeholder hidden">
+                        <div class="placeholder-car"></div>
+                        <p>Add <code>assets/imgs/mockup.png</code> to use your saved default image, or upload a photo.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

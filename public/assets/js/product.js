@@ -268,17 +268,21 @@ function renderRacingStripeLivePreview(container, product) {
 
     const stripeWidths = parseStripeWidths(selectedWidth, options.hasMultipleStripes);
     const spacingInches = parseInchValue(selectedSpacing, 0.5);
-    const maxWidth = Math.max(...stripeWidths, 1);
 
     const stripeColorHex = stripeColorToHex(selectedColor);
     const outlineColorHex = stripeColorToHex(selectedOutline);
     const laneHeight = 112;
     const gapPx = options.hasMultipleStripes ? Math.max(8, Math.min(30, spacingInches * 18)) : 0;
 
-    const stripeHeights = stripeWidths.map((value) => {
-      const normalized = value / maxWidth;
-      return Math.max(10, Math.round(normalized * 28));
-    });
+    const pxPerInch = 2.2;
+    let stripeHeights = stripeWidths.map((value) => Math.max(8, Math.round(value * pxPerInch)));
+
+    const maxStripeAreaHeight = Math.max(24, laneHeight - (options.hasMultipleStripes ? gapPx : 0) - 20);
+    const currentStripeHeightTotal = stripeHeights.reduce((sum, value) => sum + value, 0);
+    if (currentStripeHeightTotal > maxStripeAreaHeight) {
+      const scale = maxStripeAreaHeight / currentStripeHeightTotal;
+      stripeHeights = stripeHeights.map((value) => Math.max(6, Math.round(value * scale)));
+    }
 
     const totalStripeHeight = stripeHeights.reduce((sum, value) => sum + value, 0) + gapPx;
     let top = Math.max(10, Math.round((laneHeight - totalStripeHeight) / 2));

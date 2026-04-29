@@ -427,7 +427,7 @@
               <option value="">All States</option>
             </select>
             <select id="serviceFilter">
-              <option value="">All Services</option>
+              <option value="wrap" selected>Wrap Installers</option>
             </select>
           </div>
         </div>
@@ -508,6 +508,15 @@
       return str ? str.replace(/\b\w/g, c => c.toUpperCase()) : '';
     }
 
+    function isWrapInstaller(service) {
+      const normalized = String(service || '').toLowerCase().trim();
+      return (
+        normalized.includes('wrap')
+        || normalized.includes('vinyl')
+        || normalized.includes('sign')
+      );
+    }
+
     // ── Map init ──
     const map = L.map('installerMap', {
       center: [39.5, -98.35],
@@ -574,12 +583,9 @@
     // ── Filters ──
     function populateFilters() {
       const stateSet = new Set();
-      const serviceSet = new Set();
 
       allListings.forEach(l => {
         if (l.state) stateSet.add(l.state.toLowerCase());
-        const svc = (l.services || '').toLowerCase().trim();
-        if (svc && KNOWN_SERVICES.has(svc)) serviceSet.add(svc);
       });
 
       const stateFilter = document.getElementById('stateFilter');
@@ -591,12 +597,7 @@
       });
 
       const serviceFilter = document.getElementById('serviceFilter');
-      [...serviceSet].sort().forEach(svc => {
-        const opt = document.createElement('option');
-        opt.value = svc;
-        opt.textContent = capitalize(serviceLabel(svc));
-        serviceFilter.appendChild(opt);
-      });
+      serviceFilter.innerHTML = '<option value="wrap" selected>Wrap Installers</option>';
     }
 
     function applyFilters() {
@@ -606,7 +607,7 @@
 
       filtered = allListings.filter(l => {
         if (state && (l.state || '').toLowerCase() !== state) return false;
-        if (service && (l.services || '').toLowerCase().trim() !== service) return false;
+        if (service === 'wrap' && !isWrapInstaller(l.services)) return false;
         if (q) {
           const hay = `${l.name} ${l.city} ${l.address}`.toLowerCase();
           if (!hay.includes(q)) return false;
@@ -759,10 +760,10 @@
 
         // Reset filters & show nearby
         document.getElementById('stateFilter').value = '';
-        document.getElementById('serviceFilter').value = '';
+        document.getElementById('serviceFilter').value = 'wrap';
         document.getElementById('searchInput').value = '';
 
-        filtered = nearby;
+        filtered = nearby.filter(l => isWrapInstaller(l.services));
         renderList();
         renderMarkers();
         updateMeta();

@@ -1,4 +1,7 @@
 const express = require("express");
+const path = require("path");
+const fs = require("fs");
+const multer = require("multer");
 const { getHealth } = require("../controllers/healthController");
 const { listProducts } = require("../controllers/productController");
 const { listInstallers } = require("../controllers/installerController");
@@ -23,8 +26,19 @@ const {
 	updateCmsSettings
 } = require("../controllers/cmsController");
 const { requireCmsAuth } = require("../middleware/requireCmsAuth");
+const { createAIDecalMockup } = require("../controllers/decalIdeaController");
 
 const router = express.Router();
+
+const uploadDir = path.join(__dirname, "..", "..", "data", "uploads");
+fs.mkdirSync(uploadDir, { recursive: true });
+
+const upload = multer({
+	dest: uploadDir,
+	limits: {
+		fileSize: 12 * 1024 * 1024,
+	},
+});
 
 router.get("/health", getHealth);
 router.get("/products", listProducts);
@@ -38,6 +52,7 @@ router.post("/auth/login", login);
 router.get("/orders", listOrders);
 router.post("/orders", createNewOrder);
 router.post("/messages", createNewMessage);
+router.post("/ai-decal-mockup", upload.single("vehicleImage"), createAIDecalMockup);
 
 router.post("/cms/login", cmsLogin);
 router.get("/cms/products", requireCmsAuth, listCmsProducts);
