@@ -752,15 +752,28 @@
 
       const data = await response.json().catch(() => null);
 
-      if (!response.ok || !data?.success) {
-        const message = data?.message || getHttpErrorMessage(response.status);
-        throw new Error(message);
+      if (!response.ok || !data?.success || !data?.jobId) {
+        throw new Error(data?.message || getHttpErrorMessage(response.status));
       }
 
-      renderMockups(data.mockups || []);
+      statusChip.textContent = "Queued...";
+      results.innerHTML = `
+        <div class="mockup-card">Job started...</div>
+        <div class="mockup-card">AI is designing...</div>
+        <div class="mockup-card">Waiting for image...</div>
+      `;
+
+      const finishedJob = await pollMockupJob(data.jobId);
+
+      if (!finishedJob.success || finishedJob.status === "failed") {
+        throw new Error(finishedJob.message || finishedJob.error || "Mockup generation failed.");
+      }
+
+      renderMockups(finishedJob.mockups || []);
       statusChip.textContent = "Generated";
     } catch (error) {
       console.error(error);
+
       statusChip.textContent = "Error";
 
       results.innerHTML = `
@@ -773,6 +786,48 @@
     }
   });
 
+  async function pollMockupJob(jobId) {
+    const timeoutMs = 6 * 60 * 1000;
+    const delayMs = 3000;
+    const startedAt = Date.now();
+
+    while (Date.now() - startedAt < timeoutMs) {
+      await delay(delayMs);
+
+      const response = await fetch(`/api/ai-decal-mockup/${encodeURIComponent(jobId)}`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok || !data) {
+        throw new Error(data?.message || `Status check failed. HTTP ${response.status}`);
+      }
+
+      if (data.status === "succeeded") {
+        return data;
+      }
+
+      if (data.status === "failed") {
+        throw new Error(data.message || data.error || "Mockup generation failed.");
+      }
+
+      statusChip.textContent = getPollingStatusText(data.status);
+    }
+
+    throw new Error("Mockup generation timed out. Try generating 1 mockup at a time.");
+  }
+
+  function getPollingStatusText(status) {
+    if (status === "queued") return "Queued...";
+    if (status === "generating") return "Generating...";
+    if (status === "saving") return "Saving...";
+    return "Working...";
+  }
+
   async function compressImage(file) {
     const maxDimension = 1600;
     const targetBytes = 4 * 1024 * 1024;
@@ -781,10 +836,7 @@
 
     const img = await loadImage(file);
 
-    const scale = Math.min(
-      1,
-      maxDimension / Math.max(img.width, img.height)
-    );
+    const scale = Math.min(1, maxDimension / Math.max(img.width, img.height));
 
     const canvas = document.createElement("canvas");
     canvas.width = Math.max(1, Math.round(img.width * scale));
@@ -837,19 +889,21 @@
     });
   }
 
+  function delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   function setLoading(isLoading) {
     generateBtn.disabled = isLoading;
-    generateBtn.textContent = isLoading
-      ? "Generating..."
-      : "Generate AI Mockups";
+    generateBtn.textContent = isLoading ? "Generating..." : "Generate AI Mockups";
 
     if (isLoading) {
-      statusChip.textContent = "Generating...";
+      statusChip.textContent = "Starting...";
 
       results.innerHTML = `
-        <div class="mockup-card">Generating mockup...</div>
-        <div class="mockup-card">Preparing preview...</div>
-        <div class="mockup-card">Saving image...</div>
+        <div class="mockup-card">Uploading photo...</div>
+        <div class="mockup-card">Starting AI job...</div>
+        <div class="mockup-card">Preparing mockup...</div>
       `;
     }
   }
@@ -925,6 +979,10 @@
 
     if (status === 429) {
       return "Too many requests. Try again in a minute.";
+    }
+
+    if (status === 504) {
+      return "Server timed out while starting the AI job. Make sure your backend returns a jobId immediately.";
     }
 
     if (status === 500) {
