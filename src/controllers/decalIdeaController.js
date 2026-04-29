@@ -78,7 +78,7 @@ function findGeneratedMockupsByRequestId(requestId) {
 
 function findRecentGeneratedMockups(sinceMs) {
   const since = Number(sinceMs || 0);
-  if (!Number.isFinite(since) || since <= 0 || !fs.existsSync(generatedMockupsDir)) return [];
+  if (!fs.existsSync(generatedMockupsDir)) return [];
 
   return fs.readdirSync(generatedMockupsDir)
     .filter((fileName) => fileName.startsWith("mockup-") && fileName.endsWith(".png"))
@@ -91,10 +91,10 @@ function findRecentGeneratedMockups(sinceMs) {
         url: `/generated-mockups/${fileName}`,
       };
     })
-    .filter((file) => file.createdAt >= since)
-    .sort((left, right) => left.createdAt - right.createdAt)
+    .filter((file) => !Number.isFinite(since) || since <= 0 || file.createdAt >= since)
+    .sort((left, right) => right.createdAt - left.createdAt)
     .map((file) => file.url)
-    .slice(-3);
+    .slice(0, 3);
 }
 
 async function runAIDecalMockupJob(jobId, { imagePath, preferences, outputDir, mockupCount, requestId }) {
