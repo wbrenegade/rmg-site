@@ -6,6 +6,7 @@ const { generateVehicleDecalMockup } = require("../../tools/decal_idea_generator
 const jobs = new Map();
 const JOB_TTL_MS = 30 * 60 * 1000;
 const generatedMockupsDir = path.join(__dirname, "..", "..", "public", "generated-mockups");
+const generatedMockupJobsDir = path.join(generatedMockupsDir, "job-results");
 
 function createSafeRequestId(value) {
   return String(value || "")
@@ -33,6 +34,36 @@ function setJob(jobId, updates) {
     ...updates,
     updatedAt: Date.now(),
   });
+}
+
+function ensureGeneratedDirs() {
+  fs.mkdirSync(generatedMockupsDir, { recursive: true });
+  fs.mkdirSync(generatedMockupJobsDir, { recursive: true });
+}
+
+function getJobResultPath(id) {
+  const safeId = createSafeRequestId(id);
+  if (!safeId) return "";
+  return path.join(generatedMockupJobsDir, `${safeId}.json`);
+}
+
+function writeJobResult(ids, payload) {
+  ensureGeneratedDirs();
+
+  [...new Set(ids.filter(Boolean).map(createSafeRequestId).filter(Boolean))].forEach((id) => {
+    fs.writeFileSync(getJobResultPath(id), JSON.stringify(payload, null, 2));
+  });
+}
+
+function readJobResult(id) {
+  const filePath = getJobResultPath(id);
+  if (!filePath || !fs.existsSync(filePath)) return null;
+
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+  } catch {
+    return null;
+  }
 }
 
 function findGeneratedMockupsByRequestId(requestId) {
@@ -82,20 +113,35 @@ async function runAIDecalMockupJob(jobId, { imagePath, preferences, outputDir, m
     });
 
     const mockups = (result.files || []).map((file) => `/generated-mockups/${file.fileName}`);
-
-    setJob(jobId, {
-      status: "succeeded",
+    const payload = {
       success: true,
+      jobId,
+      requestId,
+      status: "succeeded",
       mockups,
       message: "Mockup generation complete.",
-    });
-  } catch (error) {
+    };
+
     setJob(jobId, {
+      ...payload,
+    });
+
+    writeJobResult([jobId, requestId], payload);
+    return payload;
+  } catch (error) {
+    const payload = {
+      jobId,
+      requestId,
       status: "failed",
       success: false,
       error: error?.message || "Mockup generation failed.",
       message: error?.message || "Mockup generation failed.",
-    });
+      mockups: [],
+    };
+
+    setJob(jobId, payload);
+    writeJobResult([jobId, requestId], payload);
+    return payload;
   } finally {
     try {
       fs.unlinkSync(imagePath);
@@ -116,6 +162,7 @@ function createAIDecalMockup(req, res, next) {
       });
     }
 
+    ensureGeneratedDirs();
     const outputDir = generatedMockupsDir;
     const requestId = createSafeRequestId(req.body.requestId || crypto.randomUUID());
     const preferences = {
@@ -175,7 +222,12 @@ function getAIDecalMockupJob(req, res) {
 
   const jobId = String(req.params.jobId || "");
   const job = jobs.get(jobId);
+  const storedResult = readJobResult(jobId);
   const generatedMockups = findGeneratedMockupsByRequestId(jobId);
+
+  if (storedResult) {
+    return res.status(200).json(storedResult);
+  }
 
   if (!job && generatedMockups.length) {
     return res.status(200).json({
