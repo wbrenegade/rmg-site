@@ -4279,6 +4279,28 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "d3657f88-94db-4fab-b674-67b41cd9ceba",
+      "type": "page_view",
+      "pathname": "/tools/decal-idea-generator",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/windshield-banner-creator",
+      "method": "GET",
+      "timestamp": "2026-04-29T06:09:27.283Z",
+      "date": "2026-04-29",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }

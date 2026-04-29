@@ -36,7 +36,7 @@ fs.mkdirSync(uploadDir, { recursive: true });
 const upload = multer({
 	dest: uploadDir,
 	limits: {
-		fileSize: 12 * 1024 * 1024,
+		fileSize: 25 * 1024 * 1024,
 	},
 });
 
