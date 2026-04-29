@@ -41,6 +41,8 @@ function initBannerCustomizer() {
   const mockupTypeInput = document.getElementById('bannerMockupType');
   const vehicleInput = document.getElementById('bannerVehicle');
   const sizeInput = document.getElementById('bannerSize');
+  const textWidthInput = document.getElementById('bannerTextWidth');
+  const textHeightInput = document.getElementById('bannerTextHeight');
   const rotateInput = document.getElementById('bannerRotate');
   const posXInput = document.getElementById('bannerPosX');
   const posYInput = document.getElementById('bannerPosY');
@@ -94,6 +96,16 @@ function initBannerCustomizer() {
         const px = Number(value || 72);
         return `${px}px (${(px / 96).toFixed(2)} in)`;
       }
+    },
+    {
+      key: 'bannerTextWidth',
+      element: textWidthInput,
+      format: (value) => `${Number(value || 100)}%`
+    },
+    {
+      key: 'bannerTextHeight',
+      element: textHeightInput,
+      format: (value) => `${Number(value || 100)}%`
     },
     {
       key: 'bannerRotate',
@@ -349,18 +361,20 @@ function initBannerCustomizer() {
     textNode.style.opacity = String(opacity);
   }
 
-  function fitDesignToText(text, color, outline, font, size, spacing, curve, opacity) {
+  function fitDesignToText(text, color, outline, font, size, spacing, curve, opacity, textWidthScale, textHeightScale) {
     const minWidth = 160;
     const minHeight = 90;
     const maxWidth = Math.max(minWidth, viewer.clientWidth - 18);
     const maxHeight = Math.max(minHeight, viewer.clientHeight - 18);
+    const currentBaseWidth = design.offsetWidth / Math.max(textWidthScale, 0.01);
+    const currentBaseHeight = design.offsetHeight / Math.max(textHeightScale, 0.01);
 
     let width = Math.min(
-      Math.max(Math.max(design.offsetWidth, text.length * (size * 0.64)), minWidth),
+      Math.max(Math.max(currentBaseWidth, text.length * (size * 0.64)), minWidth),
       maxWidth
     );
     let height = Math.min(
-      Math.max(Math.max(design.offsetHeight, size * 1.9), minHeight),
+      Math.max(Math.max(currentBaseHeight, size * 1.9), minHeight),
       maxHeight
     );
 
@@ -404,6 +418,8 @@ function initBannerCustomizer() {
     const outline = outlineInput?.value || '#000000';
     const font = fontInput?.value || "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif";
     const size = Number(sizeInput?.value || 72);
+    const textWidthScale = Number(textWidthInput?.value || 100) / 100;
+    const textHeightScale = Number(textHeightInput?.value || 100) / 100;
     const rotate = Number(rotateInput?.value || 0);
     let posX = Number(posXInput?.value || 0);
     let posY = Number(posYInput?.value || -8);
@@ -425,10 +441,12 @@ function initBannerCustomizer() {
       size,
       spacing,
       curve,
-      opacity
+      opacity,
+      textWidthScale,
+      textHeightScale
     );
-    design.style.width = `${boxWidth}px`;
-    design.style.height = `${boxHeight}px`;
+    design.style.width = `${boxWidth * textWidthScale}px`;
+    design.style.height = `${boxHeight * textHeightScale}px`;
 
     const bounds = getDragBounds();
     syncPositionInputBounds(bounds);
@@ -587,6 +605,8 @@ function initBannerCustomizer() {
       `Mockup Type: ${mockupTypeInput?.selectedOptions?.[0]?.textContent || 'Windshield'}`,
       `Vehicle: ${vehicleInput?.selectedOptions?.[0]?.textContent || 'Mustang'}`,
       `Size: ${sizeInput?.value || '72'}`,
+      `Text Width: ${textWidthInput?.value || '100'}%`,
+      `Text Height: ${textHeightInput?.value || '100'}%`,
       `Rotation: ${rotateInput?.value || '0'}deg`,
       `Position: X ${posXInput?.value || '0'}, Y ${posYInput?.value || '0'}`,
       `Spacing: ${spacingInput?.value || '5'}`,

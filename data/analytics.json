@@ -4235,6 +4235,50 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "315b50e6-7a37-4e33-965e-551a4835a3bb",
+      "type": "page_view",
+      "pathname": "/tools/decal-idea-generator",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/",
+      "method": "GET",
+      "timestamp": "2026-04-29T06:01:39.794Z",
+      "date": "2026-04-29",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "10c6e072-4974-4532-8d29-aa14c13ff923",
+      "type": "page_view",
+      "pathname": "/windshield-banner-creator",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/",
+      "method": "GET",
+      "timestamp": "2026-04-29T06:05:23.057Z",
+      "date": "2026-04-29",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }

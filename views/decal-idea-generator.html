@@ -716,10 +716,15 @@
           body: formData
         });
 
-        const data = await response.json();
+        let data = null;
+        try {
+          data = await response.json();
+        } catch {
+          data = null;
+        }
 
         if (!response.ok || !data.success) {
-          throw new Error(data.message || "Mockup generation failed.");
+          throw new Error((data && data.message) || `Mockup generation failed (HTTP ${response.status}).`);
         }
 
         renderMockups(data.mockups || []);
@@ -728,7 +733,7 @@
       } catch (error) {
         console.error(error);
         statusChip.textContent = "Error";
-        alert("Could not generate mockups. Check your backend route.");
+        alert(error.message || "Could not generate mockups.");
       }
     });
 

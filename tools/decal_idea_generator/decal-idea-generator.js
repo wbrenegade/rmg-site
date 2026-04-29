@@ -4,6 +4,48 @@ const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
 
+async function editImageWithFallback({ client, rgbaBuffer, prompt }) {
+  const configuredPrimary = process.env.OPENAI_IMAGE_MODEL || "gpt-image-2";
+  const configuredFallback = process.env.OPENAI_IMAGE_FALLBACK_MODEL || "gpt-image-1";
+  const models = [...new Set([configuredPrimary, configuredFallback])];
+
+  let lastError;
+
+  for (const model of models) {
+    try {
+      const imageFile = await toFile(rgbaBuffer, "vehicle.png", {
+        type: "image/png",
+      });
+
+      const result = await client.images.edit({
+        model,
+        image: imageFile,
+        prompt,
+        size: "1536x1024",
+        quality: "medium",
+      });
+
+      const imageBase64 = result?.data?.[0]?.b64_json;
+      if (!imageBase64) {
+        throw new Error(`Image generation returned no image data for model ${model}.`);
+      }
+
+      return imageBase64;
+    } catch (error) {
+      lastError = error;
+      const message = String(error?.message || "");
+      const isOrgVerificationError = Number(error?.status) === 403 && message.includes("must be verified");
+      const isLastModel = model === models[models.length - 1];
+
+      if (!isOrgVerificationError || isLastModel) {
+        throw error;
+      }
+    }
+  }
+
+  throw lastError || new Error("Image generation failed.");
+}
+
 function buildPrompt(preferences = {}) {
   const {
     decalStyle = "modern aggressive automotive vinyl decal design",
@@ -64,23 +106,11 @@ async function generateVehicleDecalMockup({
   for (let i = 0; i < targetCount; i += 1) {
     // gpt-image-2 requires RGBA PNG; convert upload in-memory
     const rgbaBuffer = await sharp(imagePath).ensureAlpha().png().toBuffer();
-
-    const imageFile = await toFile(rgbaBuffer, "vehicle.png", {
-      type: "image/png",
-    });
-
-    const result = await client.images.edit({
-      model: "gpt-image-2",
-      image: imageFile,
+    const imageBase64 = await editImageWithFallback({
+      client,
+      rgbaBuffer,
       prompt,
-      size: "1536x1024",
-      quality: "medium",
     });
-
-    const imageBase64 = result?.data?.[0]?.b64_json;
-    if (!imageBase64) {
-      throw new Error("Image generation returned no image data.");
-    }
 
     const fileName = `mockup-${Date.now()}-${i + 1}.png`;
     const outputPath = path.join(outputDir, fileName);
