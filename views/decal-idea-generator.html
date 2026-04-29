@@ -810,8 +810,17 @@
           data = null;
         }
 
-        if (!response.ok || !data.success) {
+        if (!response.ok || !data?.success) {
           throw new Error((data && data.message) || `Mockup generation failed (HTTP ${response.status}).`);
+        }
+
+        if (data.jobId) {
+          statusChip.textContent = "Working...";
+          data = await waitForMockupJob(data.jobId);
+        }
+
+        if (data.status === "failed" || data.success === false) {
+          throw new Error(data.error || data.message || "Mockup generation failed.");
         }
 
         renderMockups(data.mockups || []);
@@ -831,6 +840,46 @@
         generateBtn.textContent = "Generate AI Mockups";
       }
     });
+
+    async function waitForMockupJob(jobId) {
+      const startedAt = Date.now();
+      const timeoutMs = 6 * 60 * 1000;
+      const pollDelayMs = 3000;
+
+      while (Date.now() - startedAt < timeoutMs) {
+        await delay(pollDelayMs);
+
+        const response = await fetch(`/api/ai-decal-mockup/${encodeURIComponent(jobId)}`, {
+          method: "GET",
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+
+        let data = null;
+        try {
+          data = await response.json();
+        } catch {
+          data = null;
+        }
+
+        if (!response.ok) {
+          throw new Error((data && data.message) || `Mockup status check failed (HTTP ${response.status}).`);
+        }
+
+        if (data.status === "succeeded" || data.status === "failed") {
+          return data;
+        }
+
+        statusChip.textContent = data.status === "queued" ? "Queued..." : "Generating...";
+      }
+
+      throw new Error("Mockup generation is taking longer than expected. Try one mockup at a time or check back shortly.");
+    }
+
+    function delay(ms) {
+      return new Promise((resolve) => window.setTimeout(resolve, ms));
+    }
 
     function renderPlaceholderCards() {
       results.innerHTML = `
