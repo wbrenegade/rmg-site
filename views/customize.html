@@ -27,7 +27,8 @@
       <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
       <nav class="site-nav" id="siteNav">
         <a href="index.html">Home</a>
-        <a href="shop.html" class="active">Shop</a>
+        <a href="shop.html">Shop</a>
+        <a href="customize.html" class="active">Customizer</a>
         <a href="/tools">Tools</a>
         <a href="/installers">Find Installer</a>
         <a href="contact.html">Contact</a>
@@ -60,7 +61,7 @@
           </div>
 
           <div class="customize-viewer customizer-stage" id="customizeViewer">
-            <img id="customizeBaseImage" src="/assets/imgs/previews/customizer/side.png" alt="Vehicle preview" />
+            <img id="customizeBaseImage" src="/assets/imgs/previews/customizer/right-side.png" alt="Vehicle preview" />
             <div id="customizeDecal" class="customize-decal customizer-decal-layer"></div>
             <div id="customizeTextLayer" class="customize-decal customizer-text-layer">YOUR TEXT</div>
           </div>
@@ -72,7 +73,8 @@
           <div class="form-section full-width"><h3>Vehicle</h3></div>
           <label>Default View
             <select id="vehicleViewSelect">
-              <option value="/assets/imgs/previews/customizer/side.png">Side</option>
+              <option value="/assets/imgs/previews/customizer/right-side.png">Right Side</option>
+              <option value="/assets/imgs/previews/customizer/left-side.png">Left Side</option>
               <option value="/assets/imgs/previews/customizer/front.png">Front</option>
               <option value="/assets/imgs/previews/customizer/rear.png">Rear</option>
             </select>
@@ -105,6 +107,33 @@
             <input type="range" id="decalY" min="-45" max="45" value="0" />
           </label>
 
+          <div class="form-section full-width"><h3>Shape Elements</h3></div>
+          <label>Edit Target
+            <select id="shapeEditScope">
+              <option value="group">All Shapes</option>
+              <option value="individual">Selected Shape</option>
+            </select>
+          </label>
+          <label>Shape
+            <select id="shapeElementSelect">
+              <option value="all">All Shapes</option>
+            </select>
+          </label>
+          <label>Shape Color
+            <input type="color" id="shapeFillColor" value="#111111" />
+          </label>
+          <label>Outline Color
+            <input type="color" id="shapeStrokeColor" value="#111111" />
+          </label>
+          <label>Outline Thickness
+            <input type="range" id="shapeStrokeWidth" min="0" max="24" value="6" />
+          </label>
+          <div class="full-width customize-actions">
+            <button type="button" class="btn btn-outline" id="undoShapeEdit">Undo</button>
+            <button type="button" class="btn btn-outline" id="redoShapeEdit">Redo</button>
+            <button type="button" class="btn btn-outline" id="resetShapeElements">Back to Original</button>
+          </div>
+
           <div class="form-section full-width"><h3>Text</h3></div>
           <label class="full-width">Custom Text
             <input type="text" id="designText" value="" maxlength="40" placeholder="Add text" />
@@ -136,6 +165,8 @@
 
           <div class="full-width customize-actions">
             <a class="btn btn-outline" id="backToProduct" href="shop.html">Back to Product</a>
+            <button type="button" class="btn btn-outline" id="downloadCustomizerPreview">Download Preview PNG</button>
+            <button type="button" class="btn btn-outline" id="shareCustomizerPreview">Share Design</button>
             <button type="button" class="btn" id="continueToCheckout">Save Customization & Checkout</button>
           </div>
           <p class="form-note full-width" id="customizeVehicleNote"></p>

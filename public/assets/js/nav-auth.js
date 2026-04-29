@@ -2,7 +2,7 @@
   var CURRENT_USER_KEY = 'rmg_current_user';
   var TOOL_ITEMS = [
     { label: 'Image to Decal', href: '/tools/svg-converter' },
-    { label: 'Decal Preview', href: '/tools/decal-preview' },
+    { label: 'Customizer', href: '/customize' },
     { label: 'Banner Calculator', href: '/tools/windshield-banner-calculator' },
     { label: 'AI Decal Ideas', href: '/tools/decal-idea-generator' },
     { label: 'Windshield Mockup Tool', href: '/windshield-banner-creator' }

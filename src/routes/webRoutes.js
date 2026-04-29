@@ -57,6 +57,10 @@ router.get("/robots.txt", serveRobotsTxt);
 router.get("/sitemap.xml", serveSitemapXml);
 
 router.get("/tools", serveToolsIndex);
+router.get("/tools/decal-preview", (req, res) => redirectWithQuery(req, res, "/customize"));
+router.get("/tools/decal-preview.html", (req, res) => redirectWithQuery(req, res, "/customize"));
+router.get("/decal-preview", (req, res) => redirectWithQuery(req, res, "/customize"));
+router.get("/decal-preview.html", (req, res) => redirectWithQuery(req, res, "/customize"));
 router.get(`/tools/:tool(${toolPattern})`, serveToolPage);
 router.get(`/tools/:tool(${toolPattern})\\.html`, redirectToCanonicalTool);
 router.get(`/:tool(${toolPattern})\\.html`, redirectToCanonicalTool);

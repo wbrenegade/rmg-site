@@ -15,6 +15,7 @@ class SiteHeader extends HTMLElement {
           <nav class="site-nav">
             <a href="index.html" class="${activePage === 'home' ? 'active' : ''}">Home</a>
             <a href="shop.html" class="${activePage === 'shop' ? 'active' : ''}">Shop</a>
+            <a href="customize.html" class="${activePage === 'customize' ? 'active' : ''}">Customizer</a>
             <a href="contact.html" class="${activePage === 'contact' ? 'active' : ''}">Contact</a>
             <a href="faq.html" class="${activePage === 'faq' ? 'active' : ''}">FAQ</a>
             <a href="login.html" class="${activePage === 'login' ? 'active' : ''}">Login</a>

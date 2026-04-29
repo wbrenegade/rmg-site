@@ -920,19 +920,21 @@ textarea { resize: vertical; }
 .customizer-text-layer {
   display: grid;
   place-items: center;
-  pointer-events: none;
 }
 
 .customizer-decal-layer {
   width: 72%;
   line-height: 0;
   text-shadow: none;
+  pointer-events: auto;
+  touch-action: none;
 }
 
 .customizer-text-layer {
   width: 80%;
   text-align: center;
   line-height: 1;
+  pointer-events: none;
 }
 
 .customizer-overlay-svg {
@@ -940,6 +942,19 @@ textarea { resize: vertical; }
   width: 100%;
   height: auto;
   overflow: visible;
+}
+
+.customizer-editable-shape {
+  cursor: grab;
+  pointer-events: all;
+}
+
+.customizer-editable-shape:active {
+  cursor: grabbing;
+}
+
+.customizer-editable-shape.is-selected-shape {
+  filter: drop-shadow(0 0 4px var(--accent));
 }
 
 .mustang-text-overlay {
@@ -1452,14 +1467,8 @@ body.modal-open {
   line-height: 1.4;
 }
 
-/* Decal Previewer Mobile-Safe Layout
-   Use these classes on the previewer page if different from shop classes:
-   .preview-builder / .decal-previewer = wrapper
-   .preview-builder__preview / .preview-area = preview side
-   .preview-builder__options / .options-panel = controls side
-*/
-.preview-builder,
-.decal-previewer {
+/* Preview Builder Mobile-Safe Layout */
+.preview-builder {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
   gap: 24px;
@@ -1646,8 +1655,7 @@ body.modal-open {
   .product-detail,
   .footer-grid,
   .form-grid,
-  .preview-builder,
-  .decal-previewer {
+  .preview-builder {
     grid-template-columns: 1fr;
   }
 
@@ -1861,8 +1869,7 @@ body.modal-open {
   }
 
   /* Critical mobile previewer fix */
-  .preview-builder,
-  .decal-previewer {
+  .preview-builder {
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -1919,8 +1926,7 @@ body.modal-open {
 
   .customize-layout,
   .customizer-workspace,
-  .preview-builder,
-  .decal-previewer {
+  .preview-builder {
     display: flex;
     flex-direction: column;
   }

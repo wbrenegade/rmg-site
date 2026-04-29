@@ -27,6 +27,7 @@
       <nav class="site-nav" id="siteNav">
         <a href="index.html">Home</a>
         <a href="shop.html">Shop</a>
+        <a href="customize.html">Customizer</a>
         <a href="/tools">Tools</a>
         <a href="/installers">Find Installer</a>
         <a href="contact.html">Contact</a>
@@ -200,11 +201,11 @@
         if (!customEl) return;
 
         customEl.innerHTML = `
-          <strong>Custom Preview Order</strong><br>
-          Placement: ${escapeHtml(settings.placementPreset || "Custom")}<br>
-          Blend: ${escapeHtml(settings.blendMode || "Normal")}<br>
-          Opacity: ${escapeHtml(settings.opacity || 100)}%<br>
-          Finish: ${escapeHtml(settings.vinylFinish || item.finish || "Standard")}
+          <strong>Custom Mockup Order</strong><br>
+          Mode: ${escapeHtml(settings.mode || settings.placementPreset || "Custom")}<br>
+          Decal: ${escapeHtml(settings.decalName || item.name || "Custom Decal")}<br>
+          Decal Color: ${escapeHtml(settings.decalColor || "Selected")}<br>
+          Text: ${escapeHtml(settings.text || "None")}
         `;
       }
 
@@ -220,7 +221,7 @@
           return;
         }
 
-        const previewItem = items.find(item => item.source === "decal-preview-tool");
+        const previewItem = items.find(item => item.source === "customizer-tool" || item.source === "decal-preview-tool");
         if (previewItem) renderPreviewContext(previewItem);
         else customEl.textContent = "";
 
@@ -268,15 +269,17 @@
 
         const settings = previewItem.settings;
         const previewNotes = [
-          "Preview decal order:",
+          "Custom mockup order:",
           `Name: ${previewItem.name || previewItem.title || "Custom Decal"}`,
           `Size: ${previewItem.size || "Custom"}`,
-          `Placement: ${settings.placementPreset || "Custom"}`,
-          `Width: ${settings.decalWidthInches || ""} in`,
-          `Height: ${settings.decalHeightInches || ""} in`,
-          `Finish: ${settings.vinylFinish || "Standard"}`,
-          `Blend: ${settings.blendMode || "Normal"}`,
-          `Opacity: ${settings.opacity || 100}%`
+          `Mode: ${settings.mode || settings.placementPreset || "Custom"}`,
+          `Decal: ${settings.decalName || "Custom Decal"}`,
+          `Decal color: ${settings.decalColor || ""}`,
+          `Decal size: ${settings.decalSize || ""}`,
+          `Decal position: ${settings.decalPosition || ""}`,
+          `Text: ${settings.text || "None"}`,
+          `Text color: ${settings.textColor || ""}`,
+          `Text font: ${settings.textFont || ""}`
         ].join("\n");
 
         return {
@@ -294,7 +297,7 @@
           return;
         }
 
-        const previewItem = items.find(item => item.source === "decal-preview-tool");
+        const previewItem = items.find(item => item.source === "customizer-tool" || item.source === "decal-preview-tool");
         const customer = appendPreviewNotes(getCustomer(), previewItem);
         const button = form.querySelector("button[type='submit']");
         const originalText = button.textContent;

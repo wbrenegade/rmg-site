@@ -300,7 +300,7 @@ function renderProductCard(product) {
   const customizeLabel = product.customizeCtaLabel || 'Customize';
   const isDecalProduct = String(product.category || '').toLowerCase() === 'decals';
   const isRacingStripe = isRacingStripeProduct(product);
-  const previewUrl = `/tools/decal-preview?productId=${encodeURIComponent(product.id)}`;
+  const previewUrl = customizeUrl;
   const primaryAction = `<a href="${detailsUrl}" class="btn btn-outline">View Details</a>`;
   const secondaryAction = product.custom
     ? `<a href="${customizeUrl}" class="btn">${customizeLabel}</a>`
@@ -309,7 +309,7 @@ function renderProductCard(product) {
     ? `<a href="${customizeUrl}" class="btn btn-outline">Customize</a>`
     : '';
   const previewAction = isDecalProduct
-    ? `<a href="${previewUrl}" class="btn btn-outline">Send to Previewer</a>`
+    ? `<a href="${previewUrl}" class="btn btn-outline">Open Customizer</a>`
     : '';
   const productIdAttr = String(product.id || '').replace(/"/g, '&quot;');
   const detailsUrlAttr = String(detailsUrl).replace(/"/g, '&quot;');
