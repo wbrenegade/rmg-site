@@ -107,8 +107,6 @@ function inferOutlinedStripe(product, outlineColors) {
     return product.stripeOptions.hasOutline;
   }
 
-  if (outlineColors.length) return true;
-
   const searchable = [
     product?.name,
     product?.slug,
@@ -119,7 +117,7 @@ function inferOutlinedStripe(product, outlineColors) {
     .join(" ")
     .toLowerCase();
 
-  return searchable.includes("outline") || searchable.includes("outlined");
+  return outlineColors.length > 0 || searchable.includes("outline") || searchable.includes("outlined");
 }
 
 function inferTopStripe(product) {
@@ -140,6 +138,67 @@ function inferTopStripe(product) {
   return searchable.includes("dual top outlined");
 }
 
+const RACING_STRIPE_PREVIEW_BASE = "/assets/imgs/previews/racing-stripes";
+const racingStripePreviewSvgCache = new Map();
+
+function getRacingStripePreviewSvgPath(product) {
+  if (product?.stripeOptions?.previewSvgPath) {
+    return product.stripeOptions.previewSvgPath;
+  }
+
+  const searchable = [
+    product?.name,
+    product?.slug,
+    product?.id,
+    ...(Array.isArray(product?.tags) ? product.tags : [])
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  if (searchable.includes("staggered")) return `${RACING_STRIPE_PREVIEW_BASE}/staggered-stripes.svg`;
+  if (searchable.includes("dual top outlined")) return `${RACING_STRIPE_PREVIEW_BASE}/dual-top-outlined-stripes.svg`;
+  if (searchable.includes("outlined single") || searchable.includes("single outlined")) return `${RACING_STRIPE_PREVIEW_BASE}/single-outlined-stripe.svg`;
+  if (searchable.includes("dual") || searchable.includes("double")) return `${RACING_STRIPE_PREVIEW_BASE}/dual-stripes.svg`;
+  return `${RACING_STRIPE_PREVIEW_BASE}/single-stripe.svg`;
+}
+
+async function loadRacingStripePreviewSvg(path) {
+  if (!racingStripePreviewSvgCache.has(path)) {
+    racingStripePreviewSvgCache.set(path, fetch(path).then((response) => {
+      if (!response.ok) throw new Error(`Unable to load ${path}`);
+      return response.text();
+    }));
+  }
+
+  return racingStripePreviewSvgCache.get(path);
+}
+
+function colorizeRacingStripeSvg(svgText, stripeColorHex, outlineColorHex) {
+  return String(svgText || "")
+    .replace(/<\?xml[^>]*>\s*/i, "")
+    .replace(/<!--[\s\S]*?-->\s*/g, "")
+    .replace(/\s(width|height)="[^"]*"/g, "")
+    .replace(/<svg\b/, '<svg x="28" y="39" width="484" height="54" class="stripe-preview-svg" preserveAspectRatio="xMidYMid meet"')
+    .replace(/fill:\s*#[0-9a-fA-F]{3,8}/g, `fill:${stripeColorHex}`)
+    .replace(/stroke:\s*#[0-9a-fA-F]{3,8}/g, `stroke:${outlineColorHex}`);
+}
+
+function renderRacingStripePreviewShell(contentMarkup, gradientId) {
+  return `
+    <svg viewBox="0 0 540 132" role="img" aria-label="Live stripe preview">
+      <defs>
+        <linearGradient id="${gradientId}" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#0f1520"/>
+          <stop offset="100%" stop-color="#1f2e39"/>
+        </linearGradient>
+      </defs>
+      <rect x="8" y="8" width="524" height="116" rx="10" fill="url(#${gradientId})" />
+      ${contentMarkup}
+    </svg>
+  `;
+}
+
 function getRacingStripeOptions(product) {
   const subcategory = String(product?.subcategory || "").toLowerCase();
   const widthFallback = subcategory.includes("rocker")
@@ -155,14 +214,17 @@ function getRacingStripeOptions(product) {
   const spacingOptions = Array.isArray(product?.stripeOptions?.spacings)
     ? product.stripeOptions.spacings
     : ["0.25 in", "0.5 in", "0.75 in", "1.0 in", "1.5 in"];
-  const outlineColorOptions = Array.isArray(product?.stripeOptions?.outlineColors)
+  const explicitOutlineColors = Array.isArray(product?.stripeOptions?.outlineColors)
     ? product.stripeOptions.outlineColors
-    : ["Gloss Black", "Matte Black", "Gloss White", "Race Red", "Nardo Gray"];
+    : [];
+  const fallbackOutlineColors = ["Gloss Black", "Matte Black", "Gloss White", "Race Red", "Nardo Gray"];
 
   const widths = widthOptions.map((value) => String(value || "").trim()).filter(Boolean);
   const colors = colorOptions.map((value) => String(value || "").trim()).filter(Boolean);
   const spacings = spacingOptions.map((value) => String(value || "").trim()).filter(Boolean);
-  const outlineColors = outlineColorOptions.map((value) => String(value || "").trim()).filter(Boolean);
+  const explicitOutlineColorValues = explicitOutlineColors.map((value) => String(value || "").trim()).filter(Boolean);
+  const hasOutline = inferOutlinedStripe(product, explicitOutlineColorValues);
+  const outlineColors = explicitOutlineColorValues.length ? explicitOutlineColorValues : fallbackOutlineColors;
 
   return {
     widths,
@@ -170,8 +232,9 @@ function getRacingStripeOptions(product) {
     spacings,
     outlineColors,
     hasMultipleStripes: inferMultipleStripeLayout(product, widths),
-    hasOutline: inferOutlinedStripe(product, outlineColors),
-    hasTopStripe: inferTopStripe(product)
+    hasOutline,
+    hasTopStripe: inferTopStripe(product),
+    previewSvgPath: getRacingStripePreviewSvgPath(product)
   };
 }
 
@@ -235,61 +298,33 @@ function renderStripeQuickLivePreview(container, options) {
   const outlineColorSelect = container.querySelector("#quickStripeOutlineColorSelect");
 
   if (!(previewCanvas && previewMeta && widthSelect && colorSelect)) return;
+  let previewRequestId = 0;
 
   const update = () => {
+    const requestId = ++previewRequestId;
     const selectedWidth = widthSelect.value || options.widths[0] || "4 in";
     const selectedColor = colorSelect.value || options.colors[0] || "Gloss Black";
     const selectedSpacing = spacingSelect?.value || options.spacings[0] || "0.5 in";
     const selectedOutline = outlineColorSelect?.value || options.outlineColors[0] || "Gloss White";
 
-    const stripeWidths = parseStripeWidths(selectedWidth, options.hasMultipleStripes);
-    const spacingInches = parseInchValue(selectedSpacing, 0.5);
-    const maxWidth = Math.max(...stripeWidths, 1);
     const stripeColorHex = stripeColorToHex(selectedColor);
-    const outlineColorHex = stripeColorToHex(selectedOutline);
-    const laneHeight = 112;
-    const gapPx = options.hasMultipleStripes ? Math.max(8, Math.min(30, spacingInches * 18)) : 0;
-    const outlinePadding = options.hasOutline ? 3 : 0;
+    const outlineColorHex = options.hasOutline ? stripeColorToHex(selectedOutline) : stripeColorHex;
 
-    const stripeHeights = stripeWidths.map((value) => {
-      const normalized = value / maxWidth;
-      return Math.max(10, Math.round(normalized * 28));
-    });
-
-    const totalStripeHeight = stripeHeights.reduce((sum, value) => sum + value, 0) + gapPx;
-    let top = Math.max(10, Math.round((laneHeight - totalStripeHeight) / 2));
-
-    const stripeRects = stripeHeights.map((height, index) => {
-      const rect = { y: top, height };
-      top += height;
-      if (index === 0 && options.hasMultipleStripes) top += gapPx;
-      return rect;
-    });
-
-    const topStripeMarkup = options.hasTopStripe && stripeRects[0]
-      ? `<rect x="28" y="${Math.max(10, stripeRects[0].y - 9)}" width="484" height="4" rx="2" fill="${outlineColorHex}" />`
-      : "";
-
-    const stripesMarkup = stripeRects.map((rect) => {
-      const outlineRect = options.hasOutline
-        ? `<rect x="22" y="${rect.y - outlinePadding}" width="496" height="${rect.height + outlinePadding * 2}" rx="3" fill="${outlineColorHex}" />`
-        : "";
-      return `${outlineRect}<rect x="28" y="${rect.y}" width="484" height="${rect.height}" rx="2" fill="${stripeColorHex}" />`;
-    }).join("");
-
-    previewCanvas.innerHTML = `
-      <svg viewBox="0 0 540 132" role="img" aria-label="Live stripe preview">
-        <defs>
-          <linearGradient id="stripeQuickBg" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#0f1520"/>
-            <stop offset="100%" stop-color="#1f2e39"/>
-          </linearGradient>
-        </defs>
-        <rect x="8" y="8" width="524" height="116" rx="10" fill="url(#stripeQuickBg)" />
-        ${topStripeMarkup}
-        ${stripesMarkup}
-      </svg>
-    `;
+    loadRacingStripePreviewSvg(options.previewSvgPath)
+      .then((svgText) => {
+        if (requestId !== previewRequestId) return;
+        previewCanvas.innerHTML = renderRacingStripePreviewShell(
+          colorizeRacingStripeSvg(svgText, stripeColorHex, outlineColorHex),
+          "stripeQuickBg"
+        );
+      })
+      .catch(() => {
+        if (requestId !== previewRequestId) return;
+        previewCanvas.innerHTML = renderRacingStripePreviewShell(
+          `<rect x="28" y="58" width="484" height="16" rx="2" fill="${stripeColorHex}" stroke="${outlineColorHex}" stroke-width="3" />`,
+          "stripeQuickBg"
+        );
+      });
 
     const meta = [`Width: ${selectedWidth}`, `Color: ${selectedColor}`];
     if (options.hasMultipleStripes) meta.push(`Spacing: ${selectedSpacing}`);

@@ -746,6 +746,7 @@ textarea { resize: vertical; }
 .product-card {
   display: flex;
   flex-direction: column;
+  cursor: pointer;
 }
 
 .product-card .product-media {
@@ -828,6 +829,29 @@ textarea { resize: vertical; }
   gap: 22px;
 }
 
+.customizer-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(340px, 0.9fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.customizer-preview-card {
+  display: grid;
+  gap: 14px;
+}
+
+.customizer-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 16px;
+}
+
+.customizer-heading h3 {
+  margin: 0;
+}
+
 .product-gallery,
 .customize-viewer,
 .mustang-viewer {
@@ -856,6 +880,11 @@ textarea { resize: vertical; }
 .customize-viewer,
 .mustang-viewer { position: relative; }
 
+.customizer-stage {
+  display: grid;
+  place-items: center;
+}
+
 .customize-decal,
 .mustang-text-overlay {
   position: absolute;
@@ -872,6 +901,45 @@ textarea { resize: vertical; }
   font-weight: 900;
   letter-spacing: 0.08em;
   text-shadow: 0 2px 8px rgba(0,0,0,0.45);
+}
+
+.customize-decal.is-racing-stripe {
+  width: min(82%, 460px);
+  line-height: 0;
+  text-shadow: none;
+}
+
+.customize-stripe-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.customizer-decal-layer,
+.customizer-text-layer {
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.customizer-decal-layer {
+  width: 72%;
+  line-height: 0;
+  text-shadow: none;
+}
+
+.customizer-text-layer {
+  width: 80%;
+  text-align: center;
+  line-height: 1;
+}
+
+.customizer-overlay-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
 }
 
 .mustang-text-overlay {
@@ -1574,6 +1642,7 @@ body.modal-open {
   .shop-page-layout,
   .shop-grid-layout,
   .customize-layout,
+  .customizer-workspace,
   .product-detail,
   .footer-grid,
   .form-grid,
@@ -1849,6 +1918,7 @@ body.modal-open {
 @media (max-width: 768px) {
 
   .customize-layout,
+  .customizer-workspace,
   .preview-builder,
   .decal-previewer {
     display: flex;

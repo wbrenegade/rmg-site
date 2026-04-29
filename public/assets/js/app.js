@@ -279,26 +279,6 @@ function calculateCartTotals() {
 
 function buildCustomizeUrl(product) {
   if (!product) return 'customize.html';
-
-  if (isRacingStripeProduct(product)) {
-    const params = new URLSearchParams({ productId: product.id });
-    return `customize.html?${params.toString()}`;
-  }
-
-  if (product.customizeUrl) return product.customizeUrl;
-
-  const id = String(product.id || '').trim();
-  const subcategory = String(product.subcategory || '').toLowerCase();
-  const name = String(product.name || '').toLowerCase();
-  const isBannerProduct = id === 'rmg-windshield-banner'
-    || id === 'rmg-custom-banner'
-    || (subcategory.includes('windshield/rear window') && name.includes('banner'));
-
-  if (isBannerProduct) {
-    const params = new URLSearchParams({ productId: id || 'rmg-windshield-banner' });
-    return `/windshield-banner-creator?${params.toString()}`;
-  }
-
   const params = new URLSearchParams({ productId: product.id });
   return `customize.html?${params.toString()}`;
 }
@@ -326,14 +306,15 @@ function renderProductCard(product) {
     ? `<a href="${customizeUrl}" class="btn">${customizeLabel}</a>`
     : `<button class="btn" onclick="addToCart('${product.id}')">Add to Cart</button>`;
   const customizeAction = (!product.custom && isRacingStripe)
-    ? `<a href="${detailsUrl}" class="btn btn-outline racing-stripe-customize-link" data-product-id="${encodeURIComponent(product.id)}">Customize</a>`
+    ? `<a href="${customizeUrl}" class="btn btn-outline">Customize</a>`
     : '';
   const previewAction = isDecalProduct
     ? `<a href="${previewUrl}" class="btn btn-outline">Send to Previewer</a>`
     : '';
   const productIdAttr = String(product.id || '').replace(/"/g, '&quot;');
+  const detailsUrlAttr = String(detailsUrl).replace(/"/g, '&quot;');
   return `
-    <article class="card product-card" data-product-id="${productIdAttr}" data-racing-stripe="${isRacingStripe ? 'true' : 'false'}" data-custom="${product.custom ? 'true' : 'false'}">
+    <article class="card product-card" data-product-id="${productIdAttr}" data-details-url="${detailsUrlAttr}" data-racing-stripe="${isRacingStripe ? 'true' : 'false'}" data-custom="${product.custom ? 'true' : 'false'}">
       <div class="product-media">
         <img src="${imagePath}" alt="${imageAlt}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
         <span class="media-fallback">${imageAlt}</span>
@@ -355,6 +336,16 @@ function renderProductCard(product) {
     </article>
   `;
 }
+
+document.addEventListener('click', (event) => {
+  if (event.target.closest('a, button, input, select, textarea, label')) return;
+
+  const card = event.target.closest('.product-card[data-details-url]');
+  if (!card) return;
+
+  const detailsUrl = card.dataset.detailsUrl;
+  if (detailsUrl) window.location.href = detailsUrl;
+});
 
 function renderFeaturedProducts(targetId, limit = 3) {
   const target = document.getElementById(targetId);

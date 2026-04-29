@@ -43,62 +43,95 @@
     <section class="page-hero compact">
       <div class="container">
         <p class="eyebrow">Live Viewer</p>
-        <h1>Customize Your Graphic</h1>
-        <p>Preview your text, color, size, and placement in real time before checkout.</p>
+        <h1>Vehicle Decal Customizer</h1>
+        <p>Build a quick vehicle mockup with product decals, custom text, and your own vehicle photo.</p>
       </div>
     </section>
 
     <section class="section">
-      <div class="container customize-layout">
-        <article class="card">
-          <h3 id="customizeProductName">Loading product...</h3>
-          <p class="form-note" id="customizeProductMeta"></p>
-          <div class="customize-viewer" id="customizeViewer">
-            <img id="customizeBaseImage" src="/assets/imgs/main.PNG" alt="Product preview" />
-            <div id="customizeDecal" class="customize-decal">YOUR TEXT</div>
+      <div class="container customizer-workspace">
+        <article class="card customizer-preview-card">
+          <div class="customizer-heading">
+            <div>
+              <p class="eyebrow" id="customizeModeEyebrow">Customizer</p>
+              <h3 id="customizeProductName">Loading customizer...</h3>
+            </div>
+            <p class="form-note" id="customizeProductMeta"></p>
           </div>
-          <p class="form-note">Drag sliders to position and style the design. This is a live preview to guide your final production request.</p>
+
+          <div class="customize-viewer customizer-stage" id="customizeViewer">
+            <img id="customizeBaseImage" src="/assets/imgs/previews/customizer/side.png" alt="Vehicle preview" />
+            <div id="customizeDecal" class="customize-decal customizer-decal-layer"></div>
+            <div id="customizeTextLayer" class="customize-decal customizer-text-layer">YOUR TEXT</div>
+          </div>
+          <p class="form-note">For windshield or rear-window banners, get more advanced controls with the banner mockup tool.</p>
+          <a class="btn btn-outline" href="/windshield-banner-creator">Open Banner Mockup Tool</a>
         </article>
 
         <form class="card form-grid" id="customizeForm">
-          <div class="form-section full-width"><h3>Design Controls</h3></div>
+          <div class="form-section full-width"><h3>Vehicle</h3></div>
+          <label>Default View
+            <select id="vehicleViewSelect">
+              <option value="/assets/imgs/previews/customizer/side.png">Side</option>
+              <option value="/assets/imgs/previews/customizer/front.png">Front</option>
+              <option value="/assets/imgs/previews/customizer/rear.png">Rear</option>
+            </select>
+          </label>
+          <label>Upload Vehicle Image
+            <input type="file" id="vehicleImageUpload" accept="image/*" />
+          </label>
+
+          <div class="form-section full-width"><h3>Decal</h3></div>
+          <label>Mode
+            <select id="customizerModeSelect"></select>
+          </label>
+          <label>Decal
+            <select id="decalSelect"></select>
+          </label>
+          <button type="button" class="btn btn-outline full-width" id="showAllModesBtn">Show Full Customizer</button>
+          <label>Decal Color
+            <input type="color" id="decalColor" value="#111111" />
+          </label>
+          <label>Decal Size
+            <input type="range" id="decalSize" min="20" max="140" value="72" />
+          </label>
+          <label>Decal Rotation
+            <input type="range" id="decalRotate" min="-45" max="45" value="0" />
+          </label>
+          <label>Decal Horizontal
+            <input type="range" id="decalX" min="-45" max="45" value="0" />
+          </label>
+          <label>Decal Vertical
+            <input type="range" id="decalY" min="-45" max="45" value="0" />
+          </label>
+
+          <div class="form-section full-width"><h3>Text</h3></div>
           <label class="full-width">Custom Text
-            <input type="text" id="designText" value="YOUR TEXT" maxlength="40" />
+            <input type="text" id="designText" value="" maxlength="40" placeholder="Add text" />
           </label>
-          <label>Color
-            <input type="color" id="designColor" value="#7dff5a" />
-          </label>
-          <label>Opacity
-            <input type="range" id="designOpacity" min="20" max="100" value="90" />
-          </label>
-          <label>Font Size
-            <input type="range" id="designSize" min="18" max="120" value="54" />
-          </label>
-          <label>Rotation
-            <input type="range" id="designRotate" min="-35" max="35" value="0" />
-          </label>
-          <label>Horizontal Position
-            <input type="range" id="designX" min="-45" max="45" value="0" />
-          </label>
-          <label>Vertical Position
-            <input type="range" id="designY" min="-45" max="45" value="0" />
-          </label>
-          <label>Finish
-            <select id="designFinish">
-              <option value="Gloss">Gloss</option>
-              <option value="Matte">Matte</option>
-              <option value="Satin">Satin</option>
-              <option value="Reflective">Reflective</option>
+          <label>Text Font
+            <select id="textFont">
+              <option value="Arial Black, Impact, sans-serif">Block</option>
+              <option value="Impact, Haettenschweiler, sans-serif">Impact</option>
+              <option value="Georgia, serif">Serif</option>
+              <option value="Verdana, Geneva, sans-serif">Clean</option>
+              <option value="'Trebuchet MS', sans-serif">Sport</option>
             </select>
           </label>
-          <label>Install Side
-            <select id="designPlacement">
-              <option value="Driver side">Driver side</option>
-              <option value="Passenger side">Passenger side</option>
-              <option value="Both sides">Both sides</option>
-              <option value="Rear glass">Rear glass</option>
-              <option value="Windshield">Windshield</option>
-            </select>
+          <label>Text Color
+            <input type="color" id="textColor" value="#7dff5a" />
+          </label>
+          <label>Text Size
+            <input type="range" id="textSize" min="14" max="120" value="42" />
+          </label>
+          <label>Text Rotation
+            <input type="range" id="textRotate" min="-45" max="45" value="0" />
+          </label>
+          <label>Text Horizontal
+            <input type="range" id="textX" min="-45" max="45" value="0" />
+          </label>
+          <label>Text Vertical
+            <input type="range" id="textY" min="-45" max="45" value="24" />
           </label>
 
           <div class="full-width customize-actions">
@@ -121,4 +154,3 @@
   <script src="assets/js/customize.js"></script>
 </body>
 </html>
-
