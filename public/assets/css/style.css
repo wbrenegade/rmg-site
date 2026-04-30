@@ -955,11 +955,6 @@ textarea { resize: vertical; }
   z-index: 2;
 }
 
-.customizer-decal-layer:not(:empty) {
-  outline: 1px dashed rgba(125,255,90,0.8);
-  outline-offset: 6px;
-}
-
 .customizer-text-layer {
   width: 80%;
   text-align: center;
@@ -973,6 +968,12 @@ textarea { resize: vertical; }
   width: 100%;
   height: auto;
   overflow: visible;
+}
+
+.customizer-decal-layer:not(:empty) .customizer-overlay-svg,
+.customizer-decal-layer:not(:empty) .customizer-decal-image {
+  outline: 1px dashed rgba(125,255,90,0.8);
+  outline-offset: 2px;
 }
 
 .customizer-decal-image {
