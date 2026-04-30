@@ -773,7 +773,7 @@ async function initCustomizePage() {
     shapeLayer.innerHTML = editorShapes.map((shape) => `
       <div class="customizer-shape-object${shape.id === selectedEditorShapeId ? ' is-active' : ''}"
         data-shape-id="${shape.id}"
-        style="width:${shape.size}px;height:${shape.size}px;transform:translate(-50%, -50%) translate(${shape.x}%, ${shape.y}%) rotate(${shape.rotate}deg);">
+        style="width:${shape.size}px;height:${shape.size}px;transform:translate(-50%, -50%) translate(${shape.x}px, ${shape.y}px) rotate(${shape.rotate}deg);">
         <svg viewBox="0 0 100 100" aria-hidden="true">${shapeMarkup(shape)}</svg>
         <button type="button" class="customizer-shape-resize" aria-label="Resize shape"></button>
       </div>
@@ -841,13 +841,33 @@ async function initCustomizePage() {
     syncEditorShapeControls();
   }
 
-  function setEditorShapeFromPointer({ size, x, y }) {
+  function clampEditorShapePosition(shape, x = shape.x, y = shape.y, stageRect = null) {
+    const rect = stageRect || document.getElementById('customizeViewer')?.getBoundingClientRect();
+    const stageWidth = Math.max(1, rect?.width || 1);
+    const stageHeight = Math.max(1, rect?.height || 1);
+    const halfShape = Math.max(12, (Number(shape.size) || 96) / 2);
+    const xLimit = Math.max(0, stageWidth / 2 - halfShape);
+    const yLimit = Math.max(0, stageHeight / 2 - halfShape);
+
+    return {
+      x: Math.max(-xLimit, Math.min(xLimit, Math.round(x))),
+      y: Math.max(-yLimit, Math.min(yLimit, Math.round(y)))
+    };
+  }
+
+  function setEditorShapeFromPointer({ size, x, y, stageRect }) {
     const selectedShape = getSelectedEditorShape();
     if (!selectedShape) return;
 
     if (typeof size === 'number') selectedShape.size = Math.max(24, Math.min(260, Math.round(size)));
-    if (typeof x === 'number') selectedShape.x = Math.max(-55, Math.min(55, Math.round(x)));
-    if (typeof y === 'number') selectedShape.y = Math.max(-55, Math.min(55, Math.round(y)));
+    const nextPosition = clampEditorShapePosition(
+      selectedShape,
+      typeof x === 'number' ? x : selectedShape.x,
+      typeof y === 'number' ? y : selectedShape.y,
+      stageRect
+    );
+    selectedShape.x = nextPosition.x;
+    selectedShape.y = nextPosition.y;
 
     renderEditorShapes();
     syncEditorShapeControls();
@@ -1444,6 +1464,7 @@ async function initCustomizePage() {
       startSize: selectedShape.size,
       objectWidth: Math.max(1, objectRect.width),
       objectHeight: Math.max(1, objectRect.height),
+      stageRect,
       stageWidth: Math.max(1, stageRect?.width || 1)
     };
     shapeLayer.setPointerCapture?.(event.pointerId);
@@ -1458,14 +1479,16 @@ async function initCustomizePage() {
     if (shapeObjectDragState.mode === 'resize') {
       const dominantDelta = Math.abs(dx) > Math.abs(dy) ? dx : dy;
       setEditorShapeFromPointer({
-        size: shapeObjectDragState.startSize + (dominantDelta / shapeObjectDragState.stageWidth) * 220
+        size: shapeObjectDragState.startSize + (dominantDelta / shapeObjectDragState.stageWidth) * 220,
+        stageRect: shapeObjectDragState.stageRect
       });
       return;
     }
 
     setEditorShapeFromPointer({
-      x: shapeObjectDragState.startX + (dx / shapeObjectDragState.objectWidth) * 100,
-      y: shapeObjectDragState.startY + (dy / shapeObjectDragState.objectHeight) * 100
+      x: shapeObjectDragState.startX + dx,
+      y: shapeObjectDragState.startY + dy,
+      stageRect: shapeObjectDragState.stageRect
     });
   });
 

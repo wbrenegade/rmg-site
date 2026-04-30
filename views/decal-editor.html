@@ -557,21 +557,31 @@
       function snapPt(p) { if (!state.snap) return {x:p.x,y:p.y}; const g=10; return {x:Math.round(p.x/g)*g, y:Math.round(p.y/g)*g}; }
       function screenPos(ev) { const r=canvasWrap.getBoundingClientRect(); return {x:ev.clientX-r.left, y:ev.clientY-r.top}; }
 
+      function setDrag(ev, drag) {
+        state.drag = { ...drag, pointerId: ev.pointerId };
+        try { stageOuter.setPointerCapture(ev.pointerId); } catch {}
+      }
+      function releaseDragPointer() {
+        if (state.drag?.pointerId === undefined) return;
+        try { stageOuter.releasePointerCapture(state.drag.pointerId); } catch {}
+      }
+      function snapDelta(v) { return state.snap ? Math.round(v / 10) * 10 : v; }
+
       function pointerDown(ev) {
-        if (ev.button === 1 || state.space || state.tool === 'pan') { state.drag={type:'pan',sx:ev.clientX,sy:ev.clientY,px:state.pan.x,py:state.pan.y}; return; }
-        const p = svgPoint(ev), target = selectable(ev.target);
+        if (ev.button === 1 || state.space || state.tool === 'pan') { setDrag(ev, {type:'pan',sx:ev.clientX,sy:ev.clientY,px:state.pan.x,py:state.pan.y}); return; }
+        const p = svgPoint(ev), rp = rawPoint(ev), target = selectable(ev.target);
         if (state.tool === 'select') {
           const handle = ev.target.getAttribute('data-handle');
-          if (handle && state.selected.length) { startTransformDrag(ev, null, p); return; }
-          if (target) { if (ev.shiftKey) toggleSelect(target); else if (!state.selected.includes(target.id)) selectOnly(target); startTransformDrag(ev, target, p); }
-          else { clearSelection(); const sp=screenPos(ev); state.drag={type:'marquee',sx:sp.x,sy:sp.y,el:createMarquee(sp.x,sp.y)}; }
+          if (handle && state.selected.length) { startTransformDrag(ev, null, rp); return; }
+          if (target) { if (ev.shiftKey) toggleSelect(target); else if (!state.selected.includes(target.id)) selectOnly(target); startTransformDrag(ev, target, rp); }
+          else { clearSelection(); const sp=screenPos(ev); setDrag(ev, {type:'marquee',sx:sp.x,sy:sp.y,el:createMarquee(sp.x,sp.y)}); }
           return;
         }
         if (state.tool === 'node') { nodePointerDown(ev, target, p); return; }
         if (state.tool === 'eyedropper' && target) { pickStyle(target); return; }
         if (state.tool === 'zoom') { setZoom(state.zoom * (ev.altKey ? .8 : 1.25), p); return; }
         saveHistory();
-        if (['rect','ellipse','line','arrow','freehand'].includes(state.tool)) startShape(p);
+        if (['rect','ellipse','line','arrow','freehand'].includes(state.tool)) startShape(p, ev);
         else if (state.tool === 'poly') { addObj(makePolygon(p.x,p.y,60,6)); setTool('select'); }
         else if (state.tool === 'star') { addObj(makeStar(p.x,p.y,70,32,5)); setTool('select'); }
         else if (state.tool === 'text') { const el=make('text',{...baseAttrs(), x:p.x, y:p.y, 'font-size':$('fontSizeInput').value, 'font-family':$('fontInput').value}); el.textContent=$('textInput').value || 'Text'; addObj(el); setTool('select'); }
@@ -581,12 +591,13 @@
       function pointerMove(ev) {
         const rp=rawPoint(ev); $('coords').textContent=`x:${rp.x.toFixed(1)} y:${rp.y.toFixed(1)}`;
         if (!state.drag) return;
+        if (state.drag.pointerId !== undefined && ev.pointerId !== state.drag.pointerId) return;
         const p=svgPoint(ev);
         if (state.drag.type==='pan') { state.pan.x=state.drag.px+(ev.clientX-state.drag.sx); state.pan.y=state.drag.py+(ev.clientY-state.drag.sy); updateStage(); return; }
         if (state.drag.type==='draw') updateShape(p);
-        if (state.drag.type==='move') moveSelected(p);
-        if (state.drag.type==='resize') resizeSelected(p, ev.shiftKey);
-        if (state.drag.type==='rotate') rotateSelected(rawPoint(ev));
+        if (state.drag.type==='move') moveSelected(rp);
+        if (state.drag.type==='resize') resizeSelected(rp, ev.shiftKey);
+        if (state.drag.type==='rotate') rotateSelected(rp);
         if (state.drag.type==='marquee') updateMarquee(ev);
         if (state.drag.type==='node') dragNode(p);
       }
@@ -595,10 +606,11 @@
         if (state.drag.type==='draw') finishShape();
         if (['move','resize','rotate','node'].includes(state.drag.type)) { bakeTransforms(); saveHistory(); }
         if (state.drag.type==='marquee') finishMarquee();
+        releaseDragPointer();
         state.drag=null; renderAll();
       }
 
-      function startShape(p) {
+      function startShape(p, ev) {
         let el;
         const attrs=baseAttrs();
         if (state.tool==='rect') el=make('rect',{...attrs,x:p.x,y:p.y,width:0,height:0,rx:0});
@@ -608,7 +620,7 @@
         el.setAttribute('id', uid(el.tagName.toLowerCase()));
         el.setAttribute('data-vf-object','true');
         activeLayer().appendChild(el);
-        state.drawing=el; state.drag={type:'draw',start:p,last:p};
+        state.drawing=el; setDrag(ev, {type:'draw',start:p,last:p});
       }
       function updateShape(p) {
         const el=state.drawing, s=state.drag.start;
@@ -676,21 +688,34 @@
 
       function startTransformDrag(ev,target,p) {
         const handle=ev.target.getAttribute('data-handle'); const b=multiBBox(selectedEls());
+        if (!b) return;
         if(handle==='rot') {
           const cx=b.x+b.width/2, cy=b.y+b.height/2;
           const startAngle=Math.atan2(p.y-cy,p.x-cx)*180/Math.PI+90;
-          state.drag={type:'rotate',bbox:b,start:p,startAngle,base:selectedEls().map(e=>{ const eb=safeBBox(e)||b; return [e, getLocalMatrix(e), eb.x+eb.width/2, eb.y+eb.height/2]; })};
+          setDrag(ev, {type:'rotate',bbox:b,start:p,startAngle,base:selectedEls().map(e=>{ const eb=safeBBox(e)||b; return [e, getLocalMatrix(e), eb.x+eb.width/2, eb.y+eb.height/2]; })});
         }
-        else if(handle) state.drag={type:'resize',handle,bbox:b,start:p,base:selectedEls().map(e=>[e, safeBBox(e), e.getAttribute('transform')||''])};
-        else state.drag={type:'move',start:p,base:selectedEls().map(e=>[e, e.getAttribute('transform')||''])};
+        else if(handle) setDrag(ev, {type:'resize',handle,bbox:b,start:p,base:selectedEls().map(e=>[e, safeBBox(e), getLocalMatrix(e)])});
+        else setDrag(ev, {type:'move',start:p,base:selectedEls().map(e=>[e, getLocalMatrix(e)])});
       }
-      function moveSelected(p) { const dx=p.x-state.drag.start.x, dy=p.y-state.drag.start.y; state.drag.base.forEach(([e,t])=>e.setAttribute('transform',`${t} translate(${dx} ${dy})`)); renderSelection(); }
+      function moveSelected(p) {
+        const dx=snapDelta(p.x-state.drag.start.x), dy=snapDelta(p.y-state.drag.start.y);
+        state.drag.base.forEach(([e,m])=>{
+          const next=new DOMMatrix().translate(dx, dy).multiply(m);
+          e.setAttribute('transform', matrixToAttr(next));
+        });
+        renderSelection();
+      }
       function resizeSelected(p, lock) {
-        const {bbox:b,start,handle,base}=state.drag; let sx=1, sy=1, dx=0, dy=0;
-        if(handle.includes('e')) sx=(p.x-b.x)/b.width; if(handle.includes('s')) sy=(p.y-b.y)/b.height; if(handle.includes('w')) { sx=(b.x+b.width-p.x)/b.width; dx=b.width*(1-sx); } if(handle.includes('n')) { sy=(b.y+b.height-p.y)/b.height; dy=b.height*(1-sy); }
+        const {bbox:b,handle,base}=state.drag; let sx=1, sy=1;
+        const bw=Math.max(b.width, .001), bh=Math.max(b.height, .001);
+        if(handle.includes('e')) sx=(p.x-b.x)/bw; if(handle.includes('s')) sy=(p.y-b.y)/bh; if(handle.includes('w')) sx=(b.x+b.width-p.x)/bw; if(handle.includes('n')) sy=(b.y+b.height-p.y)/bh;
         if(lock) { const s=Math.max(Math.abs(sx),Math.abs(sy)); sx=Math.sign(sx||1)*s; sy=Math.sign(sy||1)*s; }
         const ox=handle.includes('w')?b.x+b.width:b.x, oy=handle.includes('n')?b.y+b.height:b.y;
-        base.forEach(([e,,t])=>e.setAttribute('transform',`${t} translate(${ox} ${oy}) scale(${sx} ${sy}) translate(${-ox} ${-oy})`)); renderSelection();
+        base.forEach(([e,,m])=>{
+          const next=new DOMMatrix().translate(ox, oy).scale(sx, sy).translate(-ox, -oy).multiply(m);
+          e.setAttribute('transform', matrixToAttr(next));
+        });
+        renderSelection();
       }
       function rotateSelected(p) {
         const b=state.drag.bbox, cx=b.x+b.width/2, cy=b.y+b.height/2;
