@@ -988,6 +988,21 @@ textarea { resize: vertical; }
   pointer-events: none;
 }
 
+.customizer-rotate-handle {
+  position: absolute;
+  left: calc(var(--selection-center-x, 50%) - 13px);
+  top: calc(var(--selection-top, 0%) - 42px);
+  width: 26px;
+  height: 26px;
+  border: 2px solid #0b0d12;
+  border-radius: 50%;
+  background: var(--accent-2);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.45);
+  cursor: grab;
+  pointer-events: auto;
+  z-index: 5;
+}
+
 .customizer-resize-handle {
   position: absolute;
   left: calc(var(--selection-left, 0%) + var(--selection-width, 100%) - 13px);

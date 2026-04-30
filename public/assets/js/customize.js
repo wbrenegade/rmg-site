@@ -301,6 +301,7 @@ async function renderDecalLayer({ decalLayer, option, fillColor }) {
     decalLayer.innerHTML = `
       <img class="customizer-decal-image" src="${escapeHtml(option.path)}" alt="${escapeHtml(option.label)}" draggable="false" />
       <div class="customizer-decal-selection" aria-hidden="true"></div>
+      <button type="button" class="customizer-rotate-handle" aria-label="Rotate decal"></button>
       <button type="button" class="customizer-resize-handle" aria-label="Resize decal"></button>
     `;
     return;
@@ -311,6 +312,7 @@ async function renderDecalLayer({ decalLayer, option, fillColor }) {
       const svgText = await loadSvg(option.path || option.svgPath);
       decalLayer.innerHTML = `${colorizeInlineSvg(svgText, fillColor, strokeColor)}
         <div class="customizer-decal-selection" aria-hidden="true"></div>
+        <button type="button" class="customizer-rotate-handle" aria-label="Rotate decal"></button>
         <button type="button" class="customizer-resize-handle" aria-label="Resize decal"></button>`;
       return;
     } catch {
@@ -630,9 +632,13 @@ async function initCustomizePage() {
     updateHistoryButtons();
   }
 
-  function setDecalTransformInputs({ size, x, y }) {
+  function setDecalTransformInputs({ size, x, y, rotate }) {
     if (typeof size === 'number' && decalSizeInput) {
       decalSizeInput.value = String(Math.max(20, Math.min(140, Math.round(size))));
+    }
+    if (typeof rotate === 'number' && decalRotateInput) {
+      let normalized = ((rotate + 180) % 360 + 360) % 360 - 180;
+      decalRotateInput.value = String(Math.round(normalized));
     }
     if (typeof x === 'number' && decalXInput) {
       decalXInput.value = String(Math.max(-45, Math.min(45, Math.round(x))));
@@ -756,29 +762,97 @@ async function initCustomizePage() {
     decalLayer.style.setProperty('--selection-top', `${top}%`);
     decalLayer.style.setProperty('--selection-width', `${width}%`);
     decalLayer.style.setProperty('--selection-height', `${height}%`);
+    decalLayer.style.setProperty('--selection-center-x', `${left + width / 2}%`);
+  }
+
+  function normalizeDecalSvgBounds() {
+    const svg = decalLayer.querySelector('svg');
+    if (!svg) return;
+
+    try {
+      const bbox = svg.getBBox();
+      if (!(bbox.width && bbox.height)) return;
+
+      const strokePadding = Math.max(1, Math.max(bbox.width, bbox.height) * 0.015);
+      svg.setAttribute('viewBox', [
+        bbox.x - strokePadding,
+        bbox.y - strokePadding,
+        bbox.width + strokePadding * 2,
+        bbox.height + strokePadding * 2
+      ].join(' '));
+    } catch {
+      // Keep the source viewBox if the browser cannot measure it yet.
+    }
   }
 
   function updateDecalSelectionBounds() {
     const svg = decalLayer.querySelector('svg');
+    const image = decalLayer.querySelector('.customizer-decal-image');
+    if (image) {
+      const measureImage = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          const width = image.naturalWidth;
+          const height = image.naturalHeight;
+          if (!(width && height)) {
+            setDecalSelectionBounds(0, 0, 100, 100);
+            return;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(image, 0, 0);
+          const pixels = ctx.getImageData(0, 0, width, height).data;
+          let minX = width;
+          let minY = height;
+          let maxX = 0;
+          let maxY = 0;
+
+          for (let y = 0; y < height; y += 1) {
+            for (let x = 0; x < width; x += 1) {
+              if (pixels[(y * width + x) * 4 + 3] > 8) {
+                minX = Math.min(minX, x);
+                minY = Math.min(minY, y);
+                maxX = Math.max(maxX, x);
+                maxY = Math.max(maxY, y);
+              }
+            }
+          }
+
+          if (minX > maxX || minY > maxY) {
+            setDecalSelectionBounds(0, 0, 100, 100);
+            return;
+          }
+
+          setDecalSelectionBounds(
+            (minX / width) * 100,
+            (minY / height) * 100,
+            ((maxX - minX + 1) / width) * 100,
+            ((maxY - minY + 1) / height) * 100
+          );
+        } catch {
+          setDecalSelectionBounds(0, 0, 100, 100);
+        }
+      };
+
+      if (image.complete) {
+        measureImage();
+      } else {
+        image.addEventListener('load', measureImage, { once: true });
+        setDecalSelectionBounds(0, 0, 100, 100);
+      }
+      return;
+    }
+
     if (!svg) {
       setDecalSelectionBounds(0, 0, 100, 100);
       return;
     }
 
     try {
-      const bbox = svg.getBBox();
-      const viewBox = svg.viewBox?.baseVal;
-      if (!(viewBox?.width && viewBox?.height && bbox.width && bbox.height)) {
-        setDecalSelectionBounds(0, 0, 100, 100);
-        return;
-      }
-
-      setDecalSelectionBounds(
-        ((bbox.x - viewBox.x) / viewBox.width) * 100,
-        ((bbox.y - viewBox.y) / viewBox.height) * 100,
-        (bbox.width / viewBox.width) * 100,
-        (bbox.height / viewBox.height) * 100
-      );
+      normalizeDecalSvgBounds();
+      setDecalSelectionBounds(0, 0, 100, 100);
     } catch {
       setDecalSelectionBounds(0, 0, 100, 100);
     }
@@ -1210,14 +1284,21 @@ async function initCustomizePage() {
 
     event.preventDefault();
     const isResize = Boolean(event.target.closest?.('.customizer-resize-handle'));
+    const isRotate = Boolean(event.target.closest?.('.customizer-rotate-handle'));
     const stageRect = document.getElementById('customizeViewer')?.getBoundingClientRect();
     const layerRect = decalLayer.getBoundingClientRect();
+    const centerX = layerRect.left + layerRect.width / 2;
+    const centerY = layerRect.top + layerRect.height / 2;
     decalObjectDragState = {
       pointerId: event.pointerId,
-      mode: isResize ? 'resize' : 'move',
+      mode: isRotate ? 'rotate' : isResize ? 'resize' : 'move',
       startClientX: event.clientX,
       startClientY: event.clientY,
       startSize: Number(decalSizeInput?.value || 72),
+      startRotate: Number(decalRotateInput?.value || 0),
+      startAngle: Math.atan2(event.clientY - centerY, event.clientX - centerX) * 180 / Math.PI,
+      centerX,
+      centerY,
       startX: Number(decalXInput?.value || 0),
       startY: Number(decalYInput?.value || 0),
       layerWidth: Math.max(1, layerRect.width),
@@ -1237,6 +1318,14 @@ async function initCustomizePage() {
       const dominantDelta = Math.abs(dx) > Math.abs(dy) ? dx : dy;
       setDecalTransformInputs({
         size: decalObjectDragState.startSize + (dominantDelta / decalObjectDragState.stageWidth) * 100
+      });
+      return;
+    }
+
+    if (decalObjectDragState.mode === 'rotate') {
+      const angle = Math.atan2(event.clientY - decalObjectDragState.centerY, event.clientX - decalObjectDragState.centerX) * 180 / Math.PI;
+      setDecalTransformInputs({
+        rotate: decalObjectDragState.startRotate + angle - decalObjectDragState.startAngle
       });
       return;
     }
