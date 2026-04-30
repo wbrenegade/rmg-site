@@ -50,20 +50,23 @@
     </section>
 
     <section class="section">
-      <div class="container customizer-workspace">
+      <div class="container customizer-workspace" id="customizerWorkspace">
         <article class="card customizer-preview-card">
           <div class="customizer-heading">
             <div>
               <p class="eyebrow" id="customizeModeEyebrow">Customizer</p>
               <h3 id="customizeProductName">Loading customizer...</h3>
             </div>
-            <p class="form-note" id="customizeProductMeta"></p>
+            <div class="customizer-preview-actions">
+              <p class="form-note" id="customizeProductMeta"></p>
+              <button type="button" class="btn btn-outline btn-sm" id="toggleCustomizerFullscreen">Fullscreen</button>
+            </div>
           </div>
 
           <div class="customize-viewer customizer-stage" id="customizeViewer">
             <img id="customizeBaseImage" src="/assets/imgs/previews/customizer/right-side.png" alt="Vehicle preview" />
             <div id="customizeDecal" class="customize-decal customizer-decal-layer"></div>
-            <div id="customizeTextLayer" class="customize-decal customizer-text-layer">YOUR TEXT</div>
+            <div id="customizeTextLayer" class="customize-decal customizer-text-layer" hidden></div>
           </div>
           <p class="form-note">For windshield or rear-window banners, get more advanced controls with the banner mockup tool.</p>
           <a class="btn btn-outline" href="/windshield-banner-creator">Open Banner Mockup Tool</a>

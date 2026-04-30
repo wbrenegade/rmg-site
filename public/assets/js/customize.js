@@ -185,27 +185,6 @@ function colorizeInlineSvg(svgText, fillColor, strokeColor, className = 'customi
     .replace(/stroke="[#a-zA-Z0-9(),.\s-]+"/g, `stroke="${strokeColor}"`);
 }
 
-function escapeSvgText(value) {
-  return String(value || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-function createGenericDecalSvg(product, fillColor) {
-  const label = escapeSvgText(product?.subSubcategory || product?.subcategory || product?.name || 'Custom Decal');
-  const shortLabel = label.length > 24 ? `${label.slice(0, 21)}...` : label;
-
-  return `
-    <svg class="customizer-overlay-svg" viewBox="0 0 640 180" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${shortLabel}">
-      <path d="M42 90 C118 26 218 26 318 90 S520 154 598 90" fill="none" stroke="${fillColor}" stroke-width="28" stroke-linecap="round"/>
-      <path d="M58 126 C144 78 228 76 320 126 S498 174 580 126" fill="none" stroke="${fillColor}" stroke-width="10" stroke-linecap="round" opacity="0.75"/>
-      <text x="320" y="83" text-anchor="middle" dominant-baseline="middle" fill="${fillColor}" font-family="Arial Black, Impact, sans-serif" font-size="38">${shortLabel}</text>
-    </svg>
-  `;
-}
-
 function buildDecalOptions(products) {
   const productOptions = products
     .filter((product) => String(product?.category || '').toLowerCase() === 'decals')
@@ -265,12 +244,12 @@ async function renderDecalLayer({ decalLayer, option, fillColor }) {
       decalLayer.innerHTML = colorizeInlineSvg(svgText, fillColor, strokeColor);
       return;
     } catch {
-      decalLayer.innerHTML = createGenericDecalSvg(option.product, fillColor);
+      decalLayer.innerHTML = '';
       return;
     }
   }
 
-  decalLayer.innerHTML = createGenericDecalSvg(option.product, fillColor);
+  decalLayer.innerHTML = '';
 }
 
 function setLayerTransform(layer, size, x, y, rotate) {
@@ -302,6 +281,7 @@ async function initCustomizePage() {
   const baseImage = document.getElementById('customizeBaseImage');
   const decalLayer = document.getElementById('customizeDecal');
   const textLayer = document.getElementById('customizeTextLayer');
+  const workspace = document.getElementById('customizerWorkspace');
   const productName = document.getElementById('customizeProductName');
   const productMeta = document.getElementById('customizeProductMeta');
   const modeEyebrow = document.getElementById('customizeModeEyebrow');
@@ -310,6 +290,7 @@ async function initCustomizePage() {
   const continueToCheckout = document.getElementById('continueToCheckout');
   const downloadPreviewBtn = document.getElementById('downloadCustomizerPreview');
   const sharePreviewBtn = document.getElementById('shareCustomizerPreview');
+  const fullscreenBtn = document.getElementById('toggleCustomizerFullscreen');
 
   if (!(form && baseImage && decalLayer && textLayer && continueToCheckout)) return;
 
@@ -324,11 +305,11 @@ async function initCustomizePage() {
   const productId = getCustomizeParam('productId');
   const selectedProduct = vehicleProduct || (typeof window.findProductById === 'function' ? window.findProductById(productId) : null);
   const decalOptions = buildDecalOptions(products);
-  const initialProduct = selectedProduct || decalOptions[0]?.product || products[0] || null;
+  const initialProduct = selectedProduct || null;
   const initialMode = getProductMode(initialProduct);
 
   let activeMode = productId && initialMode ? initialMode : 'all';
-  let activeDecalId = initialProduct?.id || decalOptions[0]?.id || '';
+  let activeDecalId = decalOptions.some((option) => option.id === initialProduct?.id) ? initialProduct.id : '';
   let uploadedVehicleUrl = '';
   let decalRenderRequestId = 0;
   let originalShapeSnapshot = '';
@@ -368,6 +349,43 @@ async function initCustomizePage() {
   const textXInput = document.getElementById('textX');
   const textYInput = document.getElementById('textY');
 
+  function isCustomizerFullscreen() {
+    return workspace?.classList.contains('is-fullscreen');
+  }
+
+  function setCustomizerFullscreenState(isFullscreen) {
+    workspace?.classList.toggle('is-fullscreen', isFullscreen);
+    document.body.classList.toggle('customizer-fullscreen', isFullscreen);
+    if (fullscreenBtn) {
+      fullscreenBtn.textContent = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen';
+      fullscreenBtn.setAttribute('aria-pressed', String(isFullscreen));
+    }
+  }
+
+  async function enterCustomizerFullscreen() {
+    setCustomizerFullscreenState(true);
+    if (workspace?.requestFullscreen && document.fullscreenElement !== workspace) {
+      try {
+        await workspace.requestFullscreen();
+      } catch {
+        setCustomizerFullscreenState(true);
+      }
+    }
+  }
+
+  async function exitCustomizerFullscreen() {
+    if (document.fullscreenElement && document.exitFullscreen) {
+      try {
+        await document.exitFullscreen();
+      } catch {
+        setCustomizerFullscreenState(false);
+      }
+      return;
+    }
+
+    setCustomizerFullscreenState(false);
+  }
+
   if (productName) productName.textContent = initialProduct?.name || 'Custom Decal Mockup';
   if (productMeta) {
     productMeta.textContent = activeMode === 'all'
@@ -390,25 +408,50 @@ async function initCustomizePage() {
     );
 
     modeSelect.innerHTML = getSelectOptionsMarkup(options, activeMode);
-    showAllModesBtn.hidden = activeMode === 'all';
+    if (showAllModesBtn) {
+      showAllModesBtn.textContent = activeMode === 'all' ? 'Full Customizer Active' : 'Show Full Customizer';
+      showAllModesBtn.disabled = activeMode === 'all';
+      showAllModesBtn.hidden = false;
+    }
   }
 
   function syncDecalOptions() {
     const filtered = getFilteredDecals(decalOptions, activeMode);
     const nextOptions = filtered.length ? filtered : decalOptions;
 
-    if (!nextOptions.some((option) => option.id === activeDecalId)) {
+    if (activeDecalId && !nextOptions.some((option) => option.id === activeDecalId)) {
       activeDecalId = nextOptions[0]?.id || '';
     }
 
-    decalSelect.innerHTML = nextOptions.map((option) => {
-      const selected = option.id === activeDecalId ? ' selected' : '';
-      return `<option value="${option.id}"${selected}>${option.label}</option>`;
-    }).join('');
+    const placeholderSelected = activeDecalId ? '' : ' selected';
+    const options = [`<option value=""${placeholderSelected}>Choose a decal</option>`].concat(
+      nextOptions.map((option) => {
+        const selected = option.id === activeDecalId ? ' selected' : '';
+        return `<option value="${option.id}"${selected}>${option.label}</option>`;
+      })
+    );
+
+    decalSelect.innerHTML = options.join('');
+  }
+
+  function setActiveMode(nextMode, { keepSelectedDecal = true } = {}) {
+    activeMode = nextMode || 'all';
+
+    if (!keepSelectedDecal) {
+      const nextOptions = getFilteredDecals(decalOptions, activeMode);
+      activeDecalId = (nextOptions.length ? nextOptions : decalOptions)[0]?.id || '';
+    }
+
+    syncModeOptions();
+    syncDecalOptions();
+    if (modeSelect) modeSelect.value = activeMode;
+    if (decalSelect) decalSelect.value = activeDecalId;
+    updateAll();
   }
 
   function getActiveDecalOption() {
-    return decalOptions.find((option) => option.id === activeDecalId) || decalOptions[0] || null;
+    if (!activeDecalId) return null;
+    return decalOptions.find((option) => option.id === activeDecalId) || null;
   }
 
   function getEditableSvg() {
@@ -656,9 +699,11 @@ async function initCustomizePage() {
     const option = getActiveDecalOption();
     const fillColor = decalColorInput?.value || '#111111';
 
-    if (productName) productName.textContent = option?.label || 'Custom Decal Mockup';
+    if (productName) productName.textContent = option?.label || initialProduct?.name || 'Custom Decal Mockup';
     if (productMeta) {
-      productMeta.textContent = activeMode === 'all'
+      productMeta.textContent = !option
+        ? 'Choose a decal to preview'
+        : activeMode === 'all'
         ? `Full customizer - ${option?.mode || 'Decals'}`
         : `${activeMode} mode`;
     }
@@ -726,17 +771,31 @@ async function initCustomizePage() {
   });
 
   modeSelect?.addEventListener('change', () => {
-    activeMode = modeSelect.value || 'all';
-    syncModeOptions();
-    syncDecalOptions();
-    updateAll();
+    setActiveMode(modeSelect.value || 'all');
   });
 
-  showAllModesBtn?.addEventListener('click', () => {
-    activeMode = 'all';
-    syncModeOptions();
-    syncDecalOptions();
-    updateAll();
+  showAllModesBtn?.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setActiveMode('all');
+  });
+
+  fullscreenBtn?.addEventListener('click', () => {
+    if (isCustomizerFullscreen()) {
+      exitCustomizerFullscreen();
+    } else {
+      enterCustomizerFullscreen();
+    }
+  });
+
+  document.addEventListener('fullscreenchange', () => {
+    setCustomizerFullscreenState(document.fullscreenElement === workspace);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && isCustomizerFullscreen() && !document.fullscreenElement) {
+      setCustomizerFullscreenState(false);
+    }
   });
 
   downloadPreviewBtn?.addEventListener('click', async () => {
