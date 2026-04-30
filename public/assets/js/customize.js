@@ -300,6 +300,7 @@ async function renderDecalLayer({ decalLayer, option, fillColor }) {
   if (option.type === 'image') {
     decalLayer.innerHTML = `
       <img class="customizer-decal-image" src="${escapeHtml(option.path)}" alt="${escapeHtml(option.label)}" draggable="false" />
+      <div class="customizer-decal-selection" aria-hidden="true"></div>
       <button type="button" class="customizer-resize-handle" aria-label="Resize decal"></button>
     `;
     return;
@@ -309,6 +310,7 @@ async function renderDecalLayer({ decalLayer, option, fillColor }) {
     try {
       const svgText = await loadSvg(option.path || option.svgPath);
       decalLayer.innerHTML = `${colorizeInlineSvg(svgText, fillColor, strokeColor)}
+        <div class="customizer-decal-selection" aria-hidden="true"></div>
         <button type="button" class="customizer-resize-handle" aria-label="Resize decal"></button>`;
       return;
     } catch {
@@ -749,6 +751,39 @@ async function initCustomizePage() {
     syncEditorShapeControls();
   }
 
+  function setDecalSelectionBounds(left, top, width, height) {
+    decalLayer.style.setProperty('--selection-left', `${left}%`);
+    decalLayer.style.setProperty('--selection-top', `${top}%`);
+    decalLayer.style.setProperty('--selection-width', `${width}%`);
+    decalLayer.style.setProperty('--selection-height', `${height}%`);
+  }
+
+  function updateDecalSelectionBounds() {
+    const svg = decalLayer.querySelector('svg');
+    if (!svg) {
+      setDecalSelectionBounds(0, 0, 100, 100);
+      return;
+    }
+
+    try {
+      const bbox = svg.getBBox();
+      const viewBox = svg.viewBox?.baseVal;
+      if (!(viewBox?.width && viewBox?.height && bbox.width && bbox.height)) {
+        setDecalSelectionBounds(0, 0, 100, 100);
+        return;
+      }
+
+      setDecalSelectionBounds(
+        ((bbox.x - viewBox.x) / viewBox.width) * 100,
+        ((bbox.y - viewBox.y) / viewBox.height) * 100,
+        (bbox.width / viewBox.width) * 100,
+        (bbox.height / viewBox.height) * 100
+      );
+    } catch {
+      setDecalSelectionBounds(0, 0, 100, 100);
+    }
+  }
+
   function prepareShapeEditor(resetHistory = true) {
     const shapes = getEditableShapes();
     shapes.forEach((shape, index) => {
@@ -893,6 +928,7 @@ async function initCustomizePage() {
 
     await renderDecalLayer({ decalLayer, option, fillColor });
     if (requestId !== decalRenderRequestId) return;
+    updateDecalSelectionBounds();
     prepareShapeEditor(true);
   }
 

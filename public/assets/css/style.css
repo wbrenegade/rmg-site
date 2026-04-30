@@ -970,12 +970,6 @@ textarea { resize: vertical; }
   overflow: visible;
 }
 
-.customizer-decal-layer:not(:empty) .customizer-overlay-svg,
-.customizer-decal-layer:not(:empty) .customizer-decal-image {
-  outline: 1px dashed rgba(125,255,90,0.8);
-  outline-offset: 2px;
-}
-
 .customizer-decal-image {
   display: block;
   width: 100%;
@@ -984,10 +978,20 @@ textarea { resize: vertical; }
   pointer-events: none;
 }
 
+.customizer-decal-selection {
+  position: absolute;
+  left: var(--selection-left, 0%);
+  top: var(--selection-top, 0%);
+  width: var(--selection-width, 100%);
+  height: var(--selection-height, 100%);
+  border: 1px dashed rgba(125,255,90,0.9);
+  pointer-events: none;
+}
+
 .customizer-resize-handle {
   position: absolute;
-  right: 8px;
-  bottom: 8px;
+  left: calc(var(--selection-left, 0%) + var(--selection-width, 100%) - 13px);
+  top: calc(var(--selection-top, 0%) + var(--selection-height, 100%) - 13px);
   width: 26px;
   height: 26px;
   border: 2px solid #0b0d12;
