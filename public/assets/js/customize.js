@@ -8,6 +8,56 @@ const CUSTOMIZER_DEFAULT_VIEWS = {
 
 const RACING_STRIPE_PREVIEW_BASE = '/assets/imgs/previews/racing-stripes';
 const GRAPHICS_PREVIEW_BASE = '/assets/imgs/previews/graphics';
+const PREMADE_DECAL_OPTIONS = [
+  {
+    id: 'graphics-geo-triags',
+    label: 'Graphics - Geo Triags',
+    path: '/assets/svg/graphics/geo_triags.png',
+    type: 'image'
+  },
+  {
+    id: 'graphics-honeycomb',
+    label: 'Graphics - Honeycomb',
+    path: '/assets/svg/graphics/honeycomb.svg',
+    type: 'svg',
+    outlined: true
+  },
+  {
+    id: 'racing-stripes-dual-stripes',
+    label: 'Racing Stripes - Dual Stripes',
+    path: '/assets/svg/racing-stripes/dual-stripes.svg',
+    type: 'svg',
+    outlined: false
+  },
+  {
+    id: 'racing-stripes-dual-top-outlined-stripes',
+    label: 'Racing Stripes - Dual Top Outlined Stripes',
+    path: '/assets/svg/racing-stripes/dual-top-outlined-stripes.svg',
+    type: 'svg',
+    outlined: true
+  },
+  {
+    id: 'racing-stripes-single-outlined-stripe',
+    label: 'Racing Stripes - Single Outlined Stripe',
+    path: '/assets/svg/racing-stripes/single-outlined-stripe.svg',
+    type: 'svg',
+    outlined: true
+  },
+  {
+    id: 'racing-stripes-single-stripe',
+    label: 'Racing Stripes - Single Stripe',
+    path: '/assets/svg/racing-stripes/single-stripe.svg',
+    type: 'svg',
+    outlined: false
+  },
+  {
+    id: 'racing-stripes-staggered-stripes',
+    label: 'Racing Stripes - Staggered Stripes',
+    path: '/assets/svg/racing-stripes/staggered-stripes.svg',
+    type: 'svg',
+    outlined: false
+  }
+];
 const svgCache = new Map();
 
 function getCustomizeParam(name) {
@@ -24,6 +74,15 @@ function titleCase(value) {
     .replace(/\s+/g, ' ')
     .trim()
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function getVehicleFromCustomizeQuery() {
@@ -238,10 +297,19 @@ async function renderDecalLayer({ decalLayer, option, fillColor }) {
 
   const strokeColor = option.outlined ? '#050505' : fillColor;
 
-  if (option.svgPath) {
+  if (option.type === 'image') {
+    decalLayer.innerHTML = `
+      <img class="customizer-decal-image" src="${escapeHtml(option.path)}" alt="${escapeHtml(option.label)}" draggable="false" />
+      <button type="button" class="customizer-resize-handle" aria-label="Resize decal"></button>
+    `;
+    return;
+  }
+
+  if (option.path || option.svgPath) {
     try {
-      const svgText = await loadSvg(option.svgPath);
-      decalLayer.innerHTML = colorizeInlineSvg(svgText, fillColor, strokeColor);
+      const svgText = await loadSvg(option.path || option.svgPath);
+      decalLayer.innerHTML = `${colorizeInlineSvg(svgText, fillColor, strokeColor)}
+        <button type="button" class="customizer-resize-handle" aria-label="Resize decal"></button>`;
       return;
     } catch {
       decalLayer.innerHTML = '';
@@ -280,6 +348,7 @@ async function initCustomizePage() {
   const form = document.getElementById('customizeForm');
   const baseImage = document.getElementById('customizeBaseImage');
   const decalLayer = document.getElementById('customizeDecal');
+  const shapeLayer = document.getElementById('customizeShapes');
   const textLayer = document.getElementById('customizeTextLayer');
   const workspace = document.getElementById('customizerWorkspace');
   const productName = document.getElementById('customizeProductName');
@@ -292,7 +361,7 @@ async function initCustomizePage() {
   const sharePreviewBtn = document.getElementById('shareCustomizerPreview');
   const fullscreenBtn = document.getElementById('toggleCustomizerFullscreen');
 
-  if (!(form && baseImage && decalLayer && textLayer && continueToCheckout)) return;
+  if (!(form && baseImage && decalLayer && shapeLayer && textLayer && continueToCheckout)) return;
 
   if (typeof window.ensureProductsLoaded === 'function') {
     await window.ensureProductsLoaded();
@@ -304,43 +373,64 @@ async function initCustomizePage() {
   const vehicleProduct = createVehicleKitFromCustomizeQuery();
   const productId = getCustomizeParam('productId');
   const selectedProduct = vehicleProduct || (typeof window.findProductById === 'function' ? window.findProductById(productId) : null);
-  const decalOptions = buildDecalOptions(products);
   const initialProduct = selectedProduct || null;
-  const initialMode = getProductMode(initialProduct);
 
-  let activeMode = productId && initialMode ? initialMode : 'all';
-  let activeDecalId = decalOptions.some((option) => option.id === initialProduct?.id) ? initialProduct.id : '';
+  let activePremadeDecalId = '';
   let uploadedVehicleUrl = '';
   let decalRenderRequestId = 0;
   let originalShapeSnapshot = '';
   let undoStack = [];
   let redoStack = [];
   let activeShapeId = 'all';
-  let shapeDragState = null;
+  let decalObjectDragState = null;
+  let editorShapes = [];
+  let selectedEditorShapeId = '';
+  let shapeObjectDragState = null;
+  let premadeDecalOptions = PREMADE_DECAL_OPTIONS.slice();
 
   const selectedVehicle = vehicleProduct?.selectedVehicle || getVehicleFromCustomizeQuery() || (typeof window.getSelectedVehicle === 'function' ? window.getSelectedVehicle() : null);
   if (selectedVehicle && typeof window.setSelectedVehicle === 'function') {
     window.setSelectedVehicle(selectedVehicle);
   }
 
+  try {
+    const response = await fetch('/api/premade-decals');
+    if (response.ok) {
+      const options = await response.json();
+      if (Array.isArray(options) && options.length) {
+        premadeDecalOptions = options;
+      }
+    }
+  } catch {
+    premadeDecalOptions = PREMADE_DECAL_OPTIONS.slice();
+  }
+
   const vehicleViewSelect = document.getElementById('vehicleViewSelect');
   const vehicleImageUpload = document.getElementById('vehicleImageUpload');
-  const modeSelect = document.getElementById('customizerModeSelect');
-  const decalSelect = document.getElementById('decalSelect');
-  const showAllModesBtn = document.getElementById('showAllModesBtn');
+  const premadeDecalSelect = document.getElementById('premadeDecalSelect');
   const decalColorInput = document.getElementById('decalColor');
   const decalSizeInput = document.getElementById('decalSize');
   const decalRotateInput = document.getElementById('decalRotate');
   const decalXInput = document.getElementById('decalX');
   const decalYInput = document.getElementById('decalY');
-  const shapeEditScopeInput = document.getElementById('shapeEditScope');
-  const shapeElementSelect = document.getElementById('shapeElementSelect');
-  const shapeFillColorInput = document.getElementById('shapeFillColor');
-  const shapeStrokeColorInput = document.getElementById('shapeStrokeColor');
-  const shapeStrokeWidthInput = document.getElementById('shapeStrokeWidth');
-  const undoShapeEditBtn = document.getElementById('undoShapeEdit');
-  const redoShapeEditBtn = document.getElementById('redoShapeEdit');
-  const resetShapeElementsBtn = document.getElementById('resetShapeElements');
+  const shapeToolGrid = document.getElementById('shapeToolGrid');
+  const editorShapeSelect = document.getElementById('editorShapeSelect');
+  const editorShapeSizeInput = document.getElementById('editorShapeSize');
+  const editorShapeRotateInput = document.getElementById('editorShapeRotate');
+  const editorShapeFillInput = document.getElementById('editorShapeFill');
+  const editorShapeStrokeInput = document.getElementById('editorShapeStroke');
+  const editorShapeStrokeWidthInput = document.getElementById('editorShapeStrokeWidth');
+  const editorStarPointsWrap = document.getElementById('editorStarPointsWrap');
+  const editorStarPointsInput = document.getElementById('editorStarPoints');
+  const deleteEditorShapeBtn = document.getElementById('deleteEditorShape');
+  const shapeEditScopeInput = null;
+  const shapeElementSelect = null;
+  const shapeFillColorInput = null;
+  const shapeStrokeColorInput = null;
+  const shapeStrokeWidthInput = null;
+  const undoShapeEditBtn = null;
+  const redoShapeEditBtn = null;
+  const resetShapeElementsBtn = null;
   const textInput = document.getElementById('designText');
   const textFontInput = document.getElementById('textFont');
   const textColorInput = document.getElementById('textColor');
@@ -388,11 +478,9 @@ async function initCustomizePage() {
 
   if (productName) productName.textContent = initialProduct?.name || 'Custom Decal Mockup';
   if (productMeta) {
-    productMeta.textContent = activeMode === 'all'
-      ? 'Full customizer'
-      : `${activeMode} mode`;
+    productMeta.textContent = 'Choose a premade decal to preview';
   }
-  if (modeEyebrow) modeEyebrow.textContent = activeMode === 'all' ? 'Full Customizer' : `${activeMode} Mode`;
+  if (modeEyebrow) modeEyebrow.textContent = 'Premade Decals';
   if (backToProduct) backToProduct.href = initialProduct?.productUrl || (initialProduct?.id ? `product.html?id=${encodeURIComponent(initialProduct.id)}` : 'shop.html');
   if (vehicleNote) {
     vehicleNote.textContent = selectedVehicle?.label
@@ -400,58 +488,23 @@ async function initCustomizePage() {
       : '';
   }
 
-  function syncModeOptions() {
-    const modes = [...new Set(decalOptions.map((option) => option.mode).filter(Boolean))]
-      .sort((a, b) => a.localeCompare(b));
-    const options = [{ value: 'all', label: 'All Products' }].concat(
-      modes.map((mode) => ({ value: mode, label: mode }))
-    );
+  function syncPremadeDecalOptions() {
+    if (!premadeDecalSelect) return;
 
-    modeSelect.innerHTML = getSelectOptionsMarkup(options, activeMode);
-    if (showAllModesBtn) {
-      showAllModesBtn.textContent = activeMode === 'all' ? 'Full Customizer Active' : 'Show Full Customizer';
-      showAllModesBtn.disabled = activeMode === 'all';
-      showAllModesBtn.hidden = false;
-    }
-  }
-
-  function syncDecalOptions() {
-    const filtered = getFilteredDecals(decalOptions, activeMode);
-    const nextOptions = filtered.length ? filtered : decalOptions;
-
-    if (activeDecalId && !nextOptions.some((option) => option.id === activeDecalId)) {
-      activeDecalId = nextOptions[0]?.id || '';
-    }
-
-    const placeholderSelected = activeDecalId ? '' : ' selected';
-    const options = [`<option value=""${placeholderSelected}>Choose a decal</option>`].concat(
-      nextOptions.map((option) => {
-        const selected = option.id === activeDecalId ? ' selected' : '';
-        return `<option value="${option.id}"${selected}>${option.label}</option>`;
+    const placeholderSelected = activePremadeDecalId ? '' : ' selected';
+    const options = [`<option value=""${placeholderSelected}>Add a premade decal</option>`].concat(
+      premadeDecalOptions.map((option) => {
+        const selected = option.id === activePremadeDecalId ? ' selected' : '';
+        return `<option value="${escapeHtml(option.id)}"${selected}>${escapeHtml(option.label)}</option>`;
       })
     );
 
-    decalSelect.innerHTML = options.join('');
-  }
-
-  function setActiveMode(nextMode, { keepSelectedDecal = true } = {}) {
-    activeMode = nextMode || 'all';
-
-    if (!keepSelectedDecal) {
-      const nextOptions = getFilteredDecals(decalOptions, activeMode);
-      activeDecalId = (nextOptions.length ? nextOptions : decalOptions)[0]?.id || '';
-    }
-
-    syncModeOptions();
-    syncDecalOptions();
-    if (modeSelect) modeSelect.value = activeMode;
-    if (decalSelect) decalSelect.value = activeDecalId;
-    updateAll();
+    premadeDecalSelect.innerHTML = options.join('');
   }
 
   function getActiveDecalOption() {
-    if (!activeDecalId) return null;
-    return decalOptions.find((option) => option.id === activeDecalId) || null;
+    if (!activePremadeDecalId) return null;
+    return premadeDecalOptions.find((option) => option.id === activePremadeDecalId) || null;
   }
 
   function getEditableSvg() {
@@ -575,15 +628,125 @@ async function initCustomizePage() {
     updateHistoryButtons();
   }
 
-  function translateShape(shape, dx, dy) {
-    const x = Number.parseFloat(shape.getAttribute('x') || '0');
-    const y = Number.parseFloat(shape.getAttribute('y') || '0');
-    shape.setAttribute('x', String(x + dx));
-    shape.setAttribute('y', String(y + dy));
+  function setDecalTransformInputs({ size, x, y }) {
+    if (typeof size === 'number' && decalSizeInput) {
+      decalSizeInput.value = String(Math.max(20, Math.min(140, Math.round(size))));
+    }
+    if (typeof x === 'number' && decalXInput) {
+      decalXInput.value = String(Math.max(-45, Math.min(45, Math.round(x))));
+    }
+    if (typeof y === 'number' && decalYInput) {
+      decalYInput.value = String(Math.max(-45, Math.min(45, Math.round(y))));
+    }
+    updateTransforms();
   }
 
-  function translateTargetShapes(dx, dy) {
-    getTargetShapes().forEach((shape) => translateShape(shape, dx, dy));
+  function getSelectedEditorShape() {
+    return editorShapes.find((shape) => shape.id === selectedEditorShapeId) || null;
+  }
+
+  function starPolygonPoints(points = 5) {
+    const total = Math.max(4, Math.min(12, Number(points) || 5)) * 2;
+    return Array.from({ length: total }, (_, index) => {
+      const radius = index % 2 === 0 ? 42 : 19;
+      const angle = -Math.PI / 2 + (index * Math.PI * 2) / total;
+      return `${50 + Math.cos(angle) * radius},${50 + Math.sin(angle) * radius}`;
+    }).join(' ');
+  }
+
+  function shapeMarkup(shape) {
+    const common = `fill="${shape.fill}" stroke="${shape.stroke}" stroke-width="${shape.strokeWidth}" vector-effect="non-scaling-stroke"`;
+
+    if (shape.type === 'circle') return `<circle cx="50" cy="50" r="38" ${common} />`;
+    if (shape.type === 'triangle') return `<polygon points="50,10 92,88 8,88" ${common} />`;
+    if (shape.type === 'star') return `<polygon points="${starPolygonPoints(shape.points)}" ${common} />`;
+    if (shape.type === 'diamond') return `<polygon points="50,6 94,50 50,94 6,50" ${common} />`;
+    if (shape.type === 'line') return `<line x1="10" y1="50" x2="90" y2="50" fill="none" stroke="${shape.stroke}" stroke-width="${Math.max(1, shape.strokeWidth)}" stroke-linecap="round" vector-effect="non-scaling-stroke" />`;
+    return `<rect x="12" y="12" width="76" height="76" rx="2" ${common} />`;
+  }
+
+  function renderEditorShapes() {
+    shapeLayer.innerHTML = editorShapes.map((shape) => `
+      <div class="customizer-shape-object${shape.id === selectedEditorShapeId ? ' is-active' : ''}"
+        data-shape-id="${shape.id}"
+        style="width:${shape.size}px;height:${shape.size}px;transform:translate(-50%, -50%) translate(${shape.x}%, ${shape.y}%) rotate(${shape.rotate}deg);">
+        <svg viewBox="0 0 100 100" aria-hidden="true">${shapeMarkup(shape)}</svg>
+        <button type="button" class="customizer-shape-resize" aria-label="Resize shape"></button>
+      </div>
+    `).join('');
+  }
+
+  function syncEditorShapeControls() {
+    const selectedShape = getSelectedEditorShape();
+
+    if (editorShapeSelect) {
+      const options = ['<option value="">No shape selected</option>'].concat(
+        editorShapes.map((shape, index) => {
+          const selected = shape.id === selectedEditorShapeId ? ' selected' : '';
+          return `<option value="${shape.id}"${selected}>${titleCase(shape.type)} ${index + 1}</option>`;
+        })
+      );
+      editorShapeSelect.innerHTML = options.join('');
+      editorShapeSelect.value = selectedShape?.id || '';
+    }
+
+    [editorShapeSizeInput, editorShapeRotateInput, editorShapeFillInput, editorShapeStrokeInput, editorShapeStrokeWidthInput, editorStarPointsInput, deleteEditorShapeBtn].forEach((control) => {
+      if (control) control.disabled = !selectedShape;
+    });
+
+    if (editorStarPointsWrap) editorStarPointsWrap.hidden = selectedShape?.type !== 'star';
+    if (!selectedShape) return;
+
+    if (editorShapeSizeInput) editorShapeSizeInput.value = String(selectedShape.size);
+    if (editorShapeRotateInput) editorShapeRotateInput.value = String(selectedShape.rotate);
+    if (editorShapeFillInput) editorShapeFillInput.value = selectedShape.fill;
+    if (editorShapeStrokeInput) editorShapeStrokeInput.value = selectedShape.stroke;
+    if (editorShapeStrokeWidthInput) editorShapeStrokeWidthInput.value = String(selectedShape.strokeWidth);
+    if (editorStarPointsInput) editorStarPointsInput.value = String(selectedShape.points || 5);
+  }
+
+  function selectEditorShape(id) {
+    selectedEditorShapeId = id || '';
+    renderEditorShapes();
+    syncEditorShapeControls();
+  }
+
+  function addEditorShape(type) {
+    const shape = {
+      id: `shape-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      type,
+      x: 0,
+      y: 0,
+      size: type === 'line' ? 150 : 96,
+      rotate: 0,
+      fill: editorShapeFillInput?.value || '#111111',
+      stroke: editorShapeStrokeInput?.value || '#ffffff',
+      strokeWidth: Number(editorShapeStrokeWidthInput?.value || 4),
+      points: Number(editorStarPointsInput?.value || 5)
+    };
+
+    editorShapes.push(shape);
+    selectEditorShape(shape.id);
+  }
+
+  function updateSelectedEditorShape(updates) {
+    const selectedShape = getSelectedEditorShape();
+    if (!selectedShape) return;
+    Object.assign(selectedShape, updates);
+    renderEditorShapes();
+    syncEditorShapeControls();
+  }
+
+  function setEditorShapeFromPointer({ size, x, y }) {
+    const selectedShape = getSelectedEditorShape();
+    if (!selectedShape) return;
+
+    if (typeof size === 'number') selectedShape.size = Math.max(24, Math.min(260, Math.round(size)));
+    if (typeof x === 'number') selectedShape.x = Math.max(-55, Math.min(55, Math.round(x)));
+    if (typeof y === 'number') selectedShape.y = Math.max(-55, Math.min(55, Math.round(y)));
+
+    renderEditorShapes();
+    syncEditorShapeControls();
   }
 
   function prepareShapeEditor(resetHistory = true) {
@@ -608,8 +771,8 @@ async function initCustomizePage() {
   function getCustomizerSettings() {
     const option = getActiveDecalOption();
     return {
-      mode: activeMode === 'all' ? 'Full Customizer' : activeMode,
-      decalName: option?.label || 'Custom Decal',
+      mode: 'Premade Decal Mockup',
+      decalName: option?.label || 'No premade decal selected',
       decalProductId: option?.id || '',
       decalColor: decalColorInput?.value || '#111111',
       decalSize: `${decalSizeInput?.value || '72'}%`,
@@ -619,8 +782,9 @@ async function initCustomizePage() {
       textColor: textColorInput?.value || '#7dff5a',
       textSize: textSizeInput?.value || '42',
       textFont: titleCase(textFontInput?.selectedOptions?.[0]?.textContent || 'Block'),
+      shapes: editorShapes.map((shape) => `${titleCase(shape.type)} ${shape.size}px ${shape.fill} stroke ${shape.stroke} ${shape.strokeWidth}px`).join('; ') || 'None',
       vehicleImage: uploadedVehicleUrl ? 'Customer uploaded' : titleCase(vehicleViewSelect?.selectedOptions?.[0]?.textContent || 'Default'),
-      placementPreset: activeMode === 'all' ? 'Custom' : activeMode,
+      placementPreset: 'Custom',
       blendMode: 'Normal',
       opacity: 100,
       vinylFinish: 'Standard'
@@ -639,15 +803,34 @@ async function initCustomizePage() {
 
   async function drawSvgLayer(ctx, layer, stageRect, scale) {
     const svg = layer.querySelector('svg');
-    if (!svg) return;
+    const decalImage = layer.querySelector('.customizer-decal-image');
+    if (!svg && !decalImage) return;
 
-    const exportSvg = svg.cloneNode(true);
-    exportSvg.querySelectorAll('.is-selected-shape').forEach((shape) => shape.classList.remove('is-selected-shape'));
-    const serialized = new XMLSerializer().serializeToString(exportSvg);
-    const src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(serialized)}`;
-    const image = await loadImage(src);
+    const image = decalImage
+      ? await loadImage(decalImage.currentSrc || decalImage.src)
+      : await loadImage(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString((() => {
+        const exportSvg = svg.cloneNode(true);
+        exportSvg.querySelectorAll('.is-selected-shape').forEach((shape) => shape.classList.remove('is-selected-shape'));
+        return exportSvg;
+      })()))}`);
     const rect = layerRectInStage(layer, stageRect, scale);
     ctx.drawImage(image, rect.x, rect.y, rect.width, rect.height);
+  }
+
+  async function drawEditorShapes(ctx, stageRect, scale) {
+    for (const shape of editorShapes) {
+      const svgText = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${shapeMarkup(shape)}</svg>`;
+      const image = await loadImage(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgText)}`);
+      const size = shape.size * scale;
+      const centerX = (stageRect.width / 2 + (shape.x / 100) * shape.size) * scale;
+      const centerY = (stageRect.height / 2 + (shape.y / 100) * shape.size) * scale;
+
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate((shape.rotate * Math.PI) / 180);
+      ctx.drawImage(image, -size / 2, -size / 2, size, size);
+      ctx.restore();
+    }
   }
 
   function drawTextLayer(ctx, layer, stageRect, scale) {
@@ -689,6 +872,7 @@ async function initCustomizePage() {
     ctx.drawImage(vehicleImage, imageRect.x, imageRect.y, imageRect.width, imageRect.height);
 
     await drawSvgLayer(ctx, decalLayer, stageRect, scale);
+    await drawEditorShapes(ctx, stageRect, scale);
     drawTextLayer(ctx, textLayer, stageRect, scale);
 
     return canvas.toDataURL('image/png', 0.92);
@@ -701,13 +885,11 @@ async function initCustomizePage() {
 
     if (productName) productName.textContent = option?.label || initialProduct?.name || 'Custom Decal Mockup';
     if (productMeta) {
-      productMeta.textContent = !option
-        ? 'Choose a decal to preview'
-        : activeMode === 'all'
-        ? `Full customizer - ${option?.mode || 'Decals'}`
-        : `${activeMode} mode`;
+      productMeta.textContent = option
+        ? 'Drag the decal to move it. Drag the corner handle to resize it.'
+        : 'Choose a premade decal to preview';
     }
-    if (modeEyebrow) modeEyebrow.textContent = activeMode === 'all' ? 'Full Customizer' : `${activeMode} Mode`;
+    if (modeEyebrow) modeEyebrow.textContent = 'Premade Decals';
 
     await renderDecalLayer({ decalLayer, option, fillColor });
     if (requestId !== decalRenderRequestId) return;
@@ -748,8 +930,9 @@ async function initCustomizePage() {
     updateDecal();
   }
 
-  syncModeOptions();
-  syncDecalOptions();
+  syncPremadeDecalOptions();
+  renderEditorShapes();
+  syncEditorShapeControls();
   updateAll();
 
   vehicleViewSelect?.addEventListener('change', () => {
@@ -770,14 +953,15 @@ async function initCustomizePage() {
     reader.readAsDataURL(file);
   });
 
-  modeSelect?.addEventListener('change', () => {
-    setActiveMode(modeSelect.value || 'all');
-  });
-
-  showAllModesBtn?.addEventListener('click', (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setActiveMode('all');
+  premadeDecalSelect?.addEventListener('change', () => {
+    activePremadeDecalId = premadeDecalSelect.value || '';
+    if (activePremadeDecalId) {
+      if (decalSizeInput) decalSizeInput.value = '72';
+      if (decalXInput) decalXInput.value = '0';
+      if (decalYInput) decalYInput.value = '0';
+      if (decalRotateInput) decalRotateInput.value = '0';
+    }
+    updateAll();
   });
 
   fullscreenBtn?.addEventListener('click', () => {
@@ -830,22 +1014,8 @@ async function initCustomizePage() {
     }
   });
 
-  decalSelect?.addEventListener('change', () => {
-    activeDecalId = decalSelect.value || '';
-    updateAll();
-  });
-
   decalColorInput?.addEventListener('input', () => {
-    if (shapeFillColorInput) shapeFillColorInput.value = decalColorInput.value;
-    if (shapeStrokeColorInput) shapeStrokeColorInput.value = decalColorInput.value;
-    const previousScope = shapeEditScopeInput?.value || 'group';
-    const previousShapeId = activeShapeId;
-    if (shapeEditScopeInput) shapeEditScopeInput.value = 'group';
-    activeShapeId = 'all';
-    applyShapeStyles(true);
-    if (shapeEditScopeInput) shapeEditScopeInput.value = previousScope;
-    activeShapeId = previousShapeId;
-    syncShapeSelectOptions();
+    updateDecal();
   });
 
   [decalSizeInput, decalRotateInput, decalXInput, decalYInput].forEach((input) => {
@@ -856,6 +1026,101 @@ async function initCustomizePage() {
   [textInput, textFontInput, textColorInput, textSizeInput, textRotateInput, textXInput, textYInput].forEach((input) => {
     input?.addEventListener('input', updateTransforms);
     input?.addEventListener('change', updateTransforms);
+  });
+
+  shapeToolGrid?.addEventListener('click', (event) => {
+    const button = event.target.closest?.('[data-shape-type]');
+    if (!button) return;
+    addEditorShape(button.dataset.shapeType || 'square');
+  });
+
+  editorShapeSelect?.addEventListener('change', () => {
+    selectEditorShape(editorShapeSelect.value || '');
+  });
+
+  editorShapeSizeInput?.addEventListener('input', () => {
+    updateSelectedEditorShape({ size: Number(editorShapeSizeInput.value || 96) });
+  });
+
+  editorShapeRotateInput?.addEventListener('input', () => {
+    updateSelectedEditorShape({ rotate: Number(editorShapeRotateInput.value || 0) });
+  });
+
+  editorShapeFillInput?.addEventListener('input', () => {
+    updateSelectedEditorShape({ fill: editorShapeFillInput.value || '#111111' });
+  });
+
+  editorShapeStrokeInput?.addEventListener('input', () => {
+    updateSelectedEditorShape({ stroke: editorShapeStrokeInput.value || '#ffffff' });
+  });
+
+  editorShapeStrokeWidthInput?.addEventListener('input', () => {
+    updateSelectedEditorShape({ strokeWidth: Number(editorShapeStrokeWidthInput.value || 0) });
+  });
+
+  editorStarPointsInput?.addEventListener('input', () => {
+    updateSelectedEditorShape({ points: Number(editorStarPointsInput.value || 5) });
+  });
+
+  deleteEditorShapeBtn?.addEventListener('click', () => {
+    if (!selectedEditorShapeId) return;
+    editorShapes = editorShapes.filter((shape) => shape.id !== selectedEditorShapeId);
+    selectEditorShape(editorShapes[editorShapes.length - 1]?.id || '');
+  });
+
+  shapeLayer.addEventListener('pointerdown', (event) => {
+    const object = event.target.closest?.('.customizer-shape-object');
+    if (!object) return;
+
+    event.preventDefault();
+    selectEditorShape(object.dataset.shapeId || '');
+
+    const selectedShape = getSelectedEditorShape();
+    const stageRect = document.getElementById('customizeViewer')?.getBoundingClientRect();
+    const objectRect = object.getBoundingClientRect();
+    if (!selectedShape) return;
+
+    shapeObjectDragState = {
+      pointerId: event.pointerId,
+      mode: event.target.closest?.('.customizer-shape-resize') ? 'resize' : 'move',
+      startClientX: event.clientX,
+      startClientY: event.clientY,
+      startX: selectedShape.x,
+      startY: selectedShape.y,
+      startSize: selectedShape.size,
+      objectWidth: Math.max(1, objectRect.width),
+      objectHeight: Math.max(1, objectRect.height),
+      stageWidth: Math.max(1, stageRect?.width || 1)
+    };
+    shapeLayer.setPointerCapture?.(event.pointerId);
+  });
+
+  shapeLayer.addEventListener('pointermove', (event) => {
+    if (!shapeObjectDragState || shapeObjectDragState.pointerId !== event.pointerId) return;
+
+    const dx = event.clientX - shapeObjectDragState.startClientX;
+    const dy = event.clientY - shapeObjectDragState.startClientY;
+
+    if (shapeObjectDragState.mode === 'resize') {
+      const dominantDelta = Math.abs(dx) > Math.abs(dy) ? dx : dy;
+      setEditorShapeFromPointer({
+        size: shapeObjectDragState.startSize + (dominantDelta / shapeObjectDragState.stageWidth) * 220
+      });
+      return;
+    }
+
+    setEditorShapeFromPointer({
+      x: shapeObjectDragState.startX + (dx / shapeObjectDragState.objectWidth) * 100,
+      y: shapeObjectDragState.startY + (dy / shapeObjectDragState.objectHeight) * 100
+    });
+  });
+
+  ['pointerup', 'pointercancel'].forEach((eventName) => {
+    shapeLayer.addEventListener(eventName, (event) => {
+      if (!shapeObjectDragState || shapeObjectDragState.pointerId !== event.pointerId) return;
+      shapeObjectDragState = null;
+      shapeLayer.releasePointerCapture?.(event.pointerId);
+    });
   });
 
   shapeElementSelect?.addEventListener('change', () => {
@@ -905,53 +1170,52 @@ async function initCustomizePage() {
   });
 
   decalLayer.addEventListener('pointerdown', (event) => {
-    const shape = event.target.closest?.('.customizer-editable-shape');
-    const svg = getEditableSvg();
-    if (!shape || !svg) return;
+    if (!getActiveDecalOption()) return;
 
     event.preventDefault();
-    if (shapeEditScopeInput?.value === 'individual') {
-      activeShapeId = shape.dataset.shapeId || 'all';
-      syncShapeSelectOptions();
-      syncShapeInputsFromSelection();
-    }
-
-    pushShapeHistory();
-    const point = svg.createSVGPoint();
-    point.x = event.clientX;
-    point.y = event.clientY;
-    const svgPoint = point.matrixTransform(svg.getScreenCTM().inverse());
-    shapeDragState = {
+    const isResize = Boolean(event.target.closest?.('.customizer-resize-handle'));
+    const stageRect = document.getElementById('customizeViewer')?.getBoundingClientRect();
+    const layerRect = decalLayer.getBoundingClientRect();
+    decalObjectDragState = {
       pointerId: event.pointerId,
-      lastX: svgPoint.x,
-      lastY: svgPoint.y
+      mode: isResize ? 'resize' : 'move',
+      startClientX: event.clientX,
+      startClientY: event.clientY,
+      startSize: Number(decalSizeInput?.value || 72),
+      startX: Number(decalXInput?.value || 0),
+      startY: Number(decalYInput?.value || 0),
+      layerWidth: Math.max(1, layerRect.width),
+      layerHeight: Math.max(1, layerRect.height),
+      stageWidth: Math.max(1, stageRect?.width || 1)
     };
     decalLayer.setPointerCapture?.(event.pointerId);
   });
 
   decalLayer.addEventListener('pointermove', (event) => {
-    if (!shapeDragState || shapeDragState.pointerId !== event.pointerId) return;
-    const svg = getEditableSvg();
-    if (!svg) return;
+    if (!decalObjectDragState || decalObjectDragState.pointerId !== event.pointerId) return;
 
-    const point = svg.createSVGPoint();
-    point.x = event.clientX;
-    point.y = event.clientY;
-    const svgPoint = point.matrixTransform(svg.getScreenCTM().inverse());
-    const dx = svgPoint.x - shapeDragState.lastX;
-    const dy = svgPoint.y - shapeDragState.lastY;
+    const dx = event.clientX - decalObjectDragState.startClientX;
+    const dy = event.clientY - decalObjectDragState.startClientY;
 
-    translateTargetShapes(dx, dy);
-    shapeDragState.lastX = svgPoint.x;
-    shapeDragState.lastY = svgPoint.y;
+    if (decalObjectDragState.mode === 'resize') {
+      const dominantDelta = Math.abs(dx) > Math.abs(dy) ? dx : dy;
+      setDecalTransformInputs({
+        size: decalObjectDragState.startSize + (dominantDelta / decalObjectDragState.stageWidth) * 100
+      });
+      return;
+    }
+
+    setDecalTransformInputs({
+      x: decalObjectDragState.startX + (dx / decalObjectDragState.layerWidth) * 100,
+      y: decalObjectDragState.startY + (dy / decalObjectDragState.layerHeight) * 100
+    });
   });
 
   ['pointerup', 'pointercancel'].forEach((eventName) => {
     decalLayer.addEventListener(eventName, (event) => {
-      if (!shapeDragState || shapeDragState.pointerId !== event.pointerId) return;
-      shapeDragState = null;
+      if (!decalObjectDragState || decalObjectDragState.pointerId !== event.pointerId) return;
+      decalObjectDragState = null;
       decalLayer.releasePointerCapture?.(event.pointerId);
-      updateHistoryButtons();
     });
   });
 
@@ -965,6 +1229,7 @@ async function initCustomizePage() {
       `Decal size: ${settings.decalSize}`,
       `Decal rotation: ${settings.decalRotation}`,
       `Decal position: ${settings.decalPosition}`,
+      `Shapes: ${settings.shapes}`,
       `Text: ${settings.text}`,
       `Text color: ${settings.textColor}`,
       `Text size: ${settings.textSize}`,

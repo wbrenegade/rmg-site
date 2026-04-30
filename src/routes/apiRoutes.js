@@ -40,8 +40,51 @@ const upload = multer({
 	},
 });
 
+const premadeDecalDir = path.join(__dirname, "..", "..", "public", "assets", "svg");
+
+function titleCaseAssetName(value) {
+	return String(value || "")
+		.replace(/\.[^.]+$/, "")
+		.replace(/[_-]+/g, " ")
+		.replace(/\s+/g, " ")
+		.trim()
+		.replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function listPremadeDecalFiles(dir, relativeDir = "") {
+	if (!fs.existsSync(dir)) return [];
+
+	return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+		const relativePath = path.posix.join(relativeDir, entry.name);
+		const fullPath = path.join(dir, entry.name);
+
+		if (entry.isDirectory()) {
+			return listPremadeDecalFiles(fullPath, relativePath);
+		}
+
+		if (!/\.(svg|png|jpe?g|webp)$/i.test(entry.name)) return [];
+
+		const category = relativeDir ? titleCaseAssetName(relativeDir.split("/").join(" ")) : "Premade";
+		const name = titleCaseAssetName(entry.name);
+		const id = relativePath.toLowerCase().replace(/\.[^.]+$/, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+		const assetPath = `/assets/svg/${relativePath.split("/").map(encodeURIComponent).join("/")}`;
+		const isSvg = /\.svg$/i.test(entry.name);
+
+		return [{
+			id,
+			label: `${category} - ${name}`,
+			path: assetPath,
+			type: isSvg ? "svg" : "image",
+			outlined: /outline|outlined/i.test(entry.name)
+		}];
+	});
+}
+
 router.get("/health", getHealth);
 router.get("/products", listProducts);
+router.get("/premade-decals", (req, res) => {
+	res.json(listPremadeDecalFiles(premadeDecalDir).sort((a, b) => a.label.localeCompare(b.label)));
+});
 router.get("/installers", listInstallers);
 router.get("/categories", listCategories);
 router.get("/vehicles/catalog", listVehicleCatalog);

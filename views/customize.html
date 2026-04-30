@@ -66,6 +66,7 @@
           <div class="customize-viewer customizer-stage" id="customizeViewer">
             <img id="customizeBaseImage" src="/assets/imgs/previews/customizer/right-side.png" alt="Vehicle preview" />
             <div id="customizeDecal" class="customize-decal customizer-decal-layer"></div>
+            <div id="customizeShapes" class="customizer-shape-layer"></div>
             <div id="customizeTextLayer" class="customize-decal customizer-text-layer" hidden></div>
           </div>
           <p class="form-note">For windshield or rear-window banners, get more advanced controls with the banner mockup tool.</p>
@@ -87,13 +88,9 @@
           </label>
 
           <div class="form-section full-width"><h3>Decal</h3></div>
-          <label>Mode
-            <select id="customizerModeSelect"></select>
+          <label class="full-width">Add a Premade Decal
+            <select id="premadeDecalSelect"></select>
           </label>
-          <label>Decal
-            <select id="decalSelect"></select>
-          </label>
-          <button type="button" class="btn btn-outline full-width" id="showAllModesBtn">Show Full Customizer</button>
           <label>Decal Color
             <input type="color" id="decalColor" value="#111111" />
           </label>
@@ -111,30 +108,39 @@
           </label>
 
           <div class="form-section full-width"><h3>Shape Elements</h3></div>
-          <label>Edit Target
-            <select id="shapeEditScope">
-              <option value="group">All Shapes</option>
-              <option value="individual">Selected Shape</option>
+          <div class="shape-tool-grid full-width" id="shapeToolGrid">
+            <button type="button" class="shape-tool" data-shape-type="square">Square</button>
+            <button type="button" class="shape-tool" data-shape-type="circle">Circle</button>
+            <button type="button" class="shape-tool" data-shape-type="triangle">Triangle</button>
+            <button type="button" class="shape-tool" data-shape-type="star">Star</button>
+            <button type="button" class="shape-tool" data-shape-type="diamond">Diamond</button>
+            <button type="button" class="shape-tool" data-shape-type="line">Line</button>
+          </div>
+          <label>Active Shape
+            <select id="editorShapeSelect">
+              <option value="">No shape selected</option>
             </select>
           </label>
-          <label>Shape
-            <select id="shapeElementSelect">
-              <option value="all">All Shapes</option>
-            </select>
+          <label>Shape Size
+            <input type="range" id="editorShapeSize" min="24" max="260" value="96" />
           </label>
-          <label>Shape Color
-            <input type="color" id="shapeFillColor" value="#111111" />
+          <label>Shape Rotation
+            <input type="range" id="editorShapeRotate" min="-180" max="180" value="0" />
           </label>
-          <label>Outline Color
-            <input type="color" id="shapeStrokeColor" value="#111111" />
+          <label>Shape Fill
+            <input type="color" id="editorShapeFill" value="#111111" />
           </label>
-          <label>Outline Thickness
-            <input type="range" id="shapeStrokeWidth" min="0" max="24" value="6" />
+          <label>Stroke Color
+            <input type="color" id="editorShapeStroke" value="#ffffff" />
+          </label>
+          <label>Stroke Size
+            <input type="range" id="editorShapeStrokeWidth" min="0" max="24" value="4" />
+          </label>
+          <label id="editorStarPointsWrap">Star Points
+            <input type="range" id="editorStarPoints" min="4" max="12" value="5" />
           </label>
           <div class="full-width customize-actions">
-            <button type="button" class="btn btn-outline" id="undoShapeEdit">Undo</button>
-            <button type="button" class="btn btn-outline" id="redoShapeEdit">Redo</button>
-            <button type="button" class="btn btn-outline" id="resetShapeElements">Back to Original</button>
+            <button type="button" class="btn btn-outline" id="deleteEditorShape">Delete Shape</button>
           </div>
 
           <div class="form-section full-width"><h3>Text</h3></div>
