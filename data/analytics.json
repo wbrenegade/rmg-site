@@ -6704,6 +6704,28 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "1967205f-e706-4ad4-96cc-b610352d7e3c",
+      "type": "page_view",
+      "pathname": "/customize",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/",
+      "method": "GET",
+      "timestamp": "2026-04-30T05:45:47.596Z",
+      "date": "2026-04-30",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }
