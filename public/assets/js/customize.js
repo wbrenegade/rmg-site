@@ -815,6 +815,20 @@ async function initCustomizePage() {
     decalLayer.style.setProperty('--selection-center-x', `${left + width / 2}%`);
   }
 
+  function setDecalSelectionPixelBounds(left, top, width, height) {
+    decalLayer.style.setProperty('--selection-left-px', `${left}px`);
+    decalLayer.style.setProperty('--selection-top-px', `${top}px`);
+    decalLayer.style.setProperty('--selection-width-px', `${width}px`);
+    decalLayer.style.setProperty('--selection-height-px', `${height}px`);
+    decalLayer.style.setProperty('--selection-center-x-px', `${left + width / 2}px`);
+    decalLayer.style.setProperty('--selection-center-y-px', `${top + height / 2}px`);
+  }
+
+  function resetDecalSelectionPixelBounds() {
+    const rect = decalLayer.getBoundingClientRect();
+    setDecalSelectionPixelBounds(0, 0, rect.width || 1, rect.height || 1);
+  }
+
   function normalizeDecalSvgBounds() {
     const svg = decalLayer.querySelector('svg');
     if (!svg) return;
@@ -845,7 +859,7 @@ async function initCustomizePage() {
           const width = image.naturalWidth;
           const height = image.naturalHeight;
           if (!(width && height)) {
-            setDecalSelectionBounds(0, 0, 100, 100);
+            resetDecalSelectionPixelBounds();
             return;
           }
 
@@ -871,18 +885,19 @@ async function initCustomizePage() {
           }
 
           if (minX > maxX || minY > maxY) {
-            setDecalSelectionBounds(0, 0, 100, 100);
+            resetDecalSelectionPixelBounds();
             return;
           }
 
-          setDecalSelectionBounds(
-            (minX / width) * 100,
-            (minY / height) * 100,
-            ((maxX - minX + 1) / width) * 100,
-            ((maxY - minY + 1) / height) * 100
+          const layerRect = decalLayer.getBoundingClientRect();
+          setDecalSelectionPixelBounds(
+            (minX / width) * layerRect.width,
+            (minY / height) * layerRect.height,
+            ((maxX - minX + 1) / width) * layerRect.width,
+            ((maxY - minY + 1) / height) * layerRect.height
           );
         } catch {
-          setDecalSelectionBounds(0, 0, 100, 100);
+          resetDecalSelectionPixelBounds();
         }
       };
 
@@ -890,21 +905,39 @@ async function initCustomizePage() {
         measureImage();
       } else {
         image.addEventListener('load', measureImage, { once: true });
-        setDecalSelectionBounds(0, 0, 100, 100);
+        resetDecalSelectionPixelBounds();
       }
       return;
     }
 
     if (!svg) {
-      setDecalSelectionBounds(0, 0, 100, 100);
+      resetDecalSelectionPixelBounds();
       return;
     }
 
     try {
       normalizeDecalSvgBounds();
-      setDecalSelectionBounds(0, 0, 100, 100);
+      const bbox = svg.getBBox();
+      const matrix = svg.getScreenCTM();
+      const layerRect = decalLayer.getBoundingClientRect();
+      if (!matrix || !(bbox.width && bbox.height)) {
+        resetDecalSelectionPixelBounds();
+        return;
+      }
+
+      const points = [
+        new DOMPoint(bbox.x, bbox.y).matrixTransform(matrix),
+        new DOMPoint(bbox.x + bbox.width, bbox.y).matrixTransform(matrix),
+        new DOMPoint(bbox.x + bbox.width, bbox.y + bbox.height).matrixTransform(matrix),
+        new DOMPoint(bbox.x, bbox.y + bbox.height).matrixTransform(matrix)
+      ];
+      const minX = Math.min(...points.map((point) => point.x)) - layerRect.left;
+      const minY = Math.min(...points.map((point) => point.y)) - layerRect.top;
+      const maxX = Math.max(...points.map((point) => point.x)) - layerRect.left;
+      const maxY = Math.max(...points.map((point) => point.y)) - layerRect.top;
+      setDecalSelectionPixelBounds(minX, minY, maxX - minX, maxY - minY);
     } catch {
-      setDecalSelectionBounds(0, 0, 100, 100);
+      resetDecalSelectionPixelBounds();
     }
   }
 
@@ -1189,6 +1222,8 @@ async function initCustomizePage() {
       Number(textYInput?.value || 24),
       Number(textRotateInput?.value || 0)
     );
+
+    if (getActiveDecalOption()) requestAnimationFrame(updateDecalSelectionBounds);
   }
 
   function updateAll() {

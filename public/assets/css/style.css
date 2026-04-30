@@ -999,18 +999,18 @@ textarea { resize: vertical; }
 
 .customizer-decal-selection {
   position: absolute;
-  left: var(--selection-left, 0%);
-  top: var(--selection-top, 0%);
-  width: var(--selection-width, 100%);
-  height: var(--selection-height, 100%);
+  left: var(--selection-left-px, 0px);
+  top: var(--selection-top-px, 0px);
+  width: var(--selection-width-px, 100%);
+  height: var(--selection-height-px, 100%);
   border: 1px dashed rgba(125,255,90,0.9);
   pointer-events: none;
 }
 
 .customizer-rotate-handle {
   position: absolute;
-  left: calc(var(--selection-center-x, 50%) - 13px);
-  top: calc(var(--selection-top, 0%) - 42px);
+  left: calc(var(--selection-center-x-px, 50%) - 13px);
+  top: calc(var(--selection-top-px, 0px) - 42px);
   width: 26px;
   height: 26px;
   border: 2px solid #0b0d12;
@@ -1038,19 +1038,19 @@ textarea { resize: vertical; }
 }
 
 .customizer-resize-handle {
-  left: calc(var(--selection-left, 0%) + var(--selection-width, 100%) - 13px);
-  top: calc(var(--selection-top, 0%) + var(--selection-height, 100%) - 13px);
+  left: calc(var(--selection-left-px, 0px) + var(--selection-width-px, 100%) - 13px);
+  top: calc(var(--selection-top-px, 0px) + var(--selection-height-px, 100%) - 13px);
 }
 
 .customizer-resize-x-handle {
-  left: calc(var(--selection-left, 0%) + var(--selection-width, 100%) - 13px);
-  top: calc(var(--selection-top, 0%) + (var(--selection-height, 100%) / 2) - 13px);
+  left: calc(var(--selection-left-px, 0px) + var(--selection-width-px, 100%) - 13px);
+  top: calc(var(--selection-center-y-px, 50%) - 13px);
   cursor: ew-resize;
 }
 
 .customizer-resize-y-handle {
-  left: calc(var(--selection-left, 0%) + (var(--selection-width, 100%) / 2) - 13px);
-  top: calc(var(--selection-top, 0%) + var(--selection-height, 100%) - 13px);
+  left: calc(var(--selection-center-x-px, 50%) - 13px);
+  top: calc(var(--selection-top-px, 0px) + var(--selection-height-px, 100%) - 13px);
   cursor: ns-resize;
 }
 
@@ -2458,22 +2458,22 @@ body.modal-open {
 }
 
 .customizer-rotate-handle {
-  left: calc(var(--selection-center-x, 50%) - 9px);
+  left: calc(var(--selection-center-x-px, 50%) - 9px);
 }
 
 .customizer-resize-handle {
-  left: calc(var(--selection-left, 0%) + var(--selection-width, 100%) - 9px);
-  top: calc(var(--selection-top, 0%) + var(--selection-height, 100%) - 9px);
+  left: calc(var(--selection-left-px, 0px) + var(--selection-width-px, 100%) - 9px);
+  top: calc(var(--selection-top-px, 0px) + var(--selection-height-px, 100%) - 9px);
 }
 
 .customizer-resize-x-handle {
-  left: calc(var(--selection-left, 0%) + var(--selection-width, 100%) - 9px);
-  top: calc(var(--selection-top, 0%) + (var(--selection-height, 100%) / 2) - 9px);
+  left: calc(var(--selection-left-px, 0px) + var(--selection-width-px, 100%) - 9px);
+  top: calc(var(--selection-center-y-px, 50%) - 9px);
 }
 
 .customizer-resize-y-handle {
-  left: calc(var(--selection-left, 0%) + (var(--selection-width, 100%) / 2) - 9px);
-  top: calc(var(--selection-top, 0%) + var(--selection-height, 100%) - 9px);
+  left: calc(var(--selection-center-x-px, 50%) - 9px);
+  top: calc(var(--selection-top-px, 0px) + var(--selection-height-px, 100%) - 9px);
 }
 
 .customizer-workspace.is-fullscreen {
