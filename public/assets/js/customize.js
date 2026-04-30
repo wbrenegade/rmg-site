@@ -259,6 +259,44 @@ function tintFilterForHex(hexColor) {
   return `brightness(0) saturate(100%) sepia(1) saturate(10000%) opacity(1) drop-shadow(0 0 0 rgb(${r} ${g} ${b}))`;
 }
 
+function cropImageToVisiblePixels(image) {
+  const width = image.naturalWidth;
+  const height = image.naturalHeight;
+  if (!(width && height)) return '';
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(image, 0, 0);
+  const pixels = ctx.getImageData(0, 0, width, height).data;
+  let minX = width;
+  let minY = height;
+  let maxX = 0;
+  let maxY = 0;
+
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      if (pixels[(y * width + x) * 4 + 3] > 8) {
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+      }
+    }
+  }
+
+  if (minX > maxX || minY > maxY) return '';
+
+  const cropWidth = maxX - minX + 1;
+  const cropHeight = maxY - minY + 1;
+  const cropCanvas = document.createElement('canvas');
+  cropCanvas.width = cropWidth;
+  cropCanvas.height = cropHeight;
+  cropCanvas.getContext('2d').drawImage(canvas, minX, minY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+  return cropCanvas.toDataURL('image/png');
+}
+
 function applyInlineSvgColors(svg, fillColor, strokeColor) {
   if (!svg) return;
 
@@ -331,8 +369,16 @@ async function renderDecalLayer({ decalLayer, option, fillColor }) {
   const strokeColor = option.outlined ? '#050505' : fillColor;
 
   if (option.type === 'image') {
+    let imagePath = option.path;
+    try {
+      const image = await loadImage(option.path);
+      imagePath = cropImageToVisiblePixels(image) || option.path;
+    } catch {
+      imagePath = option.path;
+    }
+
     decalLayer.innerHTML = `
-      <img class="customizer-decal-source" src="${escapeHtml(option.path)}" alt="" draggable="false" />
+      <img class="customizer-decal-source" src="${escapeHtml(imagePath)}" alt="" draggable="false" />
       <div class="customizer-decal-image" role="img" aria-label="${escapeHtml(option.label)}"></div>
       <div class="customizer-decal-selection" aria-hidden="true"></div>
       <button type="button" class="customizer-rotate-handle" aria-label="Rotate decal"></button>
@@ -342,7 +388,7 @@ async function renderDecalLayer({ decalLayer, option, fillColor }) {
     `;
     const imageMask = decalLayer.querySelector('.customizer-decal-image');
     imageMask?.style.setProperty('background-color', fillColor);
-    imageMask?.style.setProperty('--decal-mask-url', `url("${option.path}")`);
+    imageMask?.style.setProperty('--decal-mask-url', `url("${imagePath}")`);
     return;
   }
 
