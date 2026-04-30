@@ -332,12 +332,15 @@ async function renderDecalLayer({ decalLayer, option, fillColor }) {
 
   if (option.type === 'image') {
     decalLayer.innerHTML = `
-      <img class="customizer-decal-image" src="${escapeHtml(option.path)}" alt="${escapeHtml(option.label)}" draggable="false" />
+      <img class="customizer-decal-source" src="${escapeHtml(option.path)}" alt="" draggable="false" />
+      <div class="customizer-decal-image" role="img" aria-label="${escapeHtml(option.label)}"></div>
       <div class="customizer-decal-selection" aria-hidden="true"></div>
       <button type="button" class="customizer-rotate-handle" aria-label="Rotate decal"></button>
       <button type="button" class="customizer-resize-handle" aria-label="Resize decal"></button>
     `;
-    decalLayer.querySelector('.customizer-decal-image')?.style.setProperty('filter', tintFilterForHex(fillColor));
+    const imageMask = decalLayer.querySelector('.customizer-decal-image');
+    imageMask?.style.setProperty('background-color', fillColor);
+    imageMask?.style.setProperty('--decal-mask-url', `url("${option.path}")`);
     return;
   }
 
@@ -822,7 +825,7 @@ async function initCustomizePage() {
 
   function updateDecalSelectionBounds() {
     const svg = decalLayer.querySelector('svg');
-    const image = decalLayer.querySelector('.customizer-decal-image');
+    const image = decalLayer.querySelector('.customizer-decal-source');
     if (image) {
       const measureImage = () => {
         try {
@@ -893,6 +896,17 @@ async function initCustomizePage() {
     }
   }
 
+  function updateMountedDecalColor() {
+    const fillColor = decalColorInput?.value || '#111111';
+    const option = getActiveDecalOption();
+    const strokeColor = option?.outlined ? '#050505' : fillColor;
+    const svg = decalLayer.querySelector('svg');
+    const imageMask = decalLayer.querySelector('.customizer-decal-image');
+
+    if (svg) applyInlineSvgColors(svg, fillColor, strokeColor);
+    if (imageMask) imageMask.style.setProperty('background-color', fillColor);
+  }
+
   function prepareShapeEditor(resetHistory = true) {
     const shapes = getEditableShapes();
     shapes.forEach((shape, index) => {
@@ -947,7 +961,7 @@ async function initCustomizePage() {
 
   async function drawSvgLayer(ctx, layer, stageRect, scale) {
     const svg = layer.querySelector('svg');
-    const decalImage = layer.querySelector('.customizer-decal-image');
+    const decalImage = layer.querySelector('.customizer-decal-source');
     if (!svg && !decalImage) return;
 
     const image = decalImage
@@ -958,6 +972,16 @@ async function initCustomizePage() {
         return exportSvg;
       })()))}`);
     const rect = layerRectInStage(layer, stageRect, scale);
+    if (decalImage) {
+      ctx.save();
+      ctx.drawImage(image, rect.x, rect.y, rect.width, rect.height);
+      ctx.globalCompositeOperation = 'source-in';
+      ctx.fillStyle = decalColorInput?.value || '#111111';
+      ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+      ctx.restore();
+      return;
+    }
+
     ctx.drawImage(image, rect.x, rect.y, rect.width, rect.height);
   }
 
@@ -1160,7 +1184,7 @@ async function initCustomizePage() {
   });
 
   decalColorInput?.addEventListener('input', () => {
-    updateDecal();
+    updateMountedDecalColor();
   });
 
   [decalSizeInput, decalRotateInput, decalXInput, decalYInput].forEach((input) => {
