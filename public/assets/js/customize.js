@@ -244,6 +244,39 @@ function colorizeInlineSvg(svgText, fillColor, strokeColor, className = 'customi
     .replace(/stroke="[#a-zA-Z0-9(),.\s-]+"/g, `stroke="${strokeColor}"`);
 }
 
+function hexToRgb(hexColor) {
+  const normalized = String(hexColor || '').replace('#', '').trim();
+  if (!/^[0-9a-fA-F]{6}$/.test(normalized)) return { r: 17, g: 17, b: 17 };
+  return {
+    r: Number.parseInt(normalized.slice(0, 2), 16),
+    g: Number.parseInt(normalized.slice(2, 4), 16),
+    b: Number.parseInt(normalized.slice(4, 6), 16)
+  };
+}
+
+function tintFilterForHex(hexColor) {
+  const { r, g, b } = hexToRgb(hexColor);
+  return `brightness(0) saturate(100%) sepia(1) saturate(10000%) opacity(1) drop-shadow(0 0 0 rgb(${r} ${g} ${b}))`;
+}
+
+function applyInlineSvgColors(svg, fillColor, strokeColor) {
+  if (!svg) return;
+
+  svg.querySelectorAll('[fill], [style*="fill"]').forEach((element) => {
+    const fill = element.getAttribute('fill') || inlineStyleValue(element, 'fill');
+    if (String(fill || '').trim().toLowerCase() === 'none') return;
+    element.setAttribute('fill', fillColor);
+    setInlineStyleValue(element, 'fill', fillColor);
+  });
+
+  svg.querySelectorAll('[stroke], [style*="stroke"]').forEach((element) => {
+    const stroke = element.getAttribute('stroke') || inlineStyleValue(element, 'stroke');
+    if (String(stroke || '').trim().toLowerCase() === 'none') return;
+    element.setAttribute('stroke', strokeColor);
+    setInlineStyleValue(element, 'stroke', strokeColor);
+  });
+}
+
 function buildDecalOptions(products) {
   const productOptions = products
     .filter((product) => String(product?.category || '').toLowerCase() === 'decals')
@@ -304,6 +337,7 @@ async function renderDecalLayer({ decalLayer, option, fillColor }) {
       <button type="button" class="customizer-rotate-handle" aria-label="Rotate decal"></button>
       <button type="button" class="customizer-resize-handle" aria-label="Resize decal"></button>
     `;
+    decalLayer.querySelector('.customizer-decal-image')?.style.setProperty('filter', tintFilterForHex(fillColor));
     return;
   }
 
@@ -314,6 +348,7 @@ async function renderDecalLayer({ decalLayer, option, fillColor }) {
         <div class="customizer-decal-selection" aria-hidden="true"></div>
         <button type="button" class="customizer-rotate-handle" aria-label="Rotate decal"></button>
         <button type="button" class="customizer-resize-handle" aria-label="Resize decal"></button>`;
+      applyInlineSvgColors(decalLayer.querySelector('svg'), fillColor, strokeColor);
       return;
     } catch {
       decalLayer.innerHTML = '';

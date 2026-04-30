@@ -978,6 +978,12 @@ textarea { resize: vertical; }
   pointer-events: none;
 }
 
+.customize-viewer .customizer-decal-image {
+  height: auto;
+  min-height: 0;
+  object-fit: contain;
+}
+
 .customizer-decal-selection {
   position: absolute;
   left: var(--selection-left, 0%);
