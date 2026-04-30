@@ -336,6 +336,8 @@ async function renderDecalLayer({ decalLayer, option, fillColor }) {
       <div class="customizer-decal-image" role="img" aria-label="${escapeHtml(option.label)}"></div>
       <div class="customizer-decal-selection" aria-hidden="true"></div>
       <button type="button" class="customizer-rotate-handle" aria-label="Rotate decal"></button>
+      <button type="button" class="customizer-resize-x-handle" aria-label="Resize decal horizontally"></button>
+      <button type="button" class="customizer-resize-y-handle" aria-label="Resize decal vertically"></button>
       <button type="button" class="customizer-resize-handle" aria-label="Resize decal"></button>
     `;
     const imageMask = decalLayer.querySelector('.customizer-decal-image');
@@ -350,6 +352,8 @@ async function renderDecalLayer({ decalLayer, option, fillColor }) {
       decalLayer.innerHTML = `${colorizeInlineSvg(svgText, fillColor, strokeColor)}
         <div class="customizer-decal-selection" aria-hidden="true"></div>
         <button type="button" class="customizer-rotate-handle" aria-label="Rotate decal"></button>
+        <button type="button" class="customizer-resize-x-handle" aria-label="Resize decal horizontally"></button>
+        <button type="button" class="customizer-resize-y-handle" aria-label="Resize decal vertically"></button>
         <button type="button" class="customizer-resize-handle" aria-label="Resize decal"></button>`;
       applyInlineSvgColors(decalLayer.querySelector('svg'), fillColor, strokeColor);
       return;
@@ -364,7 +368,7 @@ async function renderDecalLayer({ decalLayer, option, fillColor }) {
 
 function setLayerTransform(layer, size, x, y, rotate) {
   layer.style.width = `${size}%`;
-  layer.style.transform = `translate(calc(-50% + ${x}%), calc(-50% + ${y}%)) rotate(${rotate}deg)`;
+  layer.style.transform = `translate(calc(-50% + ${x}%), calc(-50% + ${y}%)) rotate(${rotate}deg) scale(${layer.dataset.scaleX || 1}, ${layer.dataset.scaleY || 1})`;
 }
 
 function loadImage(src) {
@@ -425,6 +429,10 @@ async function initCustomizePage() {
   let redoStack = [];
   let activeShapeId = 'all';
   let decalObjectDragState = null;
+  let decalScaleX = 1;
+  let decalScaleY = 1;
+  let isDecalEraserActive = false;
+  let eraserDragState = null;
   let editorShapes = [];
   let selectedEditorShapeId = '';
   let shapeObjectDragState = null;
@@ -455,6 +463,8 @@ async function initCustomizePage() {
   const decalRotateInput = document.getElementById('decalRotate');
   const decalXInput = document.getElementById('decalX');
   const decalYInput = document.getElementById('decalY');
+  const decalEraserSizeInput = document.getElementById('decalEraserSize');
+  const decalEraserToggle = document.getElementById('decalEraserToggle');
   const shapeToolGrid = document.getElementById('shapeToolGrid');
   const editorShapeSelect = document.getElementById('editorShapeSelect');
   const editorShapeSizeInput = document.getElementById('editorShapeSize');
@@ -670,19 +680,21 @@ async function initCustomizePage() {
     updateHistoryButtons();
   }
 
-  function setDecalTransformInputs({ size, x, y, rotate }) {
+  function setDecalTransformInputs({ size, x, y, rotate, scaleX, scaleY }) {
     if (typeof size === 'number' && decalSizeInput) {
       decalSizeInput.value = String(Math.max(20, Math.min(140, Math.round(size))));
     }
+    if (typeof scaleX === 'number') decalScaleX = Math.max(0.2, Math.min(4, scaleX));
+    if (typeof scaleY === 'number') decalScaleY = Math.max(0.2, Math.min(4, scaleY));
     if (typeof rotate === 'number' && decalRotateInput) {
       let normalized = ((rotate + 180) % 360 + 360) % 360 - 180;
       decalRotateInput.value = String(Math.round(normalized));
     }
     if (typeof x === 'number' && decalXInput) {
-      decalXInput.value = String(Math.max(-45, Math.min(45, Math.round(x))));
+      decalXInput.value = String(Math.max(-200, Math.min(200, Math.round(x))));
     }
     if (typeof y === 'number' && decalYInput) {
-      decalYInput.value = String(Math.max(-45, Math.min(45, Math.round(y))));
+      decalYInput.value = String(Math.max(-200, Math.min(200, Math.round(y))));
     }
     updateTransforms();
   }
@@ -907,6 +919,89 @@ async function initCustomizePage() {
     if (imageMask) imageMask.style.setProperty('background-color', fillColor);
   }
 
+  function syncEraserAvailability() {
+    const canErase = Boolean(decalLayer.querySelector('svg'));
+    if (decalEraserToggle) {
+      decalEraserToggle.disabled = !canErase;
+      if (!canErase) decalEraserToggle.textContent = 'Eraser SVG Only';
+    }
+    if (!canErase) setDecalEraserActive(false);
+  }
+
+  function setDecalEraserActive(isActive) {
+    if (isActive && !decalLayer.querySelector('svg')) return;
+    isDecalEraserActive = isActive;
+    decalLayer.classList.toggle('is-erasing', isActive);
+    if (decalEraserToggle) {
+      decalEraserToggle.textContent = isActive ? 'Eraser On' : 'Eraser Off';
+      decalEraserToggle.setAttribute('aria-pressed', String(isActive));
+    }
+  }
+
+  function ensureDecalEraserMask(svg) {
+    if (!svg) return null;
+
+    const maskId = svg.dataset.eraserMaskId || `decal-eraser-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    svg.dataset.eraserMaskId = maskId;
+
+    let defs = svg.querySelector('defs');
+    if (!defs) {
+      defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      svg.insertBefore(defs, svg.firstChild);
+    }
+
+    let mask = svg.querySelector(`#${maskId}`);
+    if (!mask) {
+      const viewBox = svg.viewBox?.baseVal;
+      mask = document.createElementNS('http://www.w3.org/2000/svg', 'mask');
+      mask.id = maskId;
+      mask.setAttribute('maskUnits', 'userSpaceOnUse');
+      mask.setAttribute('x', String(viewBox?.x || 0));
+      mask.setAttribute('y', String(viewBox?.y || 0));
+      mask.setAttribute('width', String(viewBox?.width || 100));
+      mask.setAttribute('height', String(viewBox?.height || 100));
+
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', String(viewBox?.x || 0));
+      rect.setAttribute('y', String(viewBox?.y || 0));
+      rect.setAttribute('width', String(viewBox?.width || 100));
+      rect.setAttribute('height', String(viewBox?.height || 100));
+      rect.setAttribute('fill', '#fff');
+      mask.appendChild(rect);
+      defs.appendChild(mask);
+    }
+
+    [...svg.children].forEach((child) => {
+      if (child.tagName.toLowerCase() !== 'defs') {
+        child.setAttribute('mask', `url(#${maskId})`);
+      }
+    });
+
+    return mask;
+  }
+
+  function getSvgPoint(svg, event) {
+    const point = svg.createSVGPoint();
+    point.x = event.clientX;
+    point.y = event.clientY;
+    return point.matrixTransform(svg.getScreenCTM().inverse());
+  }
+
+  function addEraserStroke(svg, fromPoint, toPoint) {
+    const mask = ensureDecalEraserMask(svg);
+    if (!mask) return;
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const size = Number(decalEraserSizeInput?.value || 24);
+    path.setAttribute('d', `M ${fromPoint.x} ${fromPoint.y} L ${toPoint.x} ${toPoint.y}`);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', '#000');
+    path.setAttribute('stroke-width', String(size));
+    path.setAttribute('stroke-linecap', 'round');
+    path.setAttribute('stroke-linejoin', 'round');
+    mask.appendChild(path);
+  }
+
   function prepareShapeEditor(resetHistory = true) {
     const shapes = getEditableShapes();
     shapes.forEach((shape, index) => {
@@ -1062,6 +1157,7 @@ async function initCustomizePage() {
     await renderDecalLayer({ decalLayer, option, fillColor });
     if (requestId !== decalRenderRequestId) return;
     updateDecalSelectionBounds();
+    syncEraserAvailability();
     prepareShapeEditor(true);
   }
 
@@ -1070,6 +1166,8 @@ async function initCustomizePage() {
   }
 
   function updateTransforms() {
+    decalLayer.dataset.scaleX = String(decalScaleX);
+    decalLayer.dataset.scaleY = String(decalScaleY);
     setLayerTransform(
       decalLayer,
       Number(decalSizeInput?.value || 72),
@@ -1129,6 +1227,8 @@ async function initCustomizePage() {
       if (decalXInput) decalXInput.value = '0';
       if (decalYInput) decalYInput.value = '0';
       if (decalRotateInput) decalRotateInput.value = '0';
+      decalScaleX = 1;
+      decalScaleY = 1;
     }
     updateAll();
   });
@@ -1185,6 +1285,10 @@ async function initCustomizePage() {
 
   decalColorInput?.addEventListener('input', () => {
     updateMountedDecalColor();
+  });
+
+  decalEraserToggle?.addEventListener('click', () => {
+    setDecalEraserActive(!isDecalEraserActive);
   });
 
   [decalSizeInput, decalRotateInput, decalXInput, decalYInput].forEach((input) => {
@@ -1342,7 +1446,22 @@ async function initCustomizePage() {
     if (!getActiveDecalOption()) return;
 
     event.preventDefault();
+    if (isDecalEraserActive) {
+      const svg = decalLayer.querySelector('svg');
+      if (!svg) return;
+      const point = getSvgPoint(svg, event);
+      eraserDragState = {
+        pointerId: event.pointerId,
+        lastPoint: point
+      };
+      addEraserStroke(svg, point, point);
+      decalLayer.setPointerCapture?.(event.pointerId);
+      return;
+    }
+
     const isResize = Boolean(event.target.closest?.('.customizer-resize-handle'));
+    const isResizeX = Boolean(event.target.closest?.('.customizer-resize-x-handle'));
+    const isResizeY = Boolean(event.target.closest?.('.customizer-resize-y-handle'));
     const isRotate = Boolean(event.target.closest?.('.customizer-rotate-handle'));
     const stageRect = document.getElementById('customizeViewer')?.getBoundingClientRect();
     const layerRect = decalLayer.getBoundingClientRect();
@@ -1350,10 +1469,12 @@ async function initCustomizePage() {
     const centerY = layerRect.top + layerRect.height / 2;
     decalObjectDragState = {
       pointerId: event.pointerId,
-      mode: isRotate ? 'rotate' : isResize ? 'resize' : 'move',
+      mode: isRotate ? 'rotate' : isResizeX ? 'resize-x' : isResizeY ? 'resize-y' : isResize ? 'resize' : 'move',
       startClientX: event.clientX,
       startClientY: event.clientY,
       startSize: Number(decalSizeInput?.value || 72),
+      startScaleX: decalScaleX,
+      startScaleY: decalScaleY,
       startRotate: Number(decalRotateInput?.value || 0),
       startAngle: Math.atan2(event.clientY - centerY, event.clientX - centerX) * 180 / Math.PI,
       centerX,
@@ -1368,6 +1489,15 @@ async function initCustomizePage() {
   });
 
   decalLayer.addEventListener('pointermove', (event) => {
+    if (eraserDragState && eraserDragState.pointerId === event.pointerId) {
+      const svg = decalLayer.querySelector('svg');
+      if (!svg) return;
+      const point = getSvgPoint(svg, event);
+      addEraserStroke(svg, eraserDragState.lastPoint, point);
+      eraserDragState.lastPoint = point;
+      return;
+    }
+
     if (!decalObjectDragState || decalObjectDragState.pointerId !== event.pointerId) return;
 
     const dx = event.clientX - decalObjectDragState.startClientX;
@@ -1377,6 +1507,20 @@ async function initCustomizePage() {
       const dominantDelta = Math.abs(dx) > Math.abs(dy) ? dx : dy;
       setDecalTransformInputs({
         size: decalObjectDragState.startSize + (dominantDelta / decalObjectDragState.stageWidth) * 100
+      });
+      return;
+    }
+
+    if (decalObjectDragState.mode === 'resize-x') {
+      setDecalTransformInputs({
+        scaleX: decalObjectDragState.startScaleX + dx / decalObjectDragState.layerWidth
+      });
+      return;
+    }
+
+    if (decalObjectDragState.mode === 'resize-y') {
+      setDecalTransformInputs({
+        scaleY: decalObjectDragState.startScaleY + dy / decalObjectDragState.layerHeight
       });
       return;
     }
@@ -1397,6 +1541,12 @@ async function initCustomizePage() {
 
   ['pointerup', 'pointercancel'].forEach((eventName) => {
     decalLayer.addEventListener(eventName, (event) => {
+      if (eraserDragState && eraserDragState.pointerId === event.pointerId) {
+        eraserDragState = null;
+        decalLayer.releasePointerCapture?.(event.pointerId);
+        return;
+      }
+
       if (!decalObjectDragState || decalObjectDragState.pointerId !== event.pointerId) return;
       decalObjectDragState = null;
       decalLayer.releasePointerCapture?.(event.pointerId);

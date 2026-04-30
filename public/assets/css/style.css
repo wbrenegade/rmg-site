@@ -1022,10 +1022,10 @@ textarea { resize: vertical; }
   z-index: 5;
 }
 
-.customizer-resize-handle {
+.customizer-resize-handle,
+.customizer-resize-x-handle,
+.customizer-resize-y-handle {
   position: absolute;
-  left: calc(var(--selection-left, 0%) + var(--selection-width, 100%) - 13px);
-  top: calc(var(--selection-top, 0%) + var(--selection-height, 100%) - 13px);
   width: 26px;
   height: 26px;
   border: 2px solid #0b0d12;
@@ -1035,6 +1035,27 @@ textarea { resize: vertical; }
   cursor: nwse-resize;
   pointer-events: auto;
   z-index: 5;
+}
+
+.customizer-resize-handle {
+  left: calc(var(--selection-left, 0%) + var(--selection-width, 100%) - 13px);
+  top: calc(var(--selection-top, 0%) + var(--selection-height, 100%) - 13px);
+}
+
+.customizer-resize-x-handle {
+  left: calc(var(--selection-left, 0%) + var(--selection-width, 100%) - 13px);
+  top: calc(var(--selection-top, 0%) + (var(--selection-height, 100%) / 2) - 13px);
+  cursor: ew-resize;
+}
+
+.customizer-resize-y-handle {
+  left: calc(var(--selection-left, 0%) + (var(--selection-width, 100%) / 2) - 13px);
+  top: calc(var(--selection-top, 0%) + var(--selection-height, 100%) - 13px);
+  cursor: ns-resize;
+}
+
+.customizer-decal-layer.is-erasing {
+  cursor: crosshair;
 }
 
 .shape-tool-grid {
@@ -2426,6 +2447,8 @@ body.modal-open {
 
 .customizer-rotate-handle,
 .customizer-resize-handle,
+.customizer-resize-x-handle,
+.customizer-resize-y-handle,
 .customizer-shape-resize {
   width: 18px;
   height: 18px;
@@ -2440,6 +2463,16 @@ body.modal-open {
 
 .customizer-resize-handle {
   left: calc(var(--selection-left, 0%) + var(--selection-width, 100%) - 9px);
+  top: calc(var(--selection-top, 0%) + var(--selection-height, 100%) - 9px);
+}
+
+.customizer-resize-x-handle {
+  left: calc(var(--selection-left, 0%) + var(--selection-width, 100%) - 9px);
+  top: calc(var(--selection-top, 0%) + (var(--selection-height, 100%) / 2) - 9px);
+}
+
+.customizer-resize-y-handle {
+  left: calc(var(--selection-left, 0%) + (var(--selection-width, 100%) / 2) - 9px);
   top: calc(var(--selection-top, 0%) + var(--selection-height, 100%) - 9px);
 }
 
