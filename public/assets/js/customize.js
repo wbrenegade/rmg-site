@@ -956,7 +956,7 @@ async function initCustomizePage() {
   premadeDecalSelect?.addEventListener('change', () => {
     activePremadeDecalId = premadeDecalSelect.value || '';
     if (activePremadeDecalId) {
-      if (decalSizeInput) decalSizeInput.value = '72';
+      if (decalSizeInput) decalSizeInput.value = '46';
       if (decalXInput) decalXInput.value = '0';
       if (decalYInput) decalYInput.value = '0';
       if (decalRotateInput) decalRotateInput.value = '0';

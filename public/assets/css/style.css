@@ -952,6 +952,12 @@ textarea { resize: vertical; }
   pointer-events: auto;
   touch-action: none;
   cursor: move;
+  z-index: 2;
+}
+
+.customizer-decal-layer:not(:empty) {
+  outline: 1px dashed rgba(125,255,90,0.8);
+  outline-offset: 6px;
 }
 
 .customizer-text-layer {
@@ -979,16 +985,17 @@ textarea { resize: vertical; }
 
 .customizer-resize-handle {
   position: absolute;
-  right: -9px;
-  bottom: -9px;
-  width: 18px;
-  height: 18px;
+  right: 8px;
+  bottom: 8px;
+  width: 26px;
+  height: 26px;
   border: 2px solid #0b0d12;
   border-radius: 50%;
   background: var(--accent);
   box-shadow: 0 0 0 1px rgba(255,255,255,0.45);
   cursor: nwse-resize;
   pointer-events: auto;
+  z-index: 5;
 }
 
 .shape-tool-grid {
@@ -1037,10 +1044,10 @@ textarea { resize: vertical; }
 
 .customizer-shape-resize {
   position: absolute;
-  right: -10px;
-  bottom: -10px;
-  width: 18px;
-  height: 18px;
+  right: 4px;
+  bottom: 4px;
+  width: 24px;
+  height: 24px;
   border: 2px solid #0b0d12;
   border-radius: 50%;
   background: var(--accent);
