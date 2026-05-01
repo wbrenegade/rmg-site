@@ -135,7 +135,18 @@ function sanitizePayload(payload = {}) {
 }
 
 function createAnalyticsEvent(req, event = {}) {
-  const timestamp = new Date().toISOString();
+  const now = new Date();
+  const timestamp = now.toLocaleString("en-US", {
+    timeZone: "America/Los_Angeles",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true
+  });
+  const date = now.toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
 
   return {
     id: crypto.randomUUID(),
@@ -148,7 +159,7 @@ function createAnalyticsEvent(req, event = {}) {
     referrer: req.get("referer") || null,
     method: req.method,
     timestamp,
-    date: timestamp.slice(0, 10),
+    date,
     ip: getClientIp(req),
     visitorKey: buildVisitorKey(req),
     userAgent: req.get("user-agent") || "unknown",
