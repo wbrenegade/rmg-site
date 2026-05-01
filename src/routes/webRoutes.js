@@ -58,6 +58,7 @@ router.get("/sitemap.xml", serveSitemapXml);
 
 router.get("/tools", serveToolsIndex);
 router.get("/tools/decal-preview", (req, res) => redirectWithQuery(req, res, "/customize"));
+router.get("/tools/decal-editor", (req, res) => redirectWithQuery(req, res, "/tools/decal-creator"));
 router.get("/tools/decal-preview.html", (req, res) => redirectWithQuery(req, res, "/customize"));
 router.get("/decal-preview", (req, res) => redirectWithQuery(req, res, "/customize"));
 router.get("/decal-preview.html", (req, res) => redirectWithQuery(req, res, "/customize"));

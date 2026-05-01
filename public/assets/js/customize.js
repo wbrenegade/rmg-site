@@ -73,8 +73,8 @@ function getEditorDecalOption() {
     if (!svgText.includes('<svg')) return null;
 
     return {
-      id: 'decal-editor-design',
-      label: payload?.label || 'Decal Editor Design',
+      id: 'decal-creator-design',
+      label: payload?.label || 'Decal Creator Design',
       type: 'svg',
       svgText,
       outlined: false,

@@ -46,7 +46,7 @@ async function initAccount() {
         <div class="order-card">
           <div class="order-summary-line"><span>Name</span><strong>${escapeAccountHtml(design.name || 'Saved decal')}</strong></div>
           <div class="order-summary-line"><span>Updated</span><strong>${new Date(design.updatedAt || design.createdAt).toLocaleString()}</strong></div>
-          <a class="btn btn-outline" href="/tools/decal-editor?design=${encodeURIComponent(design.id)}">Open in Editor</a>
+          <a class="btn btn-outline" href="/tools/decal-creator?design=${encodeURIComponent(design.id)}">Open in Creator</a>
         </div>
       `).join('');
     }
