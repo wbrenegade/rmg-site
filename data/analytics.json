@@ -8706,6 +8706,50 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "e56a25fc-6107-4d63-9833-ac66c8d012b2",
+      "type": "page_view",
+      "pathname": "/customize",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/tools",
+      "method": "GET",
+      "timestamp": "2026-05-01T04:59:25.006Z",
+      "date": "2026-05-01",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "5e371aa6-7151-4e30-83a9-be8c58adc233",
+      "type": "page_view",
+      "pathname": "/tools/decal-editor",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/customize",
+      "method": "GET",
+      "timestamp": "2026-05-01T04:59:30.472Z",
+      "date": "2026-05-01",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }
