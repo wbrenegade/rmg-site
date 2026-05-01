@@ -318,6 +318,7 @@
         <button class="btn primary" id="saveBtn">Export SVG</button>
         <button class="btn" id="pngBtn">PNG</button>
         <button class="btn primary" id="sendToCustomizerBtn">Send to Customizer</button>
+        <button class="btn" id="backToCustomizerBtn">Back to Customizer</button>
       </div>
       <div class="sep"></div>
       <div class="action-group">
@@ -471,6 +472,8 @@
       const NS = 'http://www.w3.org/2000/svg';
       const XLINK = 'http://www.w3.org/1999/xlink';
       const CUSTOM_DECAL_STORAGE_KEY = 'rmg_decal_editor_custom_decal';
+      const CURRENT_USER_KEY = 'rmg_current_user';
+      const SAVED_DESIGNS_KEY = 'rmg_saved_decal_designs';
       const $ = id => document.getElementById(id);
       const svg = $('svgRoot');
       const content = $('content');
@@ -483,7 +486,7 @@
         fill: '#60a5fa', stroke: '#111827', strokeWidth: 2, dash: '',
         drawing: null, clipboard: [], undo: [], redo: [], snap: true, grid: true, rulers: true,
         pathEdit: false, id: 1, doc: {w: 1200, h: 800}, drag: null, space: false,
-        selectionKey: '', rotInputPrev: 0
+        selectionKey: '', rotInputPrev: 0, savedDesignId: ''
       };
       const tools = [
         ['select','↖','Select / Transform'], ['node','✥','Node Edit'], ['rect','▭','Rectangle'], ['ellipse','◯','Ellipse'], ['line','╱','Line'], ['arrow','➜','Arrow'],
@@ -511,7 +514,7 @@
       function cleanSvg() { const clone = svg.cloneNode(true); clone.querySelector('#uiLayer')?.remove(); clone.querySelector('#gridRect')?.remove(); clone.querySelectorAll('[data-ui]').forEach(e=>e.remove()); return new XMLSerializer().serializeToString(clone); }
 
       function init() {
-        buildToolbar(); buildSwatches(); createLayer('Layer 1'); setTool('select'); saveHistory(); bindEvents(); updateStage(); renderAll(); zoomFit();
+        buildToolbar(); buildSwatches(); createLayer('Layer 1'); setTool('select'); loadSavedDesignFromUrl(); saveHistory(); bindEvents(); updateStage(); renderAll(); zoomFit();
         updateStatus('Ready');
       }
 
@@ -543,7 +546,7 @@
         $('vScroll').oninput=e=>{ state.pan.y=-e.target.value; updateStage(); };
         $('newBtn').onclick=()=>{ saveHistory(); content.innerHTML=''; createLayer('Layer 1'); state.selected=[]; renderAll(); };
         $('openBtn').onclick=()=>$('fileInput').click(); $('importImageBtn').onclick=()=>$('imageInput').click();
-        $('fileInput').onchange=loadSvgFile; $('imageInput').onchange=loadImageFile; $('saveBtn').onclick=downloadSvg; $('pngBtn').onclick=downloadPng; $('sendToCustomizerBtn').onclick=sendToCustomizer;
+        $('fileInput').onchange=loadSvgFile; $('imageInput').onchange=loadImageFile; $('saveBtn').onclick=downloadSvg; $('pngBtn').onclick=downloadPng; $('sendToCustomizerBtn').onclick=sendToCustomizer; $('backToCustomizerBtn').onclick=backToCustomizer;
         $('undoBtn').onclick=undo; $('redoBtn').onclick=redo; $('copyBtn').onclick=copy; $('cutBtn').onclick=()=>{copy(); removeSelected();}; $('pasteBtn').onclick=paste; $('deleteBtn').onclick=removeSelected;
         $('addLayerBtn').onclick=()=>{saveHistory(); createLayer('Layer '+(content.querySelectorAll('[data-layer]').length+1)); renderAll();}; $('deleteLayerBtn').onclick=deleteLayer; $('layerUpBtn').onclick=()=>moveLayer(1); $('layerDownBtn').onclick=()=>moveLayer(-1);
         $('resizeDocBtn').onclick=resizeDoc; $('sourceBtn').onclick=openSource; $('applySourceBtn').onclick=applySource; $('closeSourceBtn').onclick=()=>$('sourceModal').classList.remove('open');
@@ -825,6 +828,51 @@
       function loadImageFile(e){ const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=()=>{saveHistory(); const img=make('image',{id:uid('image'),'data-vf-object':'true',x:80,y:80,width:320,height:220,href:r.result},activeLayer()); selectOnly(img); renderAll();}; r.readAsDataURL(f); }
       function downloadSvg(){ const blob=new Blob([cleanSvg()],{type:'image/svg+xml'}); download(blob,'vectorforge.svg'); }
       function downloadPng(){ const data=cleanSvg(); const img=new Image(); const url=URL.createObjectURL(new Blob([data],{type:'image/svg+xml'})); img.onload=()=>{ const c=document.createElement('canvas'); c.width=state.doc.w; c.height=state.doc.h; const ctx=c.getContext('2d'); ctx.fillStyle='white'; ctx.fillRect(0,0,c.width,c.height); ctx.drawImage(img,0,0); c.toBlob(b=>download(b,'vectorforge.png')); URL.revokeObjectURL(url); }; img.src=url; }
+      function storageGet(key,fallback){ try { const raw=localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch { return fallback; } }
+      function storageSet(key,value){ localStorage.setItem(key, JSON.stringify(value)); }
+      function currentUser(){ return storageGet(CURRENT_USER_KEY, null); }
+      function savedDesigns(){ const designs=storageGet(SAVED_DESIGNS_KEY, []); return Array.isArray(designs) ? designs : []; }
+      function saveCurrentDesignToAccount(){
+        const user=currentUser();
+        if(!user?.id) return false;
+        const designs=savedDesigns();
+        const existing=state.savedDesignId ? designs.find(d=>d.id===state.savedDesignId && d.userId===user.id) : null;
+        const defaultName=existing?.name || `SVG decal ${new Date().toLocaleDateString()}`;
+        const name=prompt('Save this decal design as:', defaultName);
+        if(name===null) return false;
+        const trimmed=(name || defaultName).trim() || defaultName;
+        const now=new Date().toISOString();
+        const design={
+          id: existing?.id || `svg-design-${Date.now()}`,
+          userId: user.id,
+          name: trimmed,
+          svgText: cleanSvg(),
+          updatedAt: now,
+          createdAt: existing?.createdAt || now
+        };
+        const next=[design, ...designs.filter(d=>d.id!==design.id)];
+        storageSet(SAVED_DESIGNS_KEY, next);
+        state.savedDesignId=design.id;
+        toast('Design saved to your account.');
+        return true;
+      }
+      function loadSavedDesignFromUrl(){
+        const id=new URLSearchParams(window.location.search).get('design');
+        if(!id) return;
+        const user=currentUser();
+        const design=savedDesigns().find(d=>d.id===id && (!user?.id || d.userId===user.id));
+        if(!design?.svgText) { toast('Saved design not found.'); return; }
+        restore(design.svgText);
+        state.savedDesignId=design.id;
+        updateStatus(`Opened ${design.name || 'saved design'}`);
+      }
+      function backToCustomizer(){
+        const user=currentUser();
+        if(user?.id && confirm('Save your current SVG decal design to your account before going back to the customizer?')) {
+          saveCurrentDesignToAccount();
+        }
+        window.location.href='/customize';
+      }
       function sendToCustomizer(){
         const svgText=cleanSvg();
         try {

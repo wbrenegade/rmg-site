@@ -1,6 +1,7 @@
 async function initAccount() {
   const profileEl = document.getElementById('accountProfile');
   const ordersEl = document.getElementById('accountOrders');
+  const savedDesignsEl = document.getElementById('accountSavedDesigns');
   const logoutBtn = document.getElementById('logoutBtn');
   if (!profileEl || !ordersEl) return;
 
@@ -35,10 +36,36 @@ async function initAccount() {
     `).join('');
   }
 
+  if (savedDesignsEl) {
+    const designs = getStorage('rmg_saved_decal_designs', []).filter(design => design.userId === currentUser.id);
+
+    if (!designs.length) {
+      savedDesignsEl.innerHTML = '<div class="empty-state">No saved decal designs yet.</div>';
+    } else {
+      savedDesignsEl.innerHTML = designs.map(design => `
+        <div class="order-card">
+          <div class="order-summary-line"><span>Name</span><strong>${escapeAccountHtml(design.name || 'Saved decal')}</strong></div>
+          <div class="order-summary-line"><span>Updated</span><strong>${new Date(design.updatedAt || design.createdAt).toLocaleString()}</strong></div>
+          <a class="btn btn-outline" href="/tools/decal-editor?design=${encodeURIComponent(design.id)}">Open in Editor</a>
+        </div>
+      `).join('');
+    }
+  }
+
   logoutBtn?.addEventListener('click', () => {
     setCurrentUser(null);
     window.location.href = '/login';
   });
+}
+
+function escapeAccountHtml(value) {
+  return String(value || '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
 }
 
 document.addEventListener('DOMContentLoaded', initAccount);
