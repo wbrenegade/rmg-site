@@ -317,6 +317,7 @@
         <button class="btn" id="importImageBtn">Image</button>
         <button class="btn primary" id="saveBtn">Export SVG</button>
         <button class="btn" id="pngBtn">PNG</button>
+        <button class="btn primary" id="sendToCustomizerBtn">Send to Customizer</button>
       </div>
       <div class="sep"></div>
       <div class="action-group">
@@ -469,6 +470,7 @@
     (() => {
       const NS = 'http://www.w3.org/2000/svg';
       const XLINK = 'http://www.w3.org/1999/xlink';
+      const CUSTOM_DECAL_STORAGE_KEY = 'rmg_decal_editor_custom_decal';
       const $ = id => document.getElementById(id);
       const svg = $('svgRoot');
       const content = $('content');
@@ -541,7 +543,7 @@
         $('vScroll').oninput=e=>{ state.pan.y=-e.target.value; updateStage(); };
         $('newBtn').onclick=()=>{ saveHistory(); content.innerHTML=''; createLayer('Layer 1'); state.selected=[]; renderAll(); };
         $('openBtn').onclick=()=>$('fileInput').click(); $('importImageBtn').onclick=()=>$('imageInput').click();
-        $('fileInput').onchange=loadSvgFile; $('imageInput').onchange=loadImageFile; $('saveBtn').onclick=downloadSvg; $('pngBtn').onclick=downloadPng;
+        $('fileInput').onchange=loadSvgFile; $('imageInput').onchange=loadImageFile; $('saveBtn').onclick=downloadSvg; $('pngBtn').onclick=downloadPng; $('sendToCustomizerBtn').onclick=sendToCustomizer;
         $('undoBtn').onclick=undo; $('redoBtn').onclick=redo; $('copyBtn').onclick=copy; $('cutBtn').onclick=()=>{copy(); removeSelected();}; $('pasteBtn').onclick=paste; $('deleteBtn').onclick=removeSelected;
         $('addLayerBtn').onclick=()=>{saveHistory(); createLayer('Layer '+(content.querySelectorAll('[data-layer]').length+1)); renderAll();}; $('deleteLayerBtn').onclick=deleteLayer; $('layerUpBtn').onclick=()=>moveLayer(1); $('layerDownBtn').onclick=()=>moveLayer(-1);
         $('resizeDocBtn').onclick=resizeDoc; $('sourceBtn').onclick=openSource; $('applySourceBtn').onclick=applySource; $('closeSourceBtn').onclick=()=>$('sourceModal').classList.remove('open');
@@ -823,6 +825,20 @@
       function loadImageFile(e){ const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=()=>{saveHistory(); const img=make('image',{id:uid('image'),'data-vf-object':'true',x:80,y:80,width:320,height:220,href:r.result},activeLayer()); selectOnly(img); renderAll();}; r.readAsDataURL(f); }
       function downloadSvg(){ const blob=new Blob([cleanSvg()],{type:'image/svg+xml'}); download(blob,'vectorforge.svg'); }
       function downloadPng(){ const data=cleanSvg(); const img=new Image(); const url=URL.createObjectURL(new Blob([data],{type:'image/svg+xml'})); img.onload=()=>{ const c=document.createElement('canvas'); c.width=state.doc.w; c.height=state.doc.h; const ctx=c.getContext('2d'); ctx.fillStyle='white'; ctx.fillRect(0,0,c.width,c.height); ctx.drawImage(img,0,0); c.toBlob(b=>download(b,'vectorforge.png')); URL.revokeObjectURL(url); }; img.src=url; }
+      function sendToCustomizer(){
+        const svgText=cleanSvg();
+        try {
+          localStorage.setItem(CUSTOM_DECAL_STORAGE_KEY, JSON.stringify({
+            id: `decal-editor-${Date.now()}`,
+            label: 'Decal Editor Design',
+            svgText,
+            createdAt: new Date().toISOString()
+          }));
+          window.location.href = '/customize?decal=editor';
+        } catch {
+          toast('Could not send decal. Try exporting the SVG instead.');
+        }
+      }
       function download(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
 
       function setZoom(z, center=null){ const old=state.zoom; state.zoom=Math.min(8,Math.max(.1,z)); if(center){ state.pan.x -= center.x*(state.zoom-old); state.pan.y -= center.y*(state.zoom-old); } $('zoomInput').value=Math.round(state.zoom*100); updateStage(); renderSelection(); }

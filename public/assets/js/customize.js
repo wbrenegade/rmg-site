@@ -8,6 +8,7 @@ const CUSTOMIZER_DEFAULT_VIEWS = {
 
 const RACING_STRIPE_PREVIEW_BASE = '/assets/imgs/previews/racing-stripes';
 const GRAPHICS_PREVIEW_BASE = '/assets/imgs/previews/graphics';
+const CUSTOM_DECAL_STORAGE_KEY = 'rmg_decal_editor_custom_decal';
 const PREMADE_DECAL_OPTIONS = [
   {
     id: 'graphics-geo-triags',
@@ -62,6 +63,26 @@ const svgCache = new Map();
 
 function getCustomizeParam(name) {
   return new URLSearchParams(window.location.search).get(name);
+}
+
+function getEditorDecalOption() {
+  try {
+    const raw = localStorage.getItem(CUSTOM_DECAL_STORAGE_KEY);
+    const payload = raw ? JSON.parse(raw) : null;
+    const svgText = String(payload?.svgText || '');
+    if (!svgText.includes('<svg')) return null;
+
+    return {
+      id: 'decal-editor-design',
+      label: payload?.label || 'Decal Editor Design',
+      type: 'svg',
+      svgText,
+      outlined: false,
+      preserveColors: true
+    };
+  } catch {
+    return null;
+  }
 }
 
 function normalizeText(value) {
@@ -392,16 +413,20 @@ async function renderDecalLayer({ decalLayer, option, fillColor }) {
     return;
   }
 
-  if (option.path || option.svgPath) {
+  if (option.svgText || option.path || option.svgPath) {
     try {
-      const svgText = await loadSvg(option.path || option.svgPath);
-      decalLayer.innerHTML = `${colorizeInlineSvg(svgText, fillColor, strokeColor)}
+      const svgText = option.svgText || await loadSvg(option.path || option.svgPath);
+      const svgMarkup = option.preserveColors
+        ? cleanInlineSvg(svgText, 'customizer-overlay-svg')
+        : colorizeInlineSvg(svgText, fillColor, strokeColor);
+
+      decalLayer.innerHTML = `${svgMarkup}
         <div class="customizer-decal-selection" aria-hidden="true"></div>
         <button type="button" class="customizer-rotate-handle" aria-label="Rotate decal"></button>
         <button type="button" class="customizer-resize-x-handle" aria-label="Resize decal horizontally"></button>
         <button type="button" class="customizer-resize-y-handle" aria-label="Resize decal vertically"></button>
         <button type="button" class="customizer-resize-handle" aria-label="Resize decal"></button>`;
-      applyInlineSvgColors(decalLayer.querySelector('svg'), fillColor, strokeColor);
+      if (!option.preserveColors) applyInlineSvgColors(decalLayer.querySelector('svg'), fillColor, strokeColor);
       return;
     } catch {
       decalLayer.innerHTML = '';
@@ -499,6 +524,17 @@ async function initCustomizePage() {
     }
   } catch {
     premadeDecalOptions = PREMADE_DECAL_OPTIONS.slice();
+  }
+
+  const editorDecalOption = getEditorDecalOption();
+  if (editorDecalOption) {
+    premadeDecalOptions = [
+      editorDecalOption,
+      ...premadeDecalOptions.filter((option) => option.id !== editorDecalOption.id)
+    ];
+    if (getCustomizeParam('decal') === 'editor') {
+      activePremadeDecalId = editorDecalOption.id;
+    }
   }
 
   const vehicleViewSelect = document.getElementById('vehicleViewSelect');
