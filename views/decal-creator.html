@@ -404,8 +404,32 @@
         top: calc(var(--mobile-topbar-height, 0px) + 57px);
         z-index: 14;
         width: 100%;
-        min-height: clamp(260px, 42dvh, 440px);
+        height: var(--mobile-canvas-height, clamp(260px, 42dvh, 440px));
+        min-height: 220px;
+        max-height: 68dvh;
         box-shadow: 0 10px 24px rgba(0,0,0,.3);
+      }
+      .canvas-resize-grip {
+        order: 2;
+        position: sticky;
+        top: calc(var(--mobile-topbar-height, 0px) + 57px + var(--mobile-canvas-height, clamp(260px, 42dvh, 440px)));
+        z-index: 16;
+        display: grid;
+        place-items: center;
+        height: 24px;
+        background: #0b1220;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        touch-action: none;
+        cursor: ns-resize;
+      }
+      .canvas-resize-grip::before {
+        content: "";
+        width: 52px;
+        height: 4px;
+        border-radius: 999px;
+        background: #64748b;
+        box-shadow: 0 -7px 0 rgba(100,116,139,.45), 0 7px 0 rgba(100,116,139,.45);
       }
       .sidebar {
         order: 3;
@@ -498,7 +522,8 @@
         min-height: 0;
       }
       .canvas-wrap {
-        min-height: clamp(230px, 38dvh, 380px);
+        height: var(--mobile-canvas-height, clamp(230px, 38dvh, 380px));
+        min-height: 200px;
       }
       .field-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .mini-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -614,6 +639,8 @@
         <input type="range" id="vScroll" class="canvas-vscroll" orient="vertical" />
         <div class="canvas-scroll-corner"></div>
       </section>
+
+      <button class="canvas-resize-grip" id="canvasResizeGrip" type="button" aria-label="Resize canvas view"></button>
 
       <aside class="inspector">
         <section class="panel">
@@ -773,6 +800,7 @@
         $('flipHBtn').onclick=()=>flip('h'); $('flipVBtn').onclick=()=>flip('v'); $('noFillBtn').onclick=()=>{state.fill='none'; selectedEls().forEach(e=>e.setAttribute('fill','none')); renderAll(); saveHistory();}; $('noStrokeBtn').onclick=()=>{state.stroke='none'; selectedEls().forEach(e=>e.setAttribute('stroke','none')); renderAll(); saveHistory();};
         $('pathEditBtn').onclick=()=>setTool('node'); $('objectToPathBtn').onclick=objectToPath; $('shadowBtn').onclick=()=>{selectedEls().forEach(e=>e.setAttribute('filter','url(#dropShadow)')); saveHistory();}; $('removeEffectsBtn').onclick=()=>{selectedEls().forEach(e=>{e.removeAttribute('filter'); e.removeAttribute('clip-path');}); saveHistory();}; $('clipBtn').onclick=setClip;
         $('swatches').onclick=e=>{ const c=e.target.dataset.color; if(c){ state.fill=c; $('fillInput').value=c; applyInspector(); }};
+        $('canvasResizeGrip')?.addEventListener('pointerdown', startCanvasResize, {passive:false});
       }
 
       function svgPoint(ev) { const p = svg.createSVGPoint(); p.x = ev.clientX; p.y = ev.clientY; const pt = p.matrixTransform(svg.getScreenCTM().inverse()); return snapPt(pt); }
@@ -855,6 +883,39 @@
           zoomFit();
           renderAll();
         }, 120);
+      }
+      function setCanvasViewHeight(height) {
+        const max = Math.max(260, Math.round(window.innerHeight * .68));
+        const min = window.matchMedia?.('(max-width: 560px)').matches ? 200 : 220;
+        const next = Math.max(min, Math.min(max, Math.round(height)));
+        document.documentElement.style.setProperty('--mobile-canvas-height', `${next}px`);
+        requestAnimationFrame(() => {
+          updateStage();
+          renderSelection();
+        });
+      }
+      function startCanvasResize(ev) {
+        if (ev.cancelable) ev.preventDefault();
+        const grip = ev.currentTarget;
+        const startY = ev.clientY;
+        const startHeight = canvasWrap.getBoundingClientRect().height;
+        const pointerId = ev.pointerId;
+        const move = (event) => {
+          if (event.pointerId !== pointerId) return;
+          setCanvasViewHeight(startHeight + event.clientY - startY);
+        };
+        const end = (event) => {
+          if (event.pointerId !== pointerId) return;
+          grip.releasePointerCapture?.(pointerId);
+          window.removeEventListener('pointermove', move);
+          window.removeEventListener('pointerup', end);
+          window.removeEventListener('pointercancel', end);
+          zoomFit();
+        };
+        grip.setPointerCapture?.(pointerId);
+        window.addEventListener('pointermove', move, {passive:false});
+        window.addEventListener('pointerup', end);
+        window.addEventListener('pointercancel', end);
       }
 
       function setDrag(ev, drag) {
