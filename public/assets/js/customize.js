@@ -811,6 +811,7 @@ async function initCustomizePage() {
         data-shape-id="${shape.id}"
         style="width:${shape.size}px;height:${shape.size}px;transform:translate(-50%, -50%) translate(${shape.x}px, ${shape.y}px) rotate(${shape.rotate}deg);">
         <svg viewBox="0 0 100 100" aria-hidden="true">${shapeMarkup(shape)}</svg>
+        <button type="button" class="customizer-shape-rotate" aria-label="Rotate shape"></button>
         <button type="button" class="customizer-shape-resize" aria-label="Resize shape"></button>
       </div>
     `).join('');
@@ -891,11 +892,12 @@ async function initCustomizePage() {
     };
   }
 
-  function setEditorShapeFromPointer({ size, x, y, stageRect }) {
+  function setEditorShapeFromPointer({ size, x, y, rotate, stageRect }) {
     const selectedShape = getSelectedEditorShape();
     if (!selectedShape) return;
 
     if (typeof size === 'number') selectedShape.size = Math.max(24, Math.min(260, Math.round(size)));
+    if (typeof rotate === 'number') selectedShape.rotate = Math.round(((rotate + 180) % 360 + 360) % 360 - 180);
     const nextPosition = clampEditorShapePosition(
       selectedShape,
       typeof x === 'number' ? x : selectedShape.x,
@@ -1492,12 +1494,16 @@ async function initCustomizePage() {
 
     shapeObjectDragState = {
       pointerId: event.pointerId,
-      mode: event.target.closest?.('.customizer-shape-resize') ? 'resize' : 'move',
+      mode: event.target.closest?.('.customizer-shape-rotate') ? 'rotate' : event.target.closest?.('.customizer-shape-resize') ? 'resize' : 'move',
       startClientX: event.clientX,
       startClientY: event.clientY,
       startX: selectedShape.x,
       startY: selectedShape.y,
       startSize: selectedShape.size,
+      startRotate: selectedShape.rotate,
+      startAngle: Math.atan2(event.clientY - (objectRect.top + objectRect.height / 2), event.clientX - (objectRect.left + objectRect.width / 2)) * 180 / Math.PI,
+      centerX: objectRect.left + objectRect.width / 2,
+      centerY: objectRect.top + objectRect.height / 2,
       objectWidth: Math.max(1, objectRect.width),
       objectHeight: Math.max(1, objectRect.height),
       stageRect,
@@ -1516,6 +1522,15 @@ async function initCustomizePage() {
       const dominantDelta = Math.abs(dx) > Math.abs(dy) ? dx : dy;
       setEditorShapeFromPointer({
         size: shapeObjectDragState.startSize + (dominantDelta / shapeObjectDragState.stageWidth) * 220,
+        stageRect: shapeObjectDragState.stageRect
+      });
+      return;
+    }
+
+    if (shapeObjectDragState.mode === 'rotate') {
+      const angle = Math.atan2(event.clientY - shapeObjectDragState.centerY, event.clientX - shapeObjectDragState.centerX) * 180 / Math.PI;
+      setEditorShapeFromPointer({
+        rotate: shapeObjectDragState.startRotate + angle - shapeObjectDragState.startAngle,
         stageRect: shapeObjectDragState.stageRect
       });
       return;

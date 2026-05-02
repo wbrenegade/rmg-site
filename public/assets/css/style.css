@@ -1128,6 +1128,22 @@ textarea { resize: vertical; }
   pointer-events: auto;
 }
 
+.customizer-shape-rotate {
+  position: absolute;
+  left: calc(50% - 13px);
+  top: -42px;
+  width: 26px;
+  height: 26px;
+  border: 2px solid #0b0d12;
+  border-radius: 50%;
+  background: var(--accent-2);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.45);
+  cursor: grab;
+  pointer-events: auto;
+  touch-action: none;
+  z-index: 5;
+}
+
 .customizer-editable-shape {
   cursor: move;
   pointer-events: all;
@@ -2461,6 +2477,7 @@ body.modal-open {
 .customizer-resize-handle,
 .customizer-resize-x-handle,
 .customizer-resize-y-handle,
+.customizer-shape-rotate,
 .customizer-shape-resize {
   width: 18px;
   height: 18px;
@@ -2471,6 +2488,11 @@ body.modal-open {
 
 .customizer-rotate-handle {
   left: calc(50% - 9px);
+}
+
+.customizer-shape-rotate {
+  left: calc(50% - 9px);
+  top: -34px;
 }
 
 .customizer-resize-handle {
@@ -2511,6 +2533,37 @@ body.modal-open {
 @media (max-width: 768px) {
   .customizer-workspace {
     gap: 14px;
+  }
+
+  .customizer-rotate-handle,
+  .customizer-resize-handle,
+  .customizer-resize-x-handle,
+  .customizer-resize-y-handle,
+  .customizer-shape-rotate,
+  .customizer-shape-resize {
+    width: 32px;
+    height: 32px;
+  }
+
+  .customizer-rotate-handle,
+  .customizer-shape-rotate {
+    left: calc(50% - 16px);
+    top: -48px;
+  }
+
+  .customizer-resize-handle {
+    right: -16px;
+    bottom: -16px;
+  }
+
+  .customizer-resize-x-handle {
+    right: -16px;
+    top: calc(50% - 16px);
+  }
+
+  .customizer-resize-y-handle {
+    left: calc(50% - 16px);
+    bottom: -16px;
   }
 
   .customizer-preview-card {

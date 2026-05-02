@@ -195,6 +195,7 @@
     .guide-line { pointer-events: none; stroke: #0ea5e9; stroke-width: 1; stroke-dasharray: 6 4; opacity: .8; }
     .select-box { pointer-events: none; fill: none; stroke: #2563eb; stroke-width: 1; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; }
     .handle { fill: white; stroke: #2563eb; stroke-width: 1.4; cursor: pointer; vector-effect: non-scaling-stroke; }
+    .handle-hit { fill: transparent; stroke: transparent; pointer-events: all; }
     .rotate-handle { fill: #fde68a; }
     .path-node { fill: #fff; stroke: #ef4444; stroke-width: 1.4; cursor: move; vector-effect: non-scaling-stroke; }
     .canvas-hscroll, .canvas-vscroll {
@@ -340,7 +341,7 @@
         flex-wrap: wrap;
         align-content: flex-start;
         gap: 6px;
-        max-height: 34dvh;
+        max-height: 24dvh;
         overflow-y: auto;
         padding: 6px;
         -webkit-overflow-scrolling: touch;
@@ -358,7 +359,16 @@
       .menu-group,
       .tool-options,
       .action-group {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+      }
+      .menu-group .btn,
+      .tool-options .icon-btn,
+      .action-group .icon-btn {
+        flex: 0 0 auto;
       }
       .sep { display: none; }
       .main {
@@ -371,7 +381,7 @@
         position: sticky;
         top: var(--mobile-topbar-height, 0px);
         z-index: 15;
-        padding: 6px 4px;
+        padding: 7px 6px;
         flex-direction: row;
         gap: 5px;
         width: 100%;
@@ -383,13 +393,13 @@
       }
       .tool-btn {
         flex: 0 0 auto;
-        width: 36px;
-        height: 36px;
+        width: 42px;
+        height: 42px;
       }
       .canvas-wrap {
         order: 2;
         width: 100%;
-        min-height: clamp(300px, 58dvh, 560px);
+        min-height: clamp(380px, 64dvh, 640px);
       }
       .sidebar {
         order: 3;
@@ -404,12 +414,24 @@
         overflow: visible;
       }
       .panel { padding: 10px; }
+      .sidebar,
+      .inspector {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: start;
+      }
+      .sidebar .panel,
+      .inspector .panel {
+        min-width: 0;
+        border-right: 1px solid var(--line);
+      }
       .statusbar {
         display: none;
       }
       .ruler-x { height: 18px; }
       .ruler-y { width: 18px; }
       .stage-outer { inset: 0; }
+      .handle { stroke-width: 2; }
       .canvas-hscroll,
       .canvas-vscroll,
       .canvas-scroll-corner {
@@ -436,10 +458,14 @@
         min-height: 0;
       }
       .canvas-wrap {
-        min-height: clamp(300px, 54dvh, 460px);
+        min-height: clamp(380px, 62dvh, 560px);
       }
       .field-row,
       .mini-grid {
+        grid-template-columns: 1fr;
+      }
+      .sidebar,
+      .inspector {
         grid-template-columns: 1fr;
       }
       .modal {
@@ -933,11 +959,21 @@
         const b=multiBBox(els); if(!b) return;
         make('rect',{class:'select-box',x:b.x,y:b.y,width:b.width,height:b.height},ui);
         const hs=[['nw',b.x,b.y],['n',b.x+b.width/2,b.y],['ne',b.x+b.width,b.y],['e',b.x+b.width,b.y+b.height/2],['se',b.x+b.width,b.y+b.height],['s',b.x+b.width/2,b.y+b.height],['sw',b.x,b.y+b.height],['w',b.x,b.y+b.height/2]];
-        hs.forEach(([pos,x,y])=>make('rect',{class:'handle','data-handle':pos,x:x-4/state.zoom,y:y-4/state.zoom,width:8/state.zoom,height:8/state.zoom},ui));
+        const visualSize = (isCoarsePointer() ? 11 : 8) / state.zoom;
+        const hitSize = Math.max(visualSize, (isCoarsePointer() ? 42 : 22) / state.zoom);
+        hs.forEach(([pos,x,y])=>{
+          make('rect',{class:'handle-hit','data-handle':pos,x:x-hitSize/2,y:y-hitSize/2,width:hitSize,height:hitSize},ui);
+          make('rect',{class:'handle','data-handle':pos,x:x-visualSize/2,y:y-visualSize/2,width:visualSize,height:visualSize},ui);
+        });
         make('line',{x1:b.x+b.width/2,y1:b.y,y2:b.y-34/state.zoom,x2:b.x+b.width/2,stroke:'#2563eb','stroke-width':1,'vector-effect':'non-scaling-stroke'},ui);
-        make('circle',{class:'handle rotate-handle','data-handle':'rot',cx:b.x+b.width/2,cy:b.y-42/state.zoom,r:6/state.zoom},ui);
+        const rotateY = b.y - (isCoarsePointer() ? 52 : 42) / state.zoom;
+        const rotateR = (isCoarsePointer() ? 8 : 6) / state.zoom;
+        const rotateHitR = Math.max(rotateR, (isCoarsePointer() ? 24 : 16) / state.zoom);
+        make('circle',{class:'handle-hit','data-handle':'rot',cx:b.x+b.width/2,cy:rotateY,r:rotateHitR},ui);
+        make('circle',{class:'handle rotate-handle','data-handle':'rot',cx:b.x+b.width/2,cy:rotateY,r:rotateR},ui);
         if (state.pathEdit && els.length===1) drawPathNodes(els[0]);
       }
+      function isCoarsePointer() { return window.matchMedia?.('(pointer: coarse)').matches; }
       function multiBBox(els) { let boxes=els.map(e=>safeBBox(e)).filter(Boolean); if(!boxes.length) return null; let x=Math.min(...boxes.map(b=>b.x)), y=Math.min(...boxes.map(b=>b.y)), x2=Math.max(...boxes.map(b=>b.x+b.width)), y2=Math.max(...boxes.map(b=>b.y+b.height)); return {x,y,width:x2-x,height:y2-y}; }
       function safeBBox(el){
         try {
@@ -968,7 +1004,7 @@
         if(handle==='rot') {
           const cx=b.x+b.width/2, cy=b.y+b.height/2;
           const startAngle=Math.atan2(p.y-cy,p.x-cx)*180/Math.PI+90;
-          setDrag(ev, {type:'rotate',bbox:b,start:p,startAngle,base:selectedEls().map(e=>{ const eb=safeBBox(e)||b; return [e, getLocalMatrix(e), eb.x+eb.width/2, eb.y+eb.height/2]; })});
+          setDrag(ev, {type:'rotate',bbox:b,start:p,startAngle,base:selectedEls().map(e=>[e, getLocalMatrix(e)])});
         }
         else if(handle) setDrag(ev, {type:'resize',handle,bbox:b,start:p,base:selectedEls().map(e=>[e, safeBBox(e), getLocalMatrix(e)])});
         else setDrag(ev, {type:'move',start:p,base:selectedEls().map(e=>[e, getLocalMatrix(e)])});
@@ -997,8 +1033,8 @@
         const b=state.drag.bbox, cx=b.x+b.width/2, cy=b.y+b.height/2;
         const a=Math.atan2(p.y-cy,p.x-cx)*180/Math.PI+90;
         const delta=a-(state.drag.startAngle||0);
-        state.drag.base.forEach(([e,m,ecx,ecy])=>{
-          const next=rotateMatrixAround(m, delta, ecx, ecy);
+        state.drag.base.forEach(([e,m])=>{
+          const next=rotateMatrixAround(m, delta, cx, cy);
           e.setAttribute('transform', matrixToAttr(next));
         });
         const shown=Math.round(delta);
