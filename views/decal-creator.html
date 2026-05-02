@@ -181,8 +181,8 @@
     .stage {
       position: absolute;
       transform-origin: 0 0;
-      left: 40px;
-      top: 40px;
+      left: 0;
+      top: 0;
       filter: drop-shadow(0 10px 30px rgba(0,0,0,.35));
     }
     #svgRoot {
@@ -740,6 +740,7 @@
       function screenPos(ev) { const r=canvasWrap.getBoundingClientRect(); return {x:ev.clientX-r.left, y:ev.clientY-r.top}; }
       function midpoint(a, b) { return {x:(a.clientX + b.clientX) / 2, y:(a.clientY + b.clientY) / 2}; }
       function distance(a, b) { return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY); }
+      function angleDelta(from, to) { return ((to - from + 540) % 360) - 180; }
       function shouldPinchSelection(bbox) { return state.tool === 'select' && Boolean(bbox); }
       function startPinchZoom() {
         if (state.pointers.size < 2) return false;
@@ -1068,7 +1069,7 @@
       function rotateSelected(p) {
         const b=state.drag.bbox, cx=b.x+b.width/2, cy=b.y+b.height/2;
         const a=Math.atan2(p.y-cy,p.x-cx)*180/Math.PI+90;
-        const delta=a-(state.drag.startAngle||0);
+        const delta=angleDelta(state.drag.startAngle||0, a);
         state.drag.base.forEach(([e,m])=>{
           const next=rotateMatrixAround(m, delta, cx, cy);
           e.setAttribute('transform', matrixToAttr(next));
@@ -1233,7 +1234,7 @@
       function download(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
 
       function setZoom(z, center=null){ const old=state.zoom; state.zoom=Math.min(8,Math.max(.1,z)); if(center){ state.pan.x -= center.x*(state.zoom-old); state.pan.y -= center.y*(state.zoom-old); } $('zoomInput').value=Math.round(state.zoom*100); updateStage(); renderSelection(); }
-      function zoomFit(){ const r=stageOuter.getBoundingClientRect(); const z=Math.min((r.width-80)/state.doc.w,(r.height-80)/state.doc.h); state.zoom=Math.max(.1,Math.min(4,z)); state.pan={x:(r.width-state.doc.w*state.zoom)/2,y:(r.height-state.doc.h*state.zoom)/2}; $('zoomInput').value=Math.round(state.zoom*100); updateStage(); }
+      function zoomFit(){ const r=stageOuter.getBoundingClientRect(); const pad=isCoarsePointer()?24:80; const z=Math.min((r.width-pad)/state.doc.w,(r.height-pad)/state.doc.h); state.zoom=Math.max(.1,Math.min(4,z)); state.pan={x:(r.width-state.doc.w*state.zoom)/2,y:(r.height-state.doc.h*state.zoom)/2}; $('zoomInput').value=Math.round(state.zoom*100); updateStage(); }
       function updateStage(){ stage.style.transform=`translate(${state.pan.x}px,${state.pan.y}px) scale(${state.zoom})`; svg.setAttribute('width',state.doc.w); svg.setAttribute('height',state.doc.h); renderRulers(); syncScrollbars(); }
       function syncScrollbars() {
         const hs=$('hScroll'), vs=$('vScroll');

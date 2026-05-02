@@ -912,6 +912,10 @@ async function initCustomizePage() {
     syncEditorShapeControls();
   }
 
+  function pointerAngleDelta(from, to) {
+    return ((to - from + 540) % 360) - 180;
+  }
+
   function setDecalSelectionBounds(left, top, width, height) {
     decalLayer.style.setProperty('--selection-left', `${left}%`);
     decalLayer.style.setProperty('--selection-top', `${top}%`);
@@ -1486,11 +1490,11 @@ async function initCustomizePage() {
     if (!object) return;
 
     event.preventDefault();
-    selectEditorShape(object.dataset.shapeId || '');
-
+    const shapeId = object.dataset.shapeId || '';
+    const objectRect = object.getBoundingClientRect();
+    if (selectedEditorShapeId !== shapeId) selectEditorShape(shapeId);
     const selectedShape = getSelectedEditorShape();
     const stageRect = document.getElementById('customizeViewer')?.getBoundingClientRect();
-    const objectRect = object.getBoundingClientRect();
     if (!selectedShape) return;
 
     shapeObjectDragState = {
@@ -1531,7 +1535,7 @@ async function initCustomizePage() {
     if (shapeObjectDragState.mode === 'rotate') {
       const angle = Math.atan2(event.clientY - shapeObjectDragState.centerY, event.clientX - shapeObjectDragState.centerX) * 180 / Math.PI;
       setEditorShapeFromPointer({
-        rotate: shapeObjectDragState.startRotate + angle - shapeObjectDragState.startAngle,
+        rotate: shapeObjectDragState.startRotate + pointerAngleDelta(shapeObjectDragState.startAngle, angle),
         stageRect: shapeObjectDragState.stageRect
       });
       return;
