@@ -853,12 +853,13 @@ async function initCustomizePage() {
   }
 
   function addEditorShape(type) {
+    const defaultSize = window.matchMedia?.('(pointer: coarse)').matches ? 150 : 120;
     const shape = {
       id: `shape-${Date.now()}-${Math.random().toString(16).slice(2)}`,
       type,
       x: 0,
       y: 0,
-      size: type === 'line' ? 150 : 96,
+      size: type === 'line' ? Math.round(defaultSize * 1.35) : defaultSize,
       rotate: 0,
       fill: editorShapeFillInput?.value || '#111111',
       stroke: editorShapeStrokeInput?.value || '#ffffff',
@@ -896,7 +897,7 @@ async function initCustomizePage() {
     const selectedShape = getSelectedEditorShape();
     if (!selectedShape) return;
 
-    if (typeof size === 'number') selectedShape.size = Math.max(24, Math.min(260, Math.round(size)));
+    if (typeof size === 'number') selectedShape.size = Math.max(36, Math.min(420, Math.round(size)));
     if (typeof rotate === 'number') selectedShape.rotate = Math.round(((rotate + 180) % 360 + 360) % 360 - 180);
     const nextPosition = clampEditorShapePosition(
       selectedShape,
@@ -1521,7 +1522,7 @@ async function initCustomizePage() {
     if (shapeObjectDragState.mode === 'resize') {
       const dominantDelta = Math.abs(dx) > Math.abs(dy) ? dx : dy;
       setEditorShapeFromPointer({
-        size: shapeObjectDragState.startSize + (dominantDelta / shapeObjectDragState.stageWidth) * 220,
+        size: shapeObjectDragState.startSize + (dominantDelta / shapeObjectDragState.stageWidth) * 260,
         stageRect: shapeObjectDragState.stageRect
       });
       return;

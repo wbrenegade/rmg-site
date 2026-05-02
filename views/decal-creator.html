@@ -934,11 +934,47 @@
       function finishShape() {
         const el=state.drawing; state.drawing=null; simplifyFreehand();
         if (el) {
-          if (el.tagName==='rect') { if (+el.getAttribute('width')<2) el.setAttribute('width',100); if (+el.getAttribute('height')<2) el.setAttribute('height',60); }
-          if (el.tagName==='ellipse') { if (+el.getAttribute('rx')<1) { el.setAttribute('rx',50); el.setAttribute('ry',30); } }
+          const defaults = defaultShapeSize();
+          if (el.tagName==='rect') {
+            const w = +el.getAttribute('width') || 0;
+            const h = +el.getAttribute('height') || 0;
+            if (w < defaults.min || h < defaults.min) {
+              el.setAttribute('width', defaults.rectW);
+              el.setAttribute('height', defaults.rectH);
+            }
+          }
+          if (el.tagName==='ellipse') {
+            const rx = +el.getAttribute('rx') || 0;
+            const ry = +el.getAttribute('ry') || 0;
+            if (rx < defaults.min / 2 || ry < defaults.min / 2) {
+              el.setAttribute('rx', defaults.ellipseW / 2);
+              el.setAttribute('ry', defaults.ellipseH / 2);
+            }
+          }
+          if (el.tagName==='line') {
+            const x1 = +el.getAttribute('x1') || 0;
+            const y1 = +el.getAttribute('y1') || 0;
+            const x2 = +el.getAttribute('x2') || 0;
+            const y2 = +el.getAttribute('y2') || 0;
+            if (Math.hypot(x2 - x1, y2 - y1) < defaults.min) {
+              el.setAttribute('x2', x1 + defaults.lineW);
+              el.setAttribute('y2', y1);
+            }
+          }
           selectOnly(el);
         }
         saveHistory(); setTool('select');
+      }
+      function defaultShapeSize() {
+        const coarse = isCoarsePointer();
+        return {
+          min: coarse ? 28 : 12,
+          rectW: coarse ? 240 : 160,
+          rectH: coarse ? 150 : 100,
+          ellipseW: coarse ? 220 : 140,
+          ellipseH: coarse ? 140 : 90,
+          lineW: coarse ? 220 : 150
+        };
       }
       function simplifyFreehand() { /* Browser-native path remains editable; intentionally conservative. */ }
       function penClick(p, ev) {
