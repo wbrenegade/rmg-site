@@ -10873,6 +10873,50 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "fce38eee-53bf-4737-981e-f020b057cb55",
+      "type": "page_view",
+      "pathname": "/tools",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/shop",
+      "method": "GET",
+      "timestamp": "05/02/2026, 2:57:16 AM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "0ab319e2-d939-4c53-bec3-7b264654e47c",
+      "type": "page_view",
+      "pathname": "/tools/decal-creator",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/tools",
+      "method": "GET",
+      "timestamp": "05/02/2026, 2:57:20 AM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }
