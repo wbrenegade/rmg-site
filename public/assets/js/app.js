@@ -300,15 +300,18 @@ function renderProductCard(product) {
   const customizeLabel = product.customizeCtaLabel || 'Customize';
   const isDecalProduct = String(product.category || '').toLowerCase() === 'decals';
   const isRacingStripe = isRacingStripeProduct(product);
+  const productIdAttr = String(product.id || '').replace(/"/g, '&quot;');
+  const productIdDataAttr = encodeURIComponent(String(product.id || ''));
   const previewUrl = customizeUrl;
   const primaryAction = `<a href="${detailsUrl}" class="btn btn-outline">View Details</a>`;
   const secondaryAction = product.custom
     ? (isDecalProduct ? '' : `<a href="${customizeUrl}" class="btn">${customizeLabel}</a>`)
     : `<button class="btn" onclick="addToCart('${product.id}')">Add to Cart</button>`;
   const previewAction = isDecalProduct
-    ? `<a href="${previewUrl}" class="btn btn-outline">Send To Decal Editor</a>`
+    ? (isRacingStripe
+      ? `<a href="${previewUrl}" class="btn racing-stripe-customize-link" data-product-id="${productIdDataAttr}">Customize</a>`
+      : `<a href="${previewUrl}" class="btn btn-outline">Send To Decal Editor</a>`)
     : '';
-  const productIdAttr = String(product.id || '').replace(/"/g, '&quot;');
   const detailsUrlAttr = String(detailsUrl).replace(/"/g, '&quot;');
   return `
     <article class="card product-card" data-product-id="${productIdAttr}" data-details-url="${detailsUrlAttr}" data-racing-stripe="${isRacingStripe ? 'true' : 'false'}" data-custom="${product.custom ? 'true' : 'false'}">

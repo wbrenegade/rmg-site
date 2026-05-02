@@ -439,7 +439,9 @@ async function renderDecalLayer({ decalLayer, option, fillColor }) {
 
 function setLayerTransform(layer, size, x, y, rotate) {
   layer.style.width = `${size}%`;
-  layer.style.transform = `translate(calc(-50% + ${x}%), calc(-50% + ${y}%)) rotate(${rotate}deg) scale(${layer.dataset.scaleX || 1}, ${layer.dataset.scaleY || 1})`;
+  layer.style.left = `calc(50% + ${x}%)`;
+  layer.style.top = `calc(50% + ${y}%)`;
+  layer.style.transform = `translate(-50%, -50%) rotate(${rotate}deg) scale(${layer.dataset.scaleX || 1}, ${layer.dataset.scaleY || 1})`;
 }
 
 function loadImage(src) {
@@ -467,6 +469,7 @@ async function initCustomizePage() {
   const decalLayer = document.getElementById('customizeDecal');
   const shapeLayer = document.getElementById('customizeShapes');
   const textLayer = document.getElementById('customizeTextLayer');
+  const customizeViewer = document.getElementById('customizeViewer');
   const workspace = document.getElementById('decal-mockup-editorWorkspace');
   const productName = document.getElementById('customizeProductName');
   const productMeta = document.getElementById('customizeProductMeta');
@@ -508,6 +511,12 @@ async function initCustomizePage() {
   let selectedEditorShapeId = '';
   let shapeObjectDragState = null;
   let premadeDecalOptions = PREMADE_DECAL_OPTIONS.slice();
+  const DECAL_SIZE_MIN = 2;
+  const DECAL_SIZE_MAX = 140;
+  const DECAL_AXIS_SCALE_MIN = 0.03;
+  const DECAL_AXIS_SCALE_MAX = 4;
+  const DECAL_POSITION_MIN = -120;
+  const DECAL_POSITION_MAX = 120;
 
   const selectedVehicle = vehicleProduct?.selectedVehicle || getVehicleFromCustomizeQuery() || (typeof window.getSelectedVehicle === 'function' ? window.getSelectedVehicle() : null);
   if (selectedVehicle && typeof window.setSelectedVehicle === 'function') {
@@ -784,21 +793,40 @@ async function initCustomizePage() {
 
   function setDecalTransformInputs({ size, x, y, rotate, scaleX, scaleY }) {
     if (typeof size === 'number' && decalSizeInput) {
-      decalSizeInput.value = String(Math.max(20, Math.min(140, Math.round(size))));
+      decalSizeInput.value = String(Math.max(DECAL_SIZE_MIN, Math.min(DECAL_SIZE_MAX, Math.round(size))));
     }
-    if (typeof scaleX === 'number') decalScaleX = Math.max(0.2, Math.min(4, scaleX));
-    if (typeof scaleY === 'number') decalScaleY = Math.max(0.2, Math.min(4, scaleY));
+    if (typeof scaleX === 'number') decalScaleX = Math.max(DECAL_AXIS_SCALE_MIN, Math.min(DECAL_AXIS_SCALE_MAX, scaleX));
+    if (typeof scaleY === 'number') decalScaleY = Math.max(DECAL_AXIS_SCALE_MIN, Math.min(DECAL_AXIS_SCALE_MAX, scaleY));
     if (typeof rotate === 'number' && decalRotateInput) {
       let normalized = ((rotate + 180) % 360 + 360) % 360 - 180;
       decalRotateInput.value = String(Math.round(normalized));
     }
-    if (typeof x === 'number' && decalXInput) {
-      decalXInput.value = String(Math.max(-200, Math.min(200, Math.round(x))));
-    }
-    if (typeof y === 'number' && decalYInput) {
-      decalYInput.value = String(Math.max(-200, Math.min(200, Math.round(y))));
+    if ((typeof x === 'number' || typeof y === 'number') && decalXInput && decalYInput) {
+      const nextPosition = containDecalPosition(
+        typeof x === 'number' ? x : Number(decalXInput.value || 0),
+        typeof y === 'number' ? y : Number(decalYInput.value || 0)
+      );
+      decalXInput.value = String(nextPosition.x);
+      decalYInput.value = String(nextPosition.y);
     }
     updateTransforms();
+  }
+
+  function containDecalPosition(x, y) {
+    const fallback = {
+      x: Math.max(DECAL_POSITION_MIN, Math.min(DECAL_POSITION_MAX, Math.round(x))),
+      y: Math.max(DECAL_POSITION_MIN, Math.min(DECAL_POSITION_MAX, Math.round(y)))
+    };
+    const stageRect = customizeViewer?.getBoundingClientRect();
+    const layerRect = decalLayer?.getBoundingClientRect();
+    if (!(stageRect?.width && stageRect?.height && layerRect?.width && layerRect?.height)) return fallback;
+
+    const xLimit = Math.max(0, 50 - (layerRect.width / stageRect.width) * 50);
+    const yLimit = Math.max(0, 50 - (layerRect.height / stageRect.height) * 50);
+    return {
+      x: Math.round(Math.max(-xLimit, Math.min(xLimit, x))),
+      y: Math.round(Math.max(-yLimit, Math.min(yLimit, y)))
+    };
   }
 
   function getSelectedEditorShape() {
@@ -1455,9 +1483,19 @@ async function initCustomizePage() {
     setDecalEraserActive(!isDecalEraserActive);
   });
 
-  [decalSizeInput, decalRotateInput, decalXInput, decalYInput].forEach((input) => {
+  [decalSizeInput, decalRotateInput].forEach((input) => {
     input?.addEventListener('input', updateTransforms);
     input?.addEventListener('change', updateTransforms);
+  });
+  [decalXInput, decalYInput].forEach((input) => {
+    input?.addEventListener('input', () => setDecalTransformInputs({
+      x: Number(decalXInput?.value || 0),
+      y: Number(decalYInput?.value || 0)
+    }));
+    input?.addEventListener('change', () => setDecalTransformInputs({
+      x: Number(decalXInput?.value || 0),
+      y: Number(decalYInput?.value || 0)
+    }));
   });
 
   [textInput, textFontInput, textColorInput, textSizeInput, textRotateInput, textXInput, textYInput].forEach((input) => {
@@ -1667,7 +1705,8 @@ async function initCustomizePage() {
       startY: Number(decalYInput?.value || 0),
       layerWidth: Math.max(1, layerRect.width),
       layerHeight: Math.max(1, layerRect.height),
-      stageWidth: Math.max(1, stageRect?.width || 1)
+      stageWidth: Math.max(1, stageRect?.width || 1),
+      stageHeight: Math.max(1, stageRect?.height || 1)
     };
     decalLayer.setPointerCapture?.(event.pointerId);
   });
@@ -1720,8 +1759,8 @@ async function initCustomizePage() {
     }
 
     setDecalTransformInputs({
-      x: decalObjectDragState.startX + (dx / decalObjectDragState.layerWidth) * 100,
-      y: decalObjectDragState.startY + (dy / decalObjectDragState.layerHeight) * 100
+      x: decalObjectDragState.startX + (dx / decalObjectDragState.stageWidth) * 100,
+      y: decalObjectDragState.startY + (dy / decalObjectDragState.stageHeight) * 100
     });
   });
 

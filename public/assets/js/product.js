@@ -482,10 +482,11 @@ async function initProductPage() {
 
   const imagePath = product.imagePath || '/assets/imgs/main.PNG';
   const imageAlt = product.imageLabel || product.name || 'Product preview';
+  const isRacingStripe = isRacingStripeProduct(product);
   const customizeUrl = typeof window.buildCustomizeUrl === 'function'
     ? window.buildCustomizeUrl(product)
     : (product.customizeUrl || `customize.html?productId=${encodeURIComponent(product.id)}`);
-  const optionsMarkup = renderRacingStripeOptions(product);
+  const optionsMarkup = isRacingStripe ? '' : renderRacingStripeOptions(product);
   const actions = product.custom
     ? `
         <a class="btn" href="${customizeUrl}">Send To Decal Editor</a>
@@ -508,11 +509,6 @@ async function initProductPage() {
         <p class="price-xl">${formatCurrency(product.price)}</p>
         <p>${product.description}</p>
         ${optionsMarkup}
-        <div class="stripe-live-preview" id="stripeLivePreview" ${isRacingStripeProduct(product) && !product.custom ? '' : 'hidden'}>
-          <p class="stripe-live-preview__title">Live Preview</p>
-          <div class="stripe-live-preview__canvas" id="stripeLivePreviewCanvas"></div>
-          <p class="inline-note stripe-live-preview__meta" id="stripeLivePreviewMeta"></p>
-        </div>
         ${renderVehicleContextNote()}
         <p class="inline-note">Use the decal editor to place this design on a vehicle mockup before checkout.</p>
         <div class="product-actions">
@@ -527,9 +523,6 @@ async function initProductPage() {
   }
 
   const addToCartButton = container.querySelector('#productAddToCartBtn');
-  if (isRacingStripeProduct(product) && !product.custom) {
-    renderRacingStripeLivePreview(container, product);
-  }
 
   if (addToCartButton) {
     addToCartButton.addEventListener('click', () => {

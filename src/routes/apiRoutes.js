@@ -103,8 +103,8 @@ router.post("/svg-converter/convert", async (req, res) => {
 			signal: AbortSignal.timeout(120000),
 		});
 
-		const contentType = response.headers.get("content-type") || "application/octet-stream";
-		res.status(response.status).type(contentType);
+		const responseContentType = response.headers.get("content-type") || "application/octet-stream";
+		res.status(response.status).type(responseContentType);
 
 		if (!response.ok) {
 			const errorText = await response.text();
