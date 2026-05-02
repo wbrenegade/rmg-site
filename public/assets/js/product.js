@@ -181,6 +181,44 @@ function renderRacingStripePreviewShell(contentMarkup, gradientId) {
   `;
 }
 
+function renderStripeGeometryPreview({ selectedWidth, selectedSpacing, stripeColorHex, outlineColorHex, hasMultipleStripes, hasOutline, hasTopStripe }) {
+  const stripeWidths = parseStripeWidths(selectedWidth, hasMultipleStripes);
+  const spacingInches = parseInchValue(selectedSpacing, 0.5);
+  const pixelsPerInch = 7;
+  const centerX = 270;
+  const stripeHeight = hasTopStripe ? 22 : 28;
+  const stripeY = hasTopStripe ? 62 : 52;
+  const maxStripeWidth = hasMultipleStripes ? 82 : 126;
+  const rects = [];
+
+  if (hasMultipleStripes) {
+    const leftWidth = Math.min(maxStripeWidth, Math.max(20, stripeWidths[0] * pixelsPerInch));
+    const rightWidth = Math.min(maxStripeWidth, Math.max(20, stripeWidths[1] * pixelsPerInch));
+    const gap = Math.min(40, Math.max(8, spacingInches * pixelsPerInch));
+    const total = leftWidth + rightWidth + gap;
+    rects.push({ x: centerX - total / 2, y: stripeY, width: leftWidth, height: stripeHeight });
+    rects.push({ x: centerX - total / 2 + leftWidth + gap, y: stripeY, width: rightWidth, height: stripeHeight });
+  } else {
+    const width = Math.min(maxStripeWidth, Math.max(28, stripeWidths[0] * pixelsPerInch));
+    rects.push({ x: centerX - width / 2, y: stripeY, width, height: stripeHeight });
+  }
+
+  if (hasTopStripe) {
+    const topHeight = 8;
+    const topGap = 8;
+    rects.push(...rects.slice(0, hasMultipleStripes ? 2 : 1).map((rect) => ({
+      ...rect,
+      y: stripeY - topHeight - topGap,
+      height: topHeight
+    })));
+  }
+
+  return rects.map((rect) => {
+    const stroke = hasOutline ? ` stroke="${outlineColorHex}" stroke-width="5" paint-order="stroke fill"` : '';
+    return `<rect x="${rect.x.toFixed(1)}" y="${rect.y.toFixed(1)}" width="${rect.width.toFixed(1)}" height="${rect.height}" rx="2" fill="${stripeColorHex}"${stroke} />`;
+  }).join('');
+}
+
 function getRacingStripeOptions(product) {
   const subcategory = String(product?.subcategory || '').toLowerCase();
   const widthFallback = subcategory.includes('rocker')
@@ -352,22 +390,17 @@ function renderRacingStripeLivePreview(container, product) {
 
     const stripeColorHex = stripeColorToHex(selectedColor);
     const outlineColorHex = options.hasOutline ? stripeColorToHex(selectedOutline) : stripeColorHex;
+    const geometryPreview = renderStripeGeometryPreview({
+      selectedWidth,
+      selectedSpacing,
+      stripeColorHex,
+      outlineColorHex,
+      hasMultipleStripes: options.hasMultipleStripes,
+      hasOutline: options.hasOutline,
+      hasTopStripe: options.hasTopStripe
+    });
 
-    loadRacingStripePreviewSvg(options.previewSvgPath)
-      .then((svgText) => {
-        if (requestId !== previewRequestId) return;
-        previewCanvas.innerHTML = renderRacingStripePreviewShell(
-          colorizeRacingStripeSvg(svgText, stripeColorHex, outlineColorHex),
-          'stripePreviewBg'
-        );
-      })
-      .catch(() => {
-        if (requestId !== previewRequestId) return;
-        previewCanvas.innerHTML = renderRacingStripePreviewShell(
-          `<rect x="28" y="58" width="484" height="16" rx="2" fill="${stripeColorHex}" stroke="${outlineColorHex}" stroke-width="3" />`,
-          'stripePreviewBg'
-        );
-      });
+    previewCanvas.innerHTML = renderRacingStripePreviewShell(geometryPreview, 'stripePreviewBg');
 
     const metaParts = [
       `Width: ${selectedWidth}`,
@@ -416,12 +449,12 @@ async function initProductPage() {
   const optionsMarkup = renderRacingStripeOptions(product);
   const actions = product.custom
     ? `
-        <a class="btn" href="${customizeUrl}">Customize</a>
+        <a class="btn" href="${customizeUrl}">Send To Decal Editor</a>
         <a class="btn btn-outline" href="shop.html">Continue Shopping</a>
       `
     : `
         <button class="btn" id="productAddToCartBtn">Add to Cart</button>
-        <a class="btn btn-outline" href="${customizeUrl}">Customize</a>
+        <a class="btn btn-outline" href="${customizeUrl}">Send To Decal Editor</a>
       `;
 
   container.innerHTML = `
@@ -442,7 +475,7 @@ async function initProductPage() {
           <p class="inline-note stripe-live-preview__meta" id="stripeLivePreviewMeta"></p>
         </div>
         ${renderVehicleContextNote()}
-        <p class="inline-note">Use Customize to dial in stripe width, color, spacing, and outline options before checkout.</p>
+        <p class="inline-note">Use the decal editor to place this design on a vehicle mockup before checkout.</p>
         <div class="product-actions">
           ${actions}
         </div>

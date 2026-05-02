@@ -303,13 +303,10 @@ function renderProductCard(product) {
   const previewUrl = customizeUrl;
   const primaryAction = `<a href="${detailsUrl}" class="btn btn-outline">View Details</a>`;
   const secondaryAction = product.custom
-    ? `<a href="${customizeUrl}" class="btn">${customizeLabel}</a>`
+    ? (isDecalProduct ? '' : `<a href="${customizeUrl}" class="btn">${customizeLabel}</a>`)
     : `<button class="btn" onclick="addToCart('${product.id}')">Add to Cart</button>`;
-  const customizeAction = (!product.custom && isRacingStripe)
-    ? `<a href="${customizeUrl}" class="btn btn-outline">Customize</a>`
-    : '';
   const previewAction = isDecalProduct
-    ? `<a href="${previewUrl}" class="btn btn-outline">Open Decal Mockup Editor</a>`
+    ? `<a href="${previewUrl}" class="btn btn-outline">Send To Decal Editor</a>`
     : '';
   const productIdAttr = String(product.id || '').replace(/"/g, '&quot;');
   const detailsUrlAttr = String(detailsUrl).replace(/"/g, '&quot;');
@@ -329,7 +326,6 @@ function renderProductCard(product) {
         <div class="product-actions">
           ${primaryAction}
           ${secondaryAction}
-          ${customizeAction}
           ${previewAction}
         </div>
       </div>
