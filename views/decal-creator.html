@@ -635,7 +635,7 @@
         fill: '#60a5fa', stroke: '#111827', strokeWidth: 2, dash: '',
         drawing: null, clipboard: [], undo: [], redo: [], snap: true, grid: true, rulers: true,
         pathEdit: false, id: 1, doc: {w: 1200, h: 800}, drag: null, space: false,
-        selectionKey: '', rotInputPrev: 0, savedDesignId: ''
+        selectionKey: '', rotInputPrev: 0, savedDesignId: '', pointers: new Map(), pinch: null
       };
       const tools = [
         ['select','↖','Select / Transform'], ['node','✥','Node Edit'], ['rect','▭','Rectangle'], ['ellipse','◯','Ellipse'], ['line','╱','Line'], ['arrow','➜','Arrow'],
@@ -684,7 +684,7 @@
 
       function bindEvents() {
         document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>setTool(b.dataset.tool));
-        stageOuter.addEventListener('pointerdown', pointerDown, {passive:false}); stageOuter.addEventListener('pointermove', pointerMove, {passive:false}); window.addEventListener('pointerup', pointerUp);
+        stageOuter.addEventListener('pointerdown', pointerDown, {passive:false}); stageOuter.addEventListener('pointermove', pointerMove, {passive:false}); window.addEventListener('pointerup', pointerUp); window.addEventListener('pointercancel', pointerUp);
         stageOuter.addEventListener('wheel', onWheel, {passive:false});
         document.addEventListener('keydown', keyDown); document.addEventListener('keyup', e=>{ if(e.code==='Space') state.space=false; });
         window.addEventListener('resize', onViewportResize);
@@ -712,6 +712,37 @@
       function rawPoint(ev) { const p = svg.createSVGPoint(); p.x = ev.clientX; p.y = ev.clientY; return p.matrixTransform(svg.getScreenCTM().inverse()); }
       function snapPt(p) { if (!state.snap) return {x:p.x,y:p.y}; const g=10; return {x:Math.round(p.x/g)*g, y:Math.round(p.y/g)*g}; }
       function screenPos(ev) { const r=canvasWrap.getBoundingClientRect(); return {x:ev.clientX-r.left, y:ev.clientY-r.top}; }
+      function midpoint(a, b) { return {x:(a.clientX + b.clientX) / 2, y:(a.clientY + b.clientY) / 2}; }
+      function distance(a, b) { return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY); }
+      function startPinchZoom() {
+        if (state.pointers.size < 2) return false;
+        const [a, b] = [...state.pointers.values()];
+        const mid = midpoint(a, b);
+        releaseDragPointer();
+        state.pinch = {
+          distance: Math.max(1, distance(a, b)),
+          zoom: state.zoom,
+          panX: state.pan.x,
+          panY: state.pan.y,
+          midX: mid.x,
+          midY: mid.y
+        };
+        state.drag = null;
+        return true;
+      }
+      function updatePinchZoom() {
+        if (!state.pinch || state.pointers.size < 2) return;
+        const [a, b] = [...state.pointers.values()];
+        const mid = midpoint(a, b);
+        const nextZoom = Math.min(8, Math.max(.1, state.pinch.zoom * (distance(a, b) / state.pinch.distance)));
+        const scale = nextZoom / state.pinch.zoom;
+        state.zoom = nextZoom;
+        state.pan.x = mid.x - (state.pinch.midX - state.pinch.panX) * scale;
+        state.pan.y = mid.y - (state.pinch.midY - state.pinch.panY) * scale;
+        $('zoomInput').value = Math.round(state.zoom * 100);
+        updateStage();
+        renderSelection();
+      }
       function updateMobileChrome() {
         const topbar = document.querySelector('.topbar');
         document.documentElement.style.setProperty('--mobile-topbar-height', `${topbar?.getBoundingClientRect().height || 0}px`);
@@ -737,6 +768,13 @@
 
       function pointerDown(ev) {
         if (ev.cancelable) ev.preventDefault();
+        if (ev.pointerType === 'touch') {
+          state.pointers.set(ev.pointerId, {clientX: ev.clientX, clientY: ev.clientY});
+          if (state.pointers.size >= 2 && startPinchZoom()) {
+            try { stageOuter.setPointerCapture(ev.pointerId); } catch {}
+            return;
+          }
+        }
         const p = svgPoint(ev), rp = rawPoint(ev), target = selectable(ev.target);
         const handle = ev.target.getAttribute('data-handle');
         const isTouch = ev.pointerType === 'touch';
@@ -768,6 +806,13 @@
 
       function pointerMove(ev) {
         if (ev.cancelable) ev.preventDefault();
+        if (ev.pointerType === 'touch' && state.pointers.has(ev.pointerId)) {
+          state.pointers.set(ev.pointerId, {clientX: ev.clientX, clientY: ev.clientY});
+          if (state.pinch) {
+            updatePinchZoom();
+            return;
+          }
+        }
         const rp=rawPoint(ev); $('coords').textContent=`x:${rp.x.toFixed(1)} y:${rp.y.toFixed(1)}`;
         if (!state.drag) return;
         if (state.drag.pointerId !== undefined && ev.pointerId !== state.drag.pointerId) return;
@@ -780,7 +825,18 @@
         if (state.drag.type==='marquee') updateMarquee(ev);
         if (state.drag.type==='node') dragNode(p);
       }
-      function pointerUp() {
+      function pointerUp(ev) {
+        if (ev?.pointerType === 'touch') {
+          state.pointers.delete(ev.pointerId);
+          if (state.pinch) {
+            state.pinch = null;
+            try { stageOuter.releasePointerCapture(ev.pointerId); } catch {}
+            releaseDragPointer();
+            state.drag = null;
+            renderAll();
+            return;
+          }
+        }
         if (!state.drag) return;
         if (state.drag.type==='draw') finishShape();
         if (['move','resize','rotate','node'].includes(state.drag.type)) { bakeTransforms(); saveHistory(); }
