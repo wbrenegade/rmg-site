@@ -737,10 +737,19 @@
 
       function pointerDown(ev) {
         if (ev.cancelable) ev.preventDefault();
-        if (ev.button === 1 || state.space || state.tool === 'pan') { setDrag(ev, {type:'pan',sx:ev.clientX,sy:ev.clientY,px:state.pan.x,py:state.pan.y}); return; }
         const p = svgPoint(ev), rp = rawPoint(ev), target = selectable(ev.target);
+        const handle = ev.target.getAttribute('data-handle');
+        const isTouch = ev.pointerType === 'touch';
+        if (
+          ev.button === 1 ||
+          state.space ||
+          state.tool === 'pan' ||
+          (isTouch && state.tool === 'select' && !target && !handle)
+        ) {
+          setDrag(ev, {type:'pan',sx:ev.clientX,sy:ev.clientY,px:state.pan.x,py:state.pan.y});
+          return;
+        }
         if (state.tool === 'select') {
-          const handle = ev.target.getAttribute('data-handle');
           if (handle && state.selected.length) { startTransformDrag(ev, null, rp); return; }
           if (target) { if (ev.shiftKey) toggleSelect(target); else if (!state.selected.includes(target.id)) selectOnly(target); startTransformDrag(ev, target, rp); }
           else { clearSelection(); const sp=screenPos(ev); setDrag(ev, {type:'marquee',sx:sp.x,sy:sp.y,el:createMarquee(sp.x,sp.y)}); }
