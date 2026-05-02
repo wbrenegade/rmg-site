@@ -138,7 +138,7 @@ function inferTopStripe(product) {
   return searchable.includes("dual top outlined");
 }
 
-const RACING_STRIPE_PREVIEW_BASE = "/assets/imgs/previews/racing-stripes";
+const RACING_STRIPE_PREVIEW_BASE = "/assets/svg/racing-stripes";
 const racingStripePreviewSvgCache = new Map();
 
 function getRacingStripePreviewSvgPath(product) {
