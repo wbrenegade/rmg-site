@@ -714,21 +714,19 @@
       function screenPos(ev) { const r=canvasWrap.getBoundingClientRect(); return {x:ev.clientX-r.left, y:ev.clientY-r.top}; }
       function midpoint(a, b) { return {x:(a.clientX + b.clientX) / 2, y:(a.clientY + b.clientY) / 2}; }
       function distance(a, b) { return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY); }
-      function angle(a, b) { return Math.atan2(b.clientY - a.clientY, b.clientX - a.clientX) * 180 / Math.PI; }
+      function shouldPinchSelection(bbox) { return state.tool === 'select' && Boolean(bbox); }
       function startPinchZoom() {
         if (state.pointers.size < 2) return false;
         const [a, b] = [...state.pointers.values()];
         const mid = midpoint(a, b);
         releaseDragPointer();
         const els = selectedEls();
-        const transformSelection = state.tool === 'select' && els.length && (a.selected || b.selected || a.handle || b.handle);
-        if (transformSelection) {
-          const bbox = multiBBox(els);
+        const bbox = els.length ? multiBBox(els) : null;
+        if (els.length && shouldPinchSelection(bbox)) {
           if (bbox) {
             state.pinch = {
               mode: 'selection',
               distance: Math.max(1, distance(a, b)),
-              angle: angle(a, b),
               changed: false,
               centerX: bbox.x + bbox.width / 2,
               centerY: bbox.y + bbox.height / 2,
@@ -755,11 +753,9 @@
         const [a, b] = [...state.pointers.values()];
         if (state.pinch.mode === 'selection') {
           const scale = Math.max(.05, distance(a, b) / state.pinch.distance);
-          const delta = angle(a, b) - state.pinch.angle;
           state.pinch.base.forEach(([e, m]) => {
             const next = new DOMMatrix()
               .translate(state.pinch.centerX, state.pinch.centerY)
-              .rotate(delta)
               .scale(scale)
               .translate(-state.pinch.centerX, -state.pinch.centerY)
               .multiply(m);
