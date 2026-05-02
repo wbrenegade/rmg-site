@@ -10072,6 +10072,28 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "c53c486a-4a85-4bfb-8a94-b8fa6b7a2a98",
+      "type": "page_view",
+      "pathname": "/tools/decal-creator",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://www.renegademadegraphix.com/",
+      "method": "GET",
+      "timestamp": "05/01/2026, 10:03:53 PM",
+      "date": "2026-05-01",
+      "ip": "35.149.51.3",
+      "visitorKey": "0b4b0dc398ed26c4",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Mobile/15E148 Safari/604.1",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }
