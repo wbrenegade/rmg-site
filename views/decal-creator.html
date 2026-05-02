@@ -171,6 +171,7 @@
       background-size: 24px 24px;
       background-position: 0 0, 0 12px, 12px -12px, -12px 0;
     }
+    .canvas-resize-grip { display: none; }
     .stage-outer {
       position: absolute;
       inset: 0 16px 16px 0;
@@ -181,8 +182,8 @@
     .stage {
       position: absolute;
       transform-origin: 0 0;
-      left: 0;
-      top: 0;
+      left: 40px;
+      top: 40px;
       filter: drop-shadow(0 10px 30px rgba(0,0,0,.35));
     }
     #svgRoot {
@@ -495,6 +496,10 @@
       .ruler-x { height: 18px; }
       .ruler-y { width: 18px; }
       .stage-outer { inset: 0; }
+      .stage {
+        left: 0;
+        top: 0;
+      }
       .handle { stroke-width: 2; }
       .canvas-hscroll,
       .canvas-vscroll,

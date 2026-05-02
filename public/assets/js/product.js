@@ -181,15 +181,52 @@ function renderRacingStripePreviewShell(contentMarkup, gradientId) {
   `;
 }
 
-function renderStripeGeometryPreview({ selectedWidth, selectedSpacing, stripeColorHex, outlineColorHex, hasMultipleStripes, hasOutline, hasTopStripe }) {
+function renderStripeGeometryPreview({ selectedWidth, selectedSpacing, stripeColorHex, outlineColorHex, hasMultipleStripes, hasOutline, hasTopStripe, isRockerStripe }) {
   const stripeWidths = parseStripeWidths(selectedWidth, hasMultipleStripes);
   const spacingInches = parseInchValue(selectedSpacing, 0.5);
-  const pixelsPerInch = 7;
+  const pixelsPerInch = isRockerStripe ? 4 : 7;
   const centerX = 270;
-  const stripeHeight = hasTopStripe ? 22 : 28;
-  const stripeY = hasTopStripe ? 62 : 52;
+  const stripeHeight = isRockerStripe
+    ? Math.min(18, Math.max(8, stripeWidths[0] * pixelsPerInch))
+    : hasTopStripe ? 22 : 28;
+  const stripeY = isRockerStripe ? 56 : hasTopStripe ? 62 : 52;
   const maxStripeWidth = hasMultipleStripes ? 82 : 126;
   const rects = [];
+
+  if (isRockerStripe) {
+    const stripeLength = 426;
+    const x = (540 - stripeLength) / 2;
+    const gap = hasMultipleStripes ? Math.min(18, Math.max(5, spacingInches * 9)) : 0;
+    const bandCount = hasMultipleStripes ? 2 : 1;
+    const totalHeight = bandCount * stripeHeight + (bandCount - 1) * gap;
+    const startY = 66 - totalHeight / 2;
+
+    for (let index = 0; index < bandCount; index += 1) {
+      rects.push({
+        x,
+        y: startY + index * (stripeHeight + gap),
+        width: stripeLength,
+        height: stripeHeight
+      });
+    }
+
+    if (hasTopStripe) {
+      const accentHeight = Math.max(4, Math.round(stripeHeight * 0.36));
+      rects.push({
+        x,
+        y: Math.max(24, startY - accentHeight - 7),
+        width: stripeLength,
+        height: accentHeight
+      });
+    }
+
+    return rects.map((rect, index) => {
+      const stroke = hasOutline || (hasTopStripe && index === rects.length - 1)
+        ? ` stroke="${outlineColorHex}" stroke-width="4" paint-order="stroke fill"`
+        : '';
+      return `<rect x="${rect.x.toFixed(1)}" y="${rect.y.toFixed(1)}" width="${rect.width.toFixed(1)}" height="${rect.height}" rx="2" fill="${stripeColorHex}"${stroke} />`;
+    }).join('');
+  }
 
   if (hasMultipleStripes) {
     const leftWidth = Math.min(maxStripeWidth, Math.max(20, stripeWidths[0] * pixelsPerInch));
@@ -371,6 +408,7 @@ function stripeColorToHex(colorValue) {
 
 function renderRacingStripeLivePreview(container, product) {
   const options = getRacingStripeOptions(product);
+  const isRockerStripe = String(product?.subcategory || '').toLowerCase().includes('rocker');
   const previewCanvas = container.querySelector('#stripeLivePreviewCanvas');
   const previewMeta = container.querySelector('#stripeLivePreviewMeta');
   const widthSelect = container.querySelector('#stripeWidthSelect');
@@ -397,7 +435,8 @@ function renderRacingStripeLivePreview(container, product) {
       outlineColorHex,
       hasMultipleStripes: options.hasMultipleStripes,
       hasOutline: options.hasOutline,
-      hasTopStripe: options.hasTopStripe
+      hasTopStripe: options.hasTopStripe,
+      isRockerStripe
     });
 
     previewCanvas.innerHTML = renderRacingStripePreviewShell(geometryPreview, 'stripePreviewBg');

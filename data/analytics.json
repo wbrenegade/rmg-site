@@ -10716,6 +10716,97 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "93160270-49a1-4e77-bed3-719f8f730dc0",
+      "type": "page_view",
+      "pathname": "/product",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/shop",
+      "method": "GET",
+      "timestamp": "05/02/2026, 2:34:54 AM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "7d087aa9-fa20-4680-8042-171df2c11127",
+      "type": "product_view",
+      "pathname": "/product",
+      "productId": "decal-rocker-panel-side-stripes-dual-top-outlined-stripes",
+      "productName": "Dual Top Outlined Stripes",
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/product?id=decal-rocker-panel-side-stripes-dual-top-outlined-stripes",
+      "method": "POST",
+      "timestamp": "05/02/2026, 2:34:55 AM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {
+        "category": "Decals",
+        "subcategory": "Rocker Panel/Side"
+      }
+    },
+    {
+      "id": "36249dff-1324-4267-ae61-4763c501978a",
+      "type": "page_view",
+      "pathname": "/tools",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/product?id=decal-rocker-panel-side-stripes-dual-top-outlined-stripes",
+      "method": "GET",
+      "timestamp": "05/02/2026, 2:36:14 AM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "6063cd27-ce67-4dca-9923-ffa4f7128560",
+      "type": "page_view",
+      "pathname": "/tools/decal-creator",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/tools",
+      "method": "GET",
+      "timestamp": "05/02/2026, 2:36:20 AM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }
