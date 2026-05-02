@@ -1,6 +1,7 @@
 import uuid
 import shutil
 import subprocess
+import os
 from pathlib import Path
 
 import cv2
@@ -28,10 +29,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-BASE_DIR = Path("uploads")
-OUT_DIR = Path("outputs")
-BASE_DIR.mkdir(exist_ok=True)
-OUT_DIR.mkdir(exist_ok=True)
+WORK_DIR = Path(os.getenv("SVG_CONVERTER_WORK_DIR", "/tmp/rmg-img-svg-converter"))
+BASE_DIR = WORK_DIR / "uploads"
+OUT_DIR = WORK_DIR / "outputs"
+BASE_DIR.mkdir(parents=True, exist_ok=True)
+OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".webm"}
 
