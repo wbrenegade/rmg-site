@@ -1506,7 +1506,8 @@ async function initCustomizePage() {
       startY: selectedShape.y,
       startSize: selectedShape.size,
       startRotate: selectedShape.rotate,
-      startAngle: Math.atan2(event.clientY - (objectRect.top + objectRect.height / 2), event.clientX - (objectRect.left + objectRect.width / 2)) * 180 / Math.PI,
+      lastAngle: Math.atan2(event.clientY - (objectRect.top + objectRect.height / 2), event.clientX - (objectRect.left + objectRect.width / 2)) * 180 / Math.PI,
+      currentRotate: selectedShape.rotate,
       centerX: objectRect.left + objectRect.width / 2,
       centerY: objectRect.top + objectRect.height / 2,
       objectWidth: Math.max(1, objectRect.width),
@@ -1534,8 +1535,10 @@ async function initCustomizePage() {
 
     if (shapeObjectDragState.mode === 'rotate') {
       const angle = Math.atan2(event.clientY - shapeObjectDragState.centerY, event.clientX - shapeObjectDragState.centerX) * 180 / Math.PI;
+      shapeObjectDragState.currentRotate += pointerAngleDelta(shapeObjectDragState.lastAngle || angle, angle);
+      shapeObjectDragState.lastAngle = angle;
       setEditorShapeFromPointer({
-        rotate: shapeObjectDragState.startRotate + pointerAngleDelta(shapeObjectDragState.startAngle, angle),
+        rotate: shapeObjectDragState.currentRotate,
         stageRect: shapeObjectDragState.stageRect
       });
       return;
@@ -1636,7 +1639,8 @@ async function initCustomizePage() {
       startScaleX: decalScaleX,
       startScaleY: decalScaleY,
       startRotate: Number(decalRotateInput?.value || 0),
-      startAngle: Math.atan2(event.clientY - centerY, event.clientX - centerX) * 180 / Math.PI,
+      lastAngle: Math.atan2(event.clientY - centerY, event.clientX - centerX) * 180 / Math.PI,
+      currentRotate: Number(decalRotateInput?.value || 0),
       centerX,
       centerY,
       startX: Number(decalXInput?.value || 0),
@@ -1687,8 +1691,10 @@ async function initCustomizePage() {
 
     if (decalObjectDragState.mode === 'rotate') {
       const angle = Math.atan2(event.clientY - decalObjectDragState.centerY, event.clientX - decalObjectDragState.centerX) * 180 / Math.PI;
+      decalObjectDragState.currentRotate += pointerAngleDelta(decalObjectDragState.lastAngle || angle, angle);
+      decalObjectDragState.lastAngle = angle;
       setDecalTransformInputs({
-        rotate: decalObjectDragState.startRotate + angle - decalObjectDragState.startAngle
+        rotate: decalObjectDragState.currentRotate
       });
       return;
     }

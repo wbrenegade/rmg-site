@@ -338,18 +338,20 @@
         position: sticky;
         top: 0;
         z-index: 20;
-        flex-wrap: wrap;
-        align-content: flex-start;
+        flex-wrap: nowrap;
         gap: 6px;
-        max-height: 24dvh;
-        overflow-y: auto;
+        overflow-x: auto;
+        overflow-y: hidden;
         padding: 6px;
         -webkit-overflow-scrolling: touch;
       }
       .brand {
-        flex: 1 1 100%;
+        flex: 0 0 auto;
         min-width: 0;
-        padding-right: 0;
+        padding-right: 8px;
+      }
+      .topbar > * {
+        flex: 0 0 auto;
       }
       .brand-mark {
         width: 24px;
@@ -380,7 +382,7 @@
       .toolbar {
         position: sticky;
         top: var(--mobile-topbar-height, 0px);
-        z-index: 15;
+        z-index: 22;
         padding: 7px 6px;
         flex-direction: row;
         gap: 5px;
@@ -398,8 +400,12 @@
       }
       .canvas-wrap {
         order: 2;
+        position: sticky;
+        top: calc(var(--mobile-topbar-height, 0px) + 57px);
+        z-index: 14;
         width: 100%;
-        min-height: clamp(380px, 64dvh, 640px);
+        min-height: clamp(340px, 54dvh, 580px);
+        box-shadow: 0 10px 24px rgba(0,0,0,.3);
       }
       .sidebar {
         order: 3;
@@ -413,7 +419,15 @@
         border-top: 1px solid var(--line);
         overflow: visible;
       }
-      .panel { padding: 10px; }
+      .panel { padding: 8px; }
+      .panel h3 {
+        font-size: 10px;
+        margin-bottom: 7px;
+      }
+      .field { gap: 3px; margin-bottom: 6px; }
+      .field-row { gap: 6px; }
+      input, select, textarea { min-height: 28px; padding: 4px 7px; }
+      .btn, .icon-btn { min-height: 30px; height: 30px; padding: 0 7px; font-size: 12px; }
       .sidebar,
       .inspector {
         display: grid;
@@ -458,7 +472,7 @@
         min-height: 0;
       }
       .canvas-wrap {
-        min-height: clamp(380px, 62dvh, 560px);
+        min-height: clamp(320px, 52dvh, 500px);
       }
       .field-row,
       .mini-grid {
@@ -1041,7 +1055,7 @@
         if(handle==='rot') {
           const cx=b.x+b.width/2, cy=b.y+b.height/2;
           const startAngle=Math.atan2(p.y-cy,p.x-cx)*180/Math.PI+90;
-          setDrag(ev, {type:'rotate',bbox:b,start:p,startAngle,base:selectedEls().map(e=>[e, getLocalMatrix(e)])});
+          setDrag(ev, {type:'rotate',bbox:b,start:p,lastAngle:startAngle,totalAngle:0,base:selectedEls().map(e=>[e, getLocalMatrix(e)])});
         }
         else if(handle) setDrag(ev, {type:'resize',handle,bbox:b,start:p,base:selectedEls().map(e=>[e, safeBBox(e), getLocalMatrix(e)])});
         else setDrag(ev, {type:'move',start:p,base:selectedEls().map(e=>[e, getLocalMatrix(e)])});
@@ -1069,7 +1083,9 @@
       function rotateSelected(p) {
         const b=state.drag.bbox, cx=b.x+b.width/2, cy=b.y+b.height/2;
         const a=Math.atan2(p.y-cy,p.x-cx)*180/Math.PI+90;
-        const delta=angleDelta(state.drag.startAngle||0, a);
+        state.drag.totalAngle += angleDelta(state.drag.lastAngle || a, a);
+        state.drag.lastAngle = a;
+        const delta=state.drag.totalAngle;
         state.drag.base.forEach(([e,m])=>{
           const next=rotateMatrixAround(m, delta, cx, cy);
           e.setAttribute('transform', matrixToAttr(next));
