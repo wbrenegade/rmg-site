@@ -526,6 +526,19 @@ async function initCustomizePage() {
     premadeDecalOptions = PREMADE_DECAL_OPTIONS.slice();
   }
 
+  const productDecalOptions = buildDecalOptions(products);
+  const productOptionIds = new Set(premadeDecalOptions.map((option) => option.id));
+  premadeDecalOptions = premadeDecalOptions.concat(
+    productDecalOptions.filter((option) => option.id && !productOptionIds.has(option.id))
+  );
+
+  if (selectedProduct && String(selectedProduct.category || '').toLowerCase() === 'decals') {
+    const selectedOption = premadeDecalOptions.find((option) => option.id === selectedProduct.id);
+    if (selectedOption) {
+      activePremadeDecalId = selectedOption.id;
+    }
+  }
+
   const editorDecalOption = getEditorDecalOption();
   if (editorDecalOption) {
     premadeDecalOptions = [
@@ -572,6 +585,13 @@ async function initCustomizePage() {
   const textRotateInput = document.getElementById('textRotate');
   const textXInput = document.getElementById('textX');
   const textYInput = document.getElementById('textY');
+
+  if (activePremadeDecalId && selectedProduct && String(selectedProduct.category || '').toLowerCase() === 'decals') {
+    if (decalSizeInput) decalSizeInput.value = isRacingStripeProduct(selectedProduct) ? '56' : '46';
+    if (decalXInput) decalXInput.value = '0';
+    if (decalYInput) decalYInput.value = '0';
+    if (decalRotateInput) decalRotateInput.value = '0';
+  }
 
   function isdecalmockupeditorFullscreen() {
     return workspace?.classList.contains('is-fullscreen');
