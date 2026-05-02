@@ -9896,6 +9896,50 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "8db89cb6-8d75-418c-bf89-c52d9aebeae6",
+      "type": "page_view",
+      "pathname": "/",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": null,
+      "method": "GET",
+      "timestamp": "05/01/2026, 7:31:23 PM",
+      "date": "2026-05-01",
+      "ip": "35.149.51.3",
+      "visitorKey": "0b4b0dc398ed26c4",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Mobile/15E148 Safari/604.1",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "77cb6d51-b9f9-46b7-b512-e607784aada9",
+      "type": "page_view",
+      "pathname": "/tools/decal-creator",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://www.renegademadegraphix.com/",
+      "method": "GET",
+      "timestamp": "05/01/2026, 7:31:28 PM",
+      "date": "2026-05-01",
+      "ip": "35.149.51.3",
+      "visitorKey": "0b4b0dc398ed26c4",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Mobile/15E148 Safari/604.1",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }
