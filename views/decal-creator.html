@@ -199,6 +199,20 @@
     .handle-hit { fill: transparent; stroke: transparent; pointer-events: all; }
     .rotate-handle { fill: #fde68a; }
     .path-node { fill: #fff; stroke: #ef4444; stroke-width: 1.4; cursor: move; vector-effect: non-scaling-stroke; }
+    .path-node-hit { fill: transparent; stroke: transparent; pointer-events: all; }
+    .text-edit-overlay {
+      position: absolute;
+      z-index: 30;
+      min-width: 90px;
+      height: 36px;
+      padding: 4px 8px;
+      color: #111827;
+      background: rgba(255,255,255,.96);
+      border: 2px solid #2563eb;
+      border-radius: 4px;
+      box-shadow: 0 10px 26px rgba(0,0,0,.28);
+      outline: none;
+    }
     .canvas-hscroll, .canvas-vscroll {
       position: absolute;
       z-index: 6;
@@ -691,7 +705,7 @@
         <section class="panel">
           <h3>Effects</h3>
           <div class="field-row"><button class="btn" id="shadowBtn">Shadow</button><button class="btn" id="removeEffectsBtn">Clear</button></div>
-          <div class="field"><label>Clip path by top object</label><button class="btn" id="clipBtn">Set Clip</button></div>
+          <div class="field"><label>Use top selected object</label><div class="field-row"><button class="btn" id="clipBtn">Set Clip</button><button class="btn" id="maskBtn">Set Mask</button></div></div>
         </section>
       </aside>
     </main>
@@ -733,7 +747,7 @@
         tool: 'select', zoom: 1, pan: {x: 40, y: 40}, selected: [], activeLayer: null,
         fill: '#60a5fa', stroke: '#111827', strokeWidth: 2, dash: '',
         drawing: null, clipboard: [], undo: [], redo: [], snap: true, grid: true, rulers: true,
-        pathEdit: false, id: 1, doc: {w: 1200, h: 800}, drag: null, space: false,
+        pathEdit: false, id: 1, doc: {w: 1200, h: 800}, drag: null, space: false, textEdit: null,
         selectionKey: '', rotInputPrev: 0, savedDesignId: '', pointers: new Map(), pinch: null
       };
       const tools = [
@@ -784,6 +798,7 @@
       function bindEvents() {
         document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>setTool(b.dataset.tool));
         stageOuter.addEventListener('pointerdown', pointerDown, {passive:false}); stageOuter.addEventListener('pointermove', pointerMove, {passive:false}); window.addEventListener('pointerup', pointerUp); window.addEventListener('pointercancel', pointerUp);
+        stageOuter.addEventListener('dblclick', textDoubleClick, {passive:false});
         stageOuter.addEventListener('wheel', onWheel, {passive:false});
         document.addEventListener('keydown', keyDown); document.addEventListener('keyup', e=>{ if(e.code==='Space') state.space=false; });
         window.addEventListener('resize', onViewportResize);
@@ -803,7 +818,7 @@
         $('groupBtn').onclick=group; $('ungroupBtn').onclick=ungroup; $('frontBtn').onclick=()=>zOrder('front'); $('backBtn').onclick=()=>zOrder('back');
         document.querySelectorAll('[data-align]').forEach(b=>b.onclick=()=>align(b.dataset.align));
         $('flipHBtn').onclick=()=>flip('h'); $('flipVBtn').onclick=()=>flip('v'); $('noFillBtn').onclick=()=>{state.fill='none'; selectedEls().forEach(e=>e.setAttribute('fill','none')); renderAll(); saveHistory();}; $('noStrokeBtn').onclick=()=>{state.stroke='none'; selectedEls().forEach(e=>e.setAttribute('stroke','none')); renderAll(); saveHistory();};
-        $('pathEditBtn').onclick=()=>setTool('node'); $('objectToPathBtn').onclick=objectToPath; $('shadowBtn').onclick=()=>{selectedEls().forEach(e=>e.setAttribute('filter','url(#dropShadow)')); saveHistory();}; $('removeEffectsBtn').onclick=()=>{selectedEls().forEach(e=>{e.removeAttribute('filter'); e.removeAttribute('clip-path');}); saveHistory();}; $('clipBtn').onclick=setClip;
+        $('pathEditBtn').onclick=()=>setTool('node'); $('objectToPathBtn').onclick=objectToPath; $('shadowBtn').onclick=()=>{selectedEls().forEach(e=>e.setAttribute('filter','url(#dropShadow)')); saveHistory();}; $('removeEffectsBtn').onclick=clearEffects; $('clipBtn').onclick=setClip; $('maskBtn').onclick=setMask;
         $('swatches').onclick=e=>{ const c=e.target.dataset.color; if(c){ state.fill=c; $('fillInput').value=c; applyInspector(); }};
         $('canvasResizeGrip')?.addEventListener('pointerdown', startCanvasResize, {passive:false});
       }
@@ -934,6 +949,7 @@
       function snapDelta(v) { return state.snap ? Math.round(v / 10) * 10 : v; }
 
       function pointerDown(ev) {
+        if (state.textEdit) commitTextEdit();
         if (ev.cancelable) ev.preventDefault();
         const target = selectable(ev.target);
         const handle = ev.target.getAttribute('data-handle');
@@ -975,6 +991,81 @@
         else if (state.tool === 'star') { addObj(makeStar(p.x,p.y,70,32,5)); setTool('select'); }
         else if (state.tool === 'text') { const el=make('text',{...baseAttrs(), x:p.x, y:p.y, 'font-size':$('fontSizeInput').value, 'font-family':$('fontInput').value}); el.textContent=$('textInput').value || 'Text'; addObj(el); setTool('select'); }
         else if (state.tool === 'pen') penClick(p, ev);
+      }
+
+      function textDoubleClick(ev) {
+        const target = selectable(ev.target);
+        if (!target || target.tagName !== 'text') return;
+        if (ev.cancelable) ev.preventDefault();
+        ev.stopPropagation();
+        beginTextEdit(target);
+      }
+      function beginTextEdit(el) {
+        if (state.textEdit) commitTextEdit();
+        selectOnly(el);
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'text-edit-overlay';
+        input.value = el.textContent || '';
+        input.style.fontFamily = el.getAttribute('font-family') || $('fontInput').value || 'Arial';
+        const fontSize = parseFloat(el.getAttribute('font-size') || $('fontSizeInput').value || 48);
+        input.style.fontSize = `${Math.max(16, fontSize * state.zoom)}px`;
+        input.style.color = readableTextEditColor(el.getAttribute('fill'));
+        canvasWrap.appendChild(input);
+        state.textEdit = { el, input, oldText: el.textContent || '', changed: false };
+        positionTextEdit();
+        input.focus();
+        input.select();
+        input.addEventListener('input', () => {
+          el.textContent = input.value || ' ';
+          state.textEdit.changed = true;
+          $('textInput').value = input.value;
+          renderSelection();
+          positionTextEdit();
+        });
+        input.addEventListener('keydown', e => {
+          if (e.key === 'Enter') { e.preventDefault(); commitTextEdit(); }
+          if (e.key === 'Escape') { e.preventDefault(); cancelTextEdit(); }
+        });
+        input.addEventListener('blur', commitTextEdit);
+      }
+      function positionTextEdit() {
+        if (!state.textEdit) return;
+        const { el, input } = state.textEdit;
+        const wrap = canvasWrap.getBoundingClientRect();
+        const box = el.getBoundingClientRect();
+        const left = Math.max(0, box.left - wrap.left - 4);
+        const top = Math.max(0, box.top - wrap.top - 4);
+        input.style.left = `${left}px`;
+        input.style.top = `${top}px`;
+        input.style.width = `${Math.max(120, box.width + 28, input.scrollWidth + 18)}px`;
+        input.style.height = `${Math.max(34, box.height + 12)}px`;
+      }
+      function commitTextEdit() {
+        const edit = state.textEdit;
+        if (!edit) return;
+        edit.input.removeEventListener('blur', commitTextEdit);
+        const text = edit.input.value.trim() ? edit.input.value : 'Text';
+        edit.el.textContent = text;
+        $('textInput').value = text;
+        edit.input.remove();
+        state.textEdit = null;
+        renderAll();
+        if (edit.changed && text !== edit.oldText) saveHistory();
+      }
+      function cancelTextEdit() {
+        const edit = state.textEdit;
+        if (!edit) return;
+        edit.input.removeEventListener('blur', commitTextEdit);
+        edit.el.textContent = edit.oldText;
+        edit.input.remove();
+        state.textEdit = null;
+        $('textInput').value = edit.oldText;
+        renderAll();
+      }
+      function readableTextEditColor(fill) {
+        if (!fill || fill === 'none' || fill.startsWith('url(')) return '#111827';
+        return fill;
       }
 
       function pointerMove(ev) {
@@ -1203,11 +1294,94 @@
       }
 
       function drawPathNodes(el) {
-        const nums=(el.getAttribute('d')||'').match(/-?\d*\.?\d+(?:e[-+]?\d+)?/gi); if(!nums) return;
-        for(let i=0;i<nums.length-1;i+=2) make('circle',{class:'path-node','data-node':i/2,cx:+nums[i],cy:+nums[i+1],r:5/state.zoom},ui);
+        const nodes = editableNodes(el);
+        const m = el.getCTM();
+        if (!nodes.length || !m) return;
+        const r = (isCoarsePointer() ? 6 : 5) / state.zoom;
+        const hitR = Math.max(r, (isCoarsePointer() ? 22 : 14) / state.zoom);
+        nodes.forEach((node, i) => {
+          const pt = new DOMPoint(node.x, node.y).matrixTransform(m);
+          make('circle',{class:'path-node-hit','data-node':i,cx:pt.x,cy:pt.y,r:hitR},ui);
+          make('circle',{class:'path-node','data-node':i,cx:pt.x,cy:pt.y,r},ui);
+        });
       }
-      function nodePointerDown(ev,target,p) { const n=ev.target.getAttribute('data-node'); if(n!==null){ state.drag={type:'node',index:+n,start:p,el:selectedEls()[0]}; return; } if(target) selectOnly(target); }
-      function dragNode(p) { const el=state.drag.el; if(!el) return; const d=el.getAttribute('d')||''; let idx=-1; const nd=d.replace(/-?\d*\.?\d+(?:e[-+]?\d+)?/gi, m => { idx++; if(idx===state.drag.index*2) return p.x.toFixed(2); if(idx===state.drag.index*2+1) return p.y.toFixed(2); return m; }); el.setAttribute('d',nd); renderSelection(); }
+      function nodePointerDown(ev,target,p) {
+        const n=ev.target.getAttribute('data-node');
+        if(n!==null){
+          const el=selectedEls()[0];
+          if (!el || !editableNodes(el).length) return;
+          setDrag(ev, {type:'node',index:+n,start:p,el});
+          return;
+        }
+        if(target) {
+          selectOnly(target);
+          if (!editableNodes(target).length) toast('Convert this object to a path before editing nodes.');
+        }
+      }
+      function dragNode(p) {
+        const el=state.drag.el;
+        if(!el) return;
+        const local = svgToLocalPoint(el, p);
+        if (!local) return;
+        setEditableNode(el, state.drag.index, local);
+        renderSelection();
+        updateInspector();
+      }
+      function editableNodes(el) {
+        if (!el) return [];
+        if (el.tagName === 'path') return pathNumberPairs(el.getAttribute('d') || '').map((pt, index)=>({...pt,index}));
+        if (el.tagName === 'polygon' || el.tagName === 'polyline') return parsePointList(el.getAttribute('points') || '').map((pt, index)=>({...pt,index}));
+        if (el.tagName === 'line') return [
+          {x:+el.getAttribute('x1') || 0, y:+el.getAttribute('y1') || 0, index:0},
+          {x:+el.getAttribute('x2') || 0, y:+el.getAttribute('y2') || 0, index:1}
+        ];
+        return [];
+      }
+      function setEditableNode(el, nodeIndex, p) {
+        if (el.tagName === 'path') {
+          let numIndex = -1;
+          const wantedX = nodeIndex * 2;
+          const wantedY = wantedX + 1;
+          const d = (el.getAttribute('d') || '').replace(numberPattern(), m => {
+            numIndex++;
+            if (numIndex === wantedX) return p.x.toFixed(2);
+            if (numIndex === wantedY) return p.y.toFixed(2);
+            return m;
+          });
+          el.setAttribute('d', d);
+          return;
+        }
+        if (el.tagName === 'polygon' || el.tagName === 'polyline') {
+          const pts = parsePointList(el.getAttribute('points') || '');
+          if (!pts[nodeIndex]) return;
+          pts[nodeIndex] = p;
+          el.setAttribute('points', pts.map(pt=>`${pt.x.toFixed(2)},${pt.y.toFixed(2)}`).join(' '));
+          return;
+        }
+        if (el.tagName === 'line') {
+          const suffix = nodeIndex === 0 ? '1' : '2';
+          el.setAttribute(`x${suffix}`, p.x.toFixed(2));
+          el.setAttribute(`y${suffix}`, p.y.toFixed(2));
+        }
+      }
+      function svgToLocalPoint(el, p) {
+        const m = el.getCTM();
+        if (!m) return null;
+        return new DOMPoint(p.x, p.y).matrixTransform(m.inverse());
+      }
+      function numberPattern() { return /-?\d*\.?\d+(?:e[-+]?\d+)?/gi; }
+      function pathNumberPairs(d) {
+        const nums = (d.match(numberPattern()) || []).map(Number);
+        const pts = [];
+        for (let i=0; i<nums.length-1; i+=2) pts.push({x:nums[i], y:nums[i+1]});
+        return pts;
+      }
+      function parsePointList(points) {
+        const nums = (points.match(numberPattern()) || []).map(Number);
+        const pts = [];
+        for (let i=0; i<nums.length-1; i+=2) pts.push({x:nums[i], y:nums[i+1]});
+        return pts;
+      }
 
       function createMarquee(x,y){ const el=document.createElement('div'); el.className='marquee'; el.style.left=x+'px'; el.style.top=y+'px'; canvasWrap.appendChild(el); return el; }
       function updateMarquee(ev){ const sp=screenPos(ev), d=state.drag; const x=Math.min(sp.x,d.sx), y=Math.min(sp.y,d.sy), w=Math.abs(sp.x-d.sx), h=Math.abs(sp.y-d.sy); Object.assign(d.el.style,{left:x+'px',top:y+'px',width:w+'px',height:h+'px'}); }
@@ -1271,8 +1445,108 @@
       function flip(axis){ const b=multiBBox(selectedEls()); if(!b)return; saveHistory(); const cx=b.x+b.width/2, cy=b.y+b.height/2; selectedEls().forEach(e=>e.setAttribute('transform',`${e.getAttribute('transform')||''} translate(${axis==='h'?cx:0} ${axis==='v'?cy:0}) scale(${axis==='h'?-1:1} ${axis==='v'?-1:1}) translate(${axis==='h'?-cx:0} ${axis==='v'?-cy:0})`)); renderAll(); }
       function pickStyle(el){ ['fill','stroke','stroke-width'].forEach(a=>{ const v=el.getAttribute(a); if(v && v!=='none'){ if(a==='fill'){$('fillInput').value=v;state.fill=v;} if(a==='stroke'){$('strokeInput').value=v;state.stroke=v;} if(a==='stroke-width'){$('strokeWidthInput').value=v;state.strokeWidth=+v;} }}); toast('Style picked'); }
 
-      function objectToPath(){ toast('Object-to-path supports existing paths natively in this browser build'); }
-      function setClip(){ const els=selectedEls(); if(els.length<2)return toast('Select target(s), then top clip object'); saveHistory(); const clipShape=els[els.length-1].cloneNode(true); clipShape.removeAttribute('data-vf-object'); const cp=make('clipPath',{id:uid('clip')},svg.querySelector('defs')); cp.appendChild(clipShape); els.slice(0,-1).forEach(e=>e.setAttribute('clip-path',`url(#${cp.id})`)); els[els.length-1].remove(); state.selected=els.slice(0,-1).map(e=>e.id); renderAll(); }
+      function clearEffects(){
+        const els=selectedEls();
+        if(!els.length)return;
+        saveHistory();
+        els.forEach(e=>{
+          e.removeAttribute('filter');
+          e.removeAttribute('clip-path');
+          e.removeAttribute('mask');
+        });
+        renderAll();
+      }
+      function objectToPath(){
+        const els=selectedEls();
+        if(!els.length)return toast('Select an object to convert.');
+        const conversions=els.map(el=>[el,convertElementToPath(el)]).filter(([,path])=>path);
+        if(!conversions.length) return toast('This object type cannot be converted to a path yet.');
+        saveHistory();
+        const converted=[];
+        conversions.forEach(([el,path])=>{
+          el.parentNode.replaceChild(path, el);
+          converted.push(path.id);
+        });
+        if(!converted.length) return toast('This object type cannot be converted to a path yet.');
+        state.selected=converted;
+        setTool('node');
+        renderAll();
+        toast('Converted to editable path.');
+      }
+      function convertElementToPath(el) {
+        if (!el || el.tagName === 'path') return null;
+        let d = '';
+        if (el.tagName === 'rect') {
+          const x=+el.getAttribute('x')||0, y=+el.getAttribute('y')||0, w=+el.getAttribute('width')||0, h=+el.getAttribute('height')||0;
+          d = `M ${x} ${y} L ${x+w} ${y} L ${x+w} ${y+h} L ${x} ${y+h} Z`;
+        } else if (el.tagName === 'ellipse') {
+          const cx=+el.getAttribute('cx')||0, cy=+el.getAttribute('cy')||0, rx=+el.getAttribute('rx')||0, ry=+el.getAttribute('ry')||0;
+          const c=.5522847498;
+          d = `M ${cx-rx} ${cy} C ${cx-rx} ${cy-ry*c} ${cx-rx*c} ${cy-ry} ${cx} ${cy-ry} C ${cx+rx*c} ${cy-ry} ${cx+rx} ${cy-ry*c} ${cx+rx} ${cy} C ${cx+rx} ${cy+ry*c} ${cx+rx*c} ${cy+ry} ${cx} ${cy+ry} C ${cx-rx*c} ${cy+ry} ${cx-rx} ${cy+ry*c} ${cx-rx} ${cy} Z`;
+        } else if (el.tagName === 'circle') {
+          const cx=+el.getAttribute('cx')||0, cy=+el.getAttribute('cy')||0, r=+el.getAttribute('r')||0;
+          const c=.5522847498;
+          d = `M ${cx-r} ${cy} C ${cx-r} ${cy-r*c} ${cx-r*c} ${cy-r} ${cx} ${cy-r} C ${cx+r*c} ${cy-r} ${cx+r} ${cy-r*c} ${cx+r} ${cy} C ${cx+r} ${cy+r*c} ${cx+r*c} ${cy+r} ${cx} ${cy+r} C ${cx-r*c} ${cy+r} ${cx-r} ${cy+r*c} ${cx-r} ${cy} Z`;
+        } else if (el.tagName === 'line') {
+          const x1=+el.getAttribute('x1')||0, y1=+el.getAttribute('y1')||0, x2=+el.getAttribute('x2')||0, y2=+el.getAttribute('y2')||0;
+          d = `M ${x1} ${y1} L ${x2} ${y2}`;
+        } else if (el.tagName === 'polygon' || el.tagName === 'polyline') {
+          const pts=parsePointList(el.getAttribute('points')||'');
+          if(!pts.length) return null;
+          d = `M ${pts.map(pt=>`${pt.x} ${pt.y}`).join(' L ')}${el.tagName === 'polygon' ? ' Z' : ''}`;
+        } else {
+          return null;
+        }
+        const path=make('path',{id:el.id,'data-vf-object':'true',d});
+        copyVisualAttributes(el,path);
+        return path;
+      }
+      function copyVisualAttributes(from,to) {
+        const attrs=['fill','stroke','stroke-width','stroke-dasharray','stroke-linecap','stroke-linejoin','opacity','transform','filter','clip-path','mask','vector-effect'];
+        attrs.forEach(a=>{
+          const v=from.getAttribute(a);
+          if(v!==null) to.setAttribute(a,v);
+        });
+        if (!to.hasAttribute('fill')) to.setAttribute('fill', from.tagName === 'line' ? 'none' : state.fill);
+        if (!to.hasAttribute('stroke')) to.setAttribute('stroke', state.stroke);
+        if (!to.hasAttribute('vector-effect')) to.setAttribute('vector-effect','non-scaling-stroke');
+      }
+      function setClip(){ applyShapeEffect('clip'); }
+      function setMask(){ applyShapeEffect('mask'); }
+      function applyShapeEffect(kind){
+        const els=selectedEls();
+        if(els.length<2)return toast(`Select target object(s), then the top ${kind} shape.`);
+        saveHistory();
+        const shape=els[els.length-1];
+        const targets=els.slice(0,-1);
+        const defs=svg.querySelector('defs');
+        const shapeClone=shape.cloneNode(true);
+        shapeClone.removeAttribute('id');
+        shapeClone.removeAttribute('data-vf-object');
+        shapeClone.querySelectorAll('[data-vf-object]').forEach(e=>e.removeAttribute('data-vf-object'));
+        if(kind==='clip') {
+          const cp=make('clipPath',{id:uid('clip'),clipPathUnits:'userSpaceOnUse'},defs);
+          cp.appendChild(shapeClone);
+          targets.forEach(e=>e.setAttribute('clip-path',`url(#${cp.id})`));
+        } else {
+          const mask=make('mask',{id:uid('mask'),maskUnits:'userSpaceOnUse'},defs);
+          prepareMaskShape(shapeClone);
+          mask.appendChild(shapeClone);
+          targets.forEach(e=>e.setAttribute('mask',`url(#${mask.id})`));
+        }
+        shape.remove();
+        state.selected=targets.map(e=>e.id);
+        renderAll();
+        toast(kind==='clip'?'Clip applied.':'Mask applied.');
+      }
+      function prepareMaskShape(el){
+        if (el.nodeType !== 1) return;
+        if (!['defs','clipPath','mask'].includes(el.tagName)) {
+          el.setAttribute('fill','#fff');
+          el.setAttribute('stroke','#fff');
+        }
+        [...el.children].forEach(prepareMaskShape);
+      }
 
       function resizeDoc(){ saveHistory(); state.doc.w=+$('docW').value; state.doc.h=+$('docH').value; svg.setAttribute('width',state.doc.w); svg.setAttribute('height',state.doc.h); svg.setAttribute('viewBox',`0 0 ${state.doc.w} ${state.doc.h}`); updateStage(); }
       function openSource(){ $('sourceText').value=cleanSvg(); $('sourceModal').classList.add('open'); }
@@ -1344,7 +1618,7 @@
 
       function setZoom(z, center=null){ const old=state.zoom; state.zoom=Math.min(8,Math.max(.1,z)); if(center){ state.pan.x -= center.x*(state.zoom-old); state.pan.y -= center.y*(state.zoom-old); } $('zoomInput').value=Math.round(state.zoom*100); updateStage(); renderSelection(); }
       function zoomFit(){ const r=stageOuter.getBoundingClientRect(); const pad=isCoarsePointer()?24:80; const z=Math.min((r.width-pad)/state.doc.w,(r.height-pad)/state.doc.h); state.zoom=Math.max(.1,Math.min(4,z)); state.pan={x:(r.width-state.doc.w*state.zoom)/2,y:(r.height-state.doc.h*state.zoom)/2}; $('zoomInput').value=Math.round(state.zoom*100); updateStage(); }
-      function updateStage(){ stage.style.transform=`translate(${state.pan.x}px,${state.pan.y}px) scale(${state.zoom})`; svg.setAttribute('width',state.doc.w); svg.setAttribute('height',state.doc.h); renderRulers(); syncScrollbars(); }
+      function updateStage(){ stage.style.transform=`translate(${state.pan.x}px,${state.pan.y}px) scale(${state.zoom})`; svg.setAttribute('width',state.doc.w); svg.setAttribute('height',state.doc.h); renderRulers(); syncScrollbars(); positionTextEdit(); }
       function syncScrollbars() {
         const hs=$('hScroll'), vs=$('vScroll');
         if (!hs || !vs) return;

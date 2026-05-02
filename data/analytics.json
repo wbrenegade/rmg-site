@@ -10807,6 +10807,72 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "eeaa7a5e-bd33-4c39-8d45-aa0ae0cdfb9d",
+      "type": "page_view",
+      "pathname": "/tools/decal-creator",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/tools",
+      "method": "GET",
+      "timestamp": "05/02/2026, 2:50:24 AM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "91d921a1-85c4-48df-a0ce-6a5cefc4fa3a",
+      "type": "page_view",
+      "pathname": "/",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": null,
+      "method": "GET",
+      "timestamp": "05/02/2026, 2:54:48 AM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "b756bcb6-82ec-4e4e-b329-b6f739582fb8",
+      "type": "page_view",
+      "pathname": "/shop",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/",
+      "method": "GET",
+      "timestamp": "05/02/2026, 2:54:59 AM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }
