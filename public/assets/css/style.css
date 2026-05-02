@@ -829,14 +829,14 @@ textarea { resize: vertical; }
   gap: 22px;
 }
 
-.customizer-workspace {
+.decal-mockup-editor-workspace {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(340px, 0.9fr);
   gap: 22px;
   align-items: start;
 }
 
-.customizer-preview-card {
+.decal-mockup-editor-preview-card {
   display: grid;
   gap: 14px;
   position: sticky;
@@ -844,18 +844,18 @@ textarea { resize: vertical; }
   align-self: start;
 }
 
-.customizer-heading {
+.decal-mockup-editor-heading {
   display: flex;
   justify-content: space-between;
   align-items: start;
   gap: 16px;
 }
 
-.customizer-heading h3 {
+.decal-mockup-editor-heading h3 {
   margin: 0;
 }
 
-.customizer-preview-actions {
+.decal-mockup-editor-preview-actions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -864,7 +864,7 @@ textarea { resize: vertical; }
   text-align: right;
 }
 
-.customizer-preview-actions .form-note {
+.decal-mockup-editor-preview-actions .form-note {
   margin: 0;
 }
 
@@ -896,7 +896,7 @@ textarea { resize: vertical; }
 .customize-viewer,
 .mustang-viewer { position: relative; }
 
-.customizer-stage {
+.decal-mockup-editor-stage {
   display: grid;
   place-items: center;
 }
@@ -932,20 +932,20 @@ textarea { resize: vertical; }
   overflow: visible;
 }
 
-.customizer-decal-layer,
-.customizer-text-layer {
+.decal-mockup-editor-decal-layer,
+.decal-mockup-editor-text-layer {
   display: grid;
   place-items: center;
 }
 
-.customizer-shape-layer {
+.decal-mockup-editor-shape-layer {
   position: absolute;
   inset: 0;
   z-index: 3;
   pointer-events: none;
 }
 
-.customizer-decal-layer {
+.decal-mockup-editor-decal-layer {
   width: 72%;
   line-height: 0;
   text-shadow: none;
@@ -956,7 +956,7 @@ textarea { resize: vertical; }
   transform-box: border-box;
 }
 
-.customizer-text-layer {
+.decal-mockup-editor-text-layer {
   width: 80%;
   text-align: center;
   line-height: 1;
@@ -964,14 +964,14 @@ textarea { resize: vertical; }
   z-index: 4;
 }
 
-.customizer-overlay-svg {
+.decal-mockup-editor-overlay-svg {
   display: block;
   width: 100%;
   height: auto;
   overflow: visible;
 }
 
-.customizer-decal-image {
+.decal-mockup-editor-decal-image {
   display: block;
   position: absolute;
   inset: 0;
@@ -985,12 +985,12 @@ textarea { resize: vertical; }
   pointer-events: none;
 }
 
-.customize-viewer .customizer-decal-image {
+.customize-viewer .decal-mockup-editor-decal-image {
   height: 100%;
   min-height: 0;
 }
 
-.customizer-decal-source {
+.decal-mockup-editor-decal-source {
   display: block;
   width: 100%;
   height: auto;
@@ -998,13 +998,13 @@ textarea { resize: vertical; }
   pointer-events: none;
 }
 
-.customize-viewer .customizer-decal-source {
+.customize-viewer .decal-mockup-editor-decal-source {
   height: auto;
   min-height: 0;
   object-fit: contain;
 }
 
-.customizer-decal-selection {
+.decal-mockup-editor-decal-selection {
   position: absolute;
   inset: 0;
   left: 0;
@@ -1015,7 +1015,7 @@ textarea { resize: vertical; }
   pointer-events: none;
 }
 
-.customizer-rotate-handle {
+.decal-mockup-editor-rotate-handle {
   position: absolute;
   left: calc(50% - 13px);
   top: -42px;
@@ -1030,9 +1030,9 @@ textarea { resize: vertical; }
   z-index: 5;
 }
 
-.customizer-resize-handle,
-.customizer-resize-x-handle,
-.customizer-resize-y-handle {
+.decal-mockup-editor-resize-handle,
+.decal-mockup-editor-resize-x-handle,
+.decal-mockup-editor-resize-y-handle {
   position: absolute;
   width: 26px;
   height: 26px;
@@ -1045,28 +1045,28 @@ textarea { resize: vertical; }
   z-index: 5;
 }
 
-.customizer-resize-handle {
+.decal-mockup-editor-resize-handle {
   right: -13px;
   bottom: -13px;
   left: auto;
   top: auto;
 }
 
-.customizer-resize-x-handle {
+.decal-mockup-editor-resize-x-handle {
   right: -13px;
   top: calc(50% - 13px);
   left: auto;
   cursor: ew-resize;
 }
 
-.customizer-resize-y-handle {
+.decal-mockup-editor-resize-y-handle {
   left: calc(50% - 13px);
   bottom: -13px;
   top: auto;
   cursor: ns-resize;
 }
 
-.customizer-decal-layer.is-erasing {
+.decal-mockup-editor-decal-layer.is-erasing {
   cursor: crosshair;
 }
 
@@ -1091,7 +1091,7 @@ textarea { resize: vertical; }
   border-color: var(--accent);
 }
 
-.customizer-shape-object {
+.decal-mockup-editor-shape-object {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -1102,19 +1102,19 @@ textarea { resize: vertical; }
   touch-action: none;
 }
 
-.customizer-shape-object.is-active {
+.decal-mockup-editor-shape-object.is-active {
   outline: 1px dashed rgba(125,255,90,0.8);
   outline-offset: 6px;
 }
 
-.customizer-shape-object svg {
+.decal-mockup-editor-shape-object svg {
   display: block;
   width: 100%;
   height: 100%;
   overflow: visible;
 }
 
-.customizer-shape-resize {
+.decal-mockup-editor-shape-resize {
   position: absolute;
   right: 4px;
   bottom: 4px;
@@ -1128,7 +1128,7 @@ textarea { resize: vertical; }
   pointer-events: auto;
 }
 
-.customizer-shape-rotate {
+.decal-mockup-editor-shape-rotate {
   position: absolute;
   left: calc(50% - 13px);
   top: -42px;
@@ -1144,35 +1144,35 @@ textarea { resize: vertical; }
   z-index: 5;
 }
 
-.customizer-editable-shape {
+.decal-mockup-editor-editable-shape {
   cursor: move;
   pointer-events: all;
 }
 
-.customizer-editable-shape:active {
+.decal-mockup-editor-editable-shape:active {
   cursor: grabbing;
 }
 
-.customizer-editable-shape.is-selected-shape {
+.decal-mockup-editor-editable-shape.is-selected-shape {
   filter: drop-shadow(0 0 4px var(--accent));
 }
 
-body.customizer-fullscreen {
+body.decal-mockup-editor-fullscreen {
   overflow: hidden;
 }
 
-body.customizer-fullscreen .site-header,
-body.customizer-fullscreen .page-hero,
-body.customizer-fullscreen .site-footer {
+body.decal-mockup-editor-fullscreen .site-header,
+body.decal-mockup-editor-fullscreen .page-hero,
+body.decal-mockup-editor-fullscreen .site-footer {
   display: none;
 }
 
-body.customizer-fullscreen .page-main,
-body.customizer-fullscreen .section {
+body.decal-mockup-editor-fullscreen .page-main,
+body.decal-mockup-editor-fullscreen .section {
   padding: 0;
 }
 
-.customizer-workspace.is-fullscreen {
+.decal-mockup-editor-workspace.is-fullscreen {
   position: fixed;
   inset: 0;
   z-index: 1000;
@@ -1189,7 +1189,7 @@ body.customizer-fullscreen .section {
   background: #0b0d12;
 }
 
-.customizer-workspace.is-fullscreen .customizer-preview-card {
+.decal-mockup-editor-workspace.is-fullscreen .decal-mockup-editor-preview-card {
   grid-area: canvas;
   position: relative;
   top: auto;
@@ -1200,23 +1200,23 @@ body.customizer-fullscreen .section {
   padding: 10px;
 }
 
-.customizer-workspace.is-fullscreen .customizer-preview-card > .form-note,
-.customizer-workspace.is-fullscreen .customizer-preview-card > a {
+.decal-mockup-editor-workspace.is-fullscreen .decal-mockup-editor-preview-card > .form-note,
+.decal-mockup-editor-workspace.is-fullscreen .decal-mockup-editor-preview-card > a {
   display: none;
 }
 
-.customizer-workspace.is-fullscreen .customize-viewer {
+.decal-mockup-editor-workspace.is-fullscreen .customize-viewer {
   position: relative;
   min-height: 0;
   height: 100%;
   border-radius: 6px;
 }
 
-.customizer-workspace.is-fullscreen .customize-viewer img {
+.decal-mockup-editor-workspace.is-fullscreen .customize-viewer img {
   min-height: 0;
 }
 
-.customizer-workspace.is-fullscreen #customizeForm {
+.decal-mockup-editor-workspace.is-fullscreen #customizeForm {
   grid-area: tools;
   height: 100%;
   min-height: 0;
@@ -1231,11 +1231,11 @@ body.customizer-fullscreen .section {
   border-radius: 6px;
 }
 
-.customizer-workspace.is-fullscreen #customizeForm > * {
+.decal-mockup-editor-workspace.is-fullscreen #customizeForm > * {
   min-width: 0;
 }
 
-.customizer-workspace.is-fullscreen #customizeForm .form-section {
+.decal-mockup-editor-workspace.is-fullscreen #customizeForm .form-section {
   width: 100%;
   min-width: 0;
   display: block;
@@ -1245,7 +1245,7 @@ body.customizer-fullscreen .section {
   text-align: left;
 }
 
-.customizer-workspace.is-fullscreen #customizeForm .form-section h3 {
+.decal-mockup-editor-workspace.is-fullscreen #customizeForm .form-section h3 {
   margin: 0;
   font-size: 12px;
   letter-spacing: 0;
@@ -1253,7 +1253,7 @@ body.customizer-fullscreen .section {
   color: var(--muted);
 }
 
-.customizer-workspace.is-fullscreen #customizeForm label {
+.decal-mockup-editor-workspace.is-fullscreen #customizeForm label {
   min-width: 0;
   max-width: none;
   display: grid;
@@ -1262,11 +1262,11 @@ body.customizer-fullscreen .section {
   margin: 0;
 }
 
-.customizer-workspace.is-fullscreen #customizeForm label.full-width {
+.decal-mockup-editor-workspace.is-fullscreen #customizeForm label.full-width {
   width: 100%;
 }
 
-.customizer-workspace.is-fullscreen #customizeForm .customize-actions {
+.decal-mockup-editor-workspace.is-fullscreen #customizeForm .customize-actions {
   min-width: 0;
   max-width: none;
   display: flex;
@@ -1275,14 +1275,14 @@ body.customizer-fullscreen .section {
   gap: 8px;
 }
 
-.customizer-workspace.is-fullscreen #customizeForm .customize-actions .btn,
-.customizer-workspace.is-fullscreen #customizeForm .customize-actions button {
+.decal-mockup-editor-workspace.is-fullscreen #customizeForm .customize-actions .btn,
+.decal-mockup-editor-workspace.is-fullscreen #customizeForm .customize-actions button {
   flex: 1 1 92px;
   min-width: 0;
   padding-inline: 10px;
 }
 
-.customizer-workspace.is-fullscreen #customizeForm .form-note {
+.decal-mockup-editor-workspace.is-fullscreen #customizeForm .form-note {
   min-width: 0;
   text-align: left;
 }
@@ -1981,7 +1981,7 @@ body.modal-open {
   .shop-page-layout,
   .shop-grid-layout,
   .customize-layout,
-  .customizer-workspace,
+  .decal-mockup-editor-workspace,
   .product-detail,
   .footer-grid,
   .form-grid,
@@ -2255,7 +2255,7 @@ body.modal-open {
 @media (max-width: 768px) {
 
   .customize-layout,
-  .customizer-workspace,
+  .decal-mockup-editor-workspace,
   .preview-builder {
     display: flex;
     flex-direction: column;
@@ -2317,13 +2317,13 @@ body.modal-open {
   }
 }
 
-/* Customizer editor polish */
-.customizer-workspace {
+/* decal-mockup-editor editor polish */
+.decal-mockup-editor-workspace {
   grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
   gap: 16px;
 }
 
-.customizer-preview-card,
+.decal-mockup-editor-preview-card,
 #customizeForm {
   border-radius: 8px;
   border-color: rgba(255,255,255,0.11);
@@ -2331,40 +2331,40 @@ body.modal-open {
   box-shadow: 0 14px 36px rgba(0,0,0,0.28);
 }
 
-.customizer-preview-card {
+.decal-mockup-editor-preview-card {
   gap: 10px;
   padding: 16px;
 }
 
-.customizer-heading {
+.decal-mockup-editor-heading {
   align-items: center;
   padding-bottom: 10px;
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
-.customizer-heading .eyebrow {
+.decal-mockup-editor-heading .eyebrow {
   margin-bottom: 4px;
   color: #8ea0b8;
 }
 
-.customizer-heading h3 {
+.decal-mockup-editor-heading h3 {
   font-size: 1rem;
   font-weight: 800;
   letter-spacing: 0;
 }
 
-.customizer-preview-actions {
+.decal-mockup-editor-preview-actions {
   gap: 8px;
 }
 
-.customizer-preview-actions .form-note {
+.decal-mockup-editor-preview-actions .form-note {
   max-width: 260px;
   font-size: 0.78rem;
   line-height: 1.25;
   color: #9aa8bb;
 }
 
-.customizer-preview-actions .btn {
+.decal-mockup-editor-preview-actions .btn {
   border-radius: 6px;
   padding: 8px 11px;
   font-size: 0.78rem;
@@ -2467,18 +2467,18 @@ body.modal-open {
   font-size: 0.82rem;
 }
 
-.customizer-decal-selection,
-.customizer-shape-object.is-active {
+.decal-mockup-editor-decal-selection,
+.decal-mockup-editor-shape-object.is-active {
   border-color: rgba(92, 190, 255, 0.95);
   outline-color: rgba(92, 190, 255, 0.95);
 }
 
-.customizer-rotate-handle,
-.customizer-resize-handle,
-.customizer-resize-x-handle,
-.customizer-resize-y-handle,
-.customizer-shape-rotate,
-.customizer-shape-resize {
+.decal-mockup-editor-rotate-handle,
+.decal-mockup-editor-resize-handle,
+.decal-mockup-editor-resize-x-handle,
+.decal-mockup-editor-resize-y-handle,
+.decal-mockup-editor-shape-rotate,
+.decal-mockup-editor-shape-resize {
   width: 18px;
   height: 18px;
   border-width: 1px;
@@ -2486,87 +2486,87 @@ body.modal-open {
   box-shadow: 0 0 0 1px rgba(8,12,18,0.9), 0 4px 12px rgba(0,0,0,0.28);
 }
 
-.customizer-rotate-handle {
+.decal-mockup-editor-rotate-handle {
   left: calc(50% - 9px);
 }
 
-.customizer-shape-rotate {
+.decal-mockup-editor-shape-rotate {
   left: calc(50% - 9px);
   top: -34px;
 }
 
-.customizer-resize-handle {
+.decal-mockup-editor-resize-handle {
   right: -9px;
   bottom: -9px;
   left: auto;
   top: auto;
 }
 
-.customizer-resize-x-handle {
+.decal-mockup-editor-resize-x-handle {
   right: -9px;
   top: calc(50% - 9px);
   left: auto;
 }
 
-.customizer-resize-y-handle {
+.decal-mockup-editor-resize-y-handle {
   left: calc(50% - 9px);
   bottom: -9px;
   top: auto;
 }
 
-.customizer-workspace.is-fullscreen {
+.decal-mockup-editor-workspace.is-fullscreen {
   grid-template-columns: minmax(280px, 320px) minmax(0, 1fr);
   gap: 8px;
   background: #080b10;
 }
 
-.customizer-workspace.is-fullscreen #customizeForm,
-.customizer-workspace.is-fullscreen .customizer-preview-card {
+.decal-mockup-editor-workspace.is-fullscreen #customizeForm,
+.decal-mockup-editor-workspace.is-fullscreen .decal-mockup-editor-preview-card {
   border-radius: 6px;
 }
 
-.customizer-workspace.is-fullscreen #customizeForm {
+.decal-mockup-editor-workspace.is-fullscreen #customizeForm {
   padding: 12px;
   gap: 9px;
 }
 
 @media (max-width: 768px) {
-  .customizer-workspace {
+  .decal-mockup-editor-workspace {
     gap: 14px;
   }
 
-  .customizer-rotate-handle,
-  .customizer-resize-handle,
-  .customizer-resize-x-handle,
-  .customizer-resize-y-handle,
-  .customizer-shape-rotate,
-  .customizer-shape-resize {
+  .decal-mockup-editor-rotate-handle,
+  .decal-mockup-editor-resize-handle,
+  .decal-mockup-editor-resize-x-handle,
+  .decal-mockup-editor-resize-y-handle,
+  .decal-mockup-editor-shape-rotate,
+  .decal-mockup-editor-shape-resize {
     width: 32px;
     height: 32px;
   }
 
-  .customizer-rotate-handle,
-  .customizer-shape-rotate {
+  .decal-mockup-editor-rotate-handle,
+  .decal-mockup-editor-shape-rotate {
     left: calc(50% - 16px);
     top: -48px;
   }
 
-  .customizer-resize-handle {
+  .decal-mockup-editor-resize-handle {
     right: -16px;
     bottom: -16px;
   }
 
-  .customizer-resize-x-handle {
+  .decal-mockup-editor-resize-x-handle {
     right: -16px;
     top: calc(50% - 16px);
   }
 
-  .customizer-resize-y-handle {
+  .decal-mockup-editor-resize-y-handle {
     left: calc(50% - 16px);
     bottom: -16px;
   }
 
-  .customizer-preview-card {
+  .decal-mockup-editor-preview-card {
     position: relative;
     top: auto;
   }
@@ -2583,18 +2583,18 @@ body.modal-open {
     overflow-x: hidden;
   }
 
-  .customizer-heading {
+  .decal-mockup-editor-heading {
     align-items: stretch;
     flex-direction: column;
   }
 
-  .customizer-preview-actions {
+  .decal-mockup-editor-preview-actions {
     align-items: stretch;
     justify-content: flex-start;
     text-align: left;
   }
 
-  .customizer-preview-actions .form-note {
+  .decal-mockup-editor-preview-actions .form-note {
     max-width: none;
   }
 
@@ -2613,14 +2613,14 @@ body.modal-open {
     min-height: 240px;
   }
 
-  .customizer-workspace.is-fullscreen {
+  .decal-mockup-editor-workspace.is-fullscreen {
     grid-template-columns: 1fr;
     height: 100dvh;
     overflow-y: auto;
   }
 
-  .customizer-workspace.is-fullscreen #customizeForm,
-  .customizer-workspace.is-fullscreen .customizer-preview-card {
+  .decal-mockup-editor-workspace.is-fullscreen #customizeForm,
+  .decal-mockup-editor-workspace.is-fullscreen .decal-mockup-editor-preview-card {
     min-width: 0;
   }
 }
@@ -2629,7 +2629,7 @@ body.modal-open {
   .card,
   .hero-card,
   .cta-wrap,
-  .customizer-preview-card,
+  .decal-mockup-editor-preview-card,
   #customizeForm {
     padding: 16px;
   }

@@ -1,4 +1,4 @@
-function initBannerCustomizer() {
+function initBannerCreator() {
   const BANNER_MOCKUPS = {
     windshield: {
       mustang: '/assets/imgs/mockups/banner-mockup/windshield/mustang.png',
@@ -30,7 +30,7 @@ function initBannerCustomizer() {
   const curvePath = document.getElementById('bannerCurvePath');
   const textPath = document.getElementById('bannerTextPath');
   const textNode = document.getElementById('bannerTextNode');
-  const form = document.getElementById('bannerCustomizerForm');
+  const form = document.getElementById('bannerCreatorForm');
   const checkoutBtn = document.getElementById('bannerCheckoutBtn');
   if (!(viewer && vehicleImage && design && svg && curvePath && textPath && textNode && form && checkoutBtn && guideX && guideY)) return;
 
@@ -597,7 +597,7 @@ function initBannerCustomizer() {
 
   checkoutBtn.addEventListener('click', () => {
     const summary = [
-      `Banner customizer`,
+      `Banner mockup`,
       `Text: ${(textInput?.value || 'RENEGADE').trim() || 'RENEGADE'}`,
       `Color: ${colorInput?.value || '#ffffff'}`,
       `Outline: ${outlineInput?.value || '#000000'}`,
@@ -625,4 +625,4 @@ function initBannerCustomizer() {
   renderOverlay();
 }
 
-document.addEventListener('DOMContentLoaded', initBannerCustomizer);
+document.addEventListener('DOMContentLoaded', initBannerCreator);

@@ -70,6 +70,8 @@ router.get(`/:page(index|tools|${pagePattern})\\.html`, redirectToCanonicalPage)
 
 router.get("/mustang-customizer", (req, res) => redirectWithQuery(req, res, "/windshield-banner-creator"));
 router.get("/mustang-customizer.html", (req, res) => redirectWithQuery(req, res, "/windshield-banner-creator"));
+router.get("/mustang-decal-mockup-editor", (req, res) => redirectWithQuery(req, res, "/windshield-banner-creator"));
+router.get("/mustang-decal-mockup-editor.html", (req, res) => redirectWithQuery(req, res, "/windshield-banner-creator"));
 
 router.get("/checkout", serveCheckout);
 router.get("/cart", serveCart);

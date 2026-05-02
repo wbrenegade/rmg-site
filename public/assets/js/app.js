@@ -309,7 +309,7 @@ function renderProductCard(product) {
     ? `<a href="${customizeUrl}" class="btn btn-outline">Customize</a>`
     : '';
   const previewAction = isDecalProduct
-    ? `<a href="${previewUrl}" class="btn btn-outline">Open Customizer</a>`
+    ? `<a href="${previewUrl}" class="btn btn-outline">Open Decal Mockup Editor</a>`
     : '';
   const productIdAttr = String(product.id || '').replace(/"/g, '&quot;');
   const detailsUrlAttr = String(detailsUrl).replace(/"/g, '&quot;');

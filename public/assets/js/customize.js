@@ -1,4 +1,4 @@
-const CUSTOMIZER_DEFAULT_VIEWS = {
+const CUSTOMIZE_DEFAULT_VIEWS = {
   side: '/assets/imgs/previews/customizer/right-side.png',
   rightSide: '/assets/imgs/previews/customizer/right-side.png',
   leftSide: '/assets/imgs/previews/customizer/left-side.png',
@@ -143,7 +143,7 @@ function createVehicleKitFromCustomizeQuery() {
     price: 149.99,
     tags: ['Tint Kits', 'Precut Kits'],
     description: `Pre-cut tint kit matched for ${label}.`,
-    imagePath: CUSTOMIZER_DEFAULT_VIEWS.side,
+    imagePath: CUSTOMIZE_DEFAULT_VIEWS.side,
     imageLabel: `${label} Tint Kit`,
     selectedVehicle: vehicle,
     productUrl: `product.html?${new URLSearchParams({
@@ -257,7 +257,7 @@ function getSvgShapeElements(svg) {
     .filter((element) => !element.closest('defs'));
 }
 
-function colorizeInlineSvg(svgText, fillColor, strokeColor, className = 'customizer-overlay-svg') {
+function colorizeInlineSvg(svgText, fillColor, strokeColor, className = 'decal-mockup-editor-overlay-svg') {
   return cleanInlineSvg(svgText, className)
     .replace(/fill:\s*#[0-9a-fA-F]{3,8}/g, `fill:${fillColor}`)
     .replace(/stroke:\s*#[0-9a-fA-F]{3,8}/g, `stroke:${strokeColor}`)
@@ -351,14 +351,14 @@ function buildDecalOptions(products) {
 
   const builtInOptions = [{
     product: {
-      id: 'customizer-honeycomb-graphics',
+      id: 'decal-mockup-editor-honeycomb-graphics',
       name: 'Honeycomb Graphics',
       category: 'Decals',
       subcategory: 'Rear Quarter Panel',
       subSubcategory: 'Graphics',
       price: 74.99
     },
-    id: 'customizer-honeycomb-graphics',
+    id: 'decal-mockup-editor-honeycomb-graphics',
     label: 'Honeycomb Graphics',
     mode: 'Graphics',
     svgPath: `${GRAPHICS_PREVIEW_BASE}/honeycomb.svg`,
@@ -399,15 +399,15 @@ async function renderDecalLayer({ decalLayer, option, fillColor }) {
     }
 
     decalLayer.innerHTML = `
-      <img class="customizer-decal-source" src="${escapeHtml(imagePath)}" alt="" draggable="false" />
-      <div class="customizer-decal-image" role="img" aria-label="${escapeHtml(option.label)}"></div>
-      <div class="customizer-decal-selection" aria-hidden="true"></div>
-      <button type="button" class="customizer-rotate-handle" aria-label="Rotate decal"></button>
-      <button type="button" class="customizer-resize-x-handle" aria-label="Resize decal horizontally"></button>
-      <button type="button" class="customizer-resize-y-handle" aria-label="Resize decal vertically"></button>
-      <button type="button" class="customizer-resize-handle" aria-label="Resize decal"></button>
+      <img class="decal-mockup-editor-decal-source" src="${escapeHtml(imagePath)}" alt="" draggable="false" />
+      <div class="decal-mockup-editor-decal-image" role="img" aria-label="${escapeHtml(option.label)}"></div>
+      <div class="decal-mockup-editor-decal-selection" aria-hidden="true"></div>
+      <button type="button" class="decal-mockup-editor-rotate-handle" aria-label="Rotate decal"></button>
+      <button type="button" class="decal-mockup-editor-resize-x-handle" aria-label="Resize decal horizontally"></button>
+      <button type="button" class="decal-mockup-editor-resize-y-handle" aria-label="Resize decal vertically"></button>
+      <button type="button" class="decal-mockup-editor-resize-handle" aria-label="Resize decal"></button>
     `;
-    const imageMask = decalLayer.querySelector('.customizer-decal-image');
+    const imageMask = decalLayer.querySelector('.decal-mockup-editor-decal-image');
     imageMask?.style.setProperty('background-color', fillColor);
     imageMask?.style.setProperty('--decal-mask-url', `url("${imagePath}")`);
     return;
@@ -417,15 +417,15 @@ async function renderDecalLayer({ decalLayer, option, fillColor }) {
     try {
       const svgText = option.svgText || await loadSvg(option.path || option.svgPath);
       const svgMarkup = option.preserveColors
-        ? cleanInlineSvg(svgText, 'customizer-overlay-svg')
+        ? cleanInlineSvg(svgText, 'decal-mockup-editor-overlay-svg')
         : colorizeInlineSvg(svgText, fillColor, strokeColor);
 
       decalLayer.innerHTML = `${svgMarkup}
-        <div class="customizer-decal-selection" aria-hidden="true"></div>
-        <button type="button" class="customizer-rotate-handle" aria-label="Rotate decal"></button>
-        <button type="button" class="customizer-resize-x-handle" aria-label="Resize decal horizontally"></button>
-        <button type="button" class="customizer-resize-y-handle" aria-label="Resize decal vertically"></button>
-        <button type="button" class="customizer-resize-handle" aria-label="Resize decal"></button>`;
+        <div class="decal-mockup-editor-decal-selection" aria-hidden="true"></div>
+        <button type="button" class="decal-mockup-editor-rotate-handle" aria-label="Rotate decal"></button>
+        <button type="button" class="decal-mockup-editor-resize-x-handle" aria-label="Resize decal horizontally"></button>
+        <button type="button" class="decal-mockup-editor-resize-y-handle" aria-label="Resize decal vertically"></button>
+        <button type="button" class="decal-mockup-editor-resize-handle" aria-label="Resize decal"></button>`;
       if (!option.preserveColors) applyInlineSvgColors(decalLayer.querySelector('svg'), fillColor, strokeColor);
       return;
     } catch {
@@ -467,16 +467,16 @@ async function initCustomizePage() {
   const decalLayer = document.getElementById('customizeDecal');
   const shapeLayer = document.getElementById('customizeShapes');
   const textLayer = document.getElementById('customizeTextLayer');
-  const workspace = document.getElementById('customizerWorkspace');
+  const workspace = document.getElementById('decal-mockup-editorWorkspace');
   const productName = document.getElementById('customizeProductName');
   const productMeta = document.getElementById('customizeProductMeta');
   const modeEyebrow = document.getElementById('customizeModeEyebrow');
   const vehicleNote = document.getElementById('customizeVehicleNote');
   const backToProduct = document.getElementById('backToProduct');
   const continueToCheckout = document.getElementById('continueToCheckout');
-  const downloadPreviewBtn = document.getElementById('downloadCustomizerPreview');
-  const sharePreviewBtn = document.getElementById('shareCustomizerPreview');
-  const fullscreenBtn = document.getElementById('toggleCustomizerFullscreen');
+  const downloadPreviewBtn = document.getElementById('downloaddecal-mockup-editorPreview');
+  const sharePreviewBtn = document.getElementById('sharedecal-mockup-editorPreview');
+  const fullscreenBtn = document.getElementById('toggledecal-mockup-editorFullscreen');
 
   if (!(form && baseImage && decalLayer && shapeLayer && textLayer && continueToCheckout)) return;
 
@@ -573,41 +573,41 @@ async function initCustomizePage() {
   const textXInput = document.getElementById('textX');
   const textYInput = document.getElementById('textY');
 
-  function isCustomizerFullscreen() {
+  function isdecalmockupeditorFullscreen() {
     return workspace?.classList.contains('is-fullscreen');
   }
 
-  function setCustomizerFullscreenState(isFullscreen) {
+  function setdecalmockupeditorFullscreenState(isFullscreen) {
     workspace?.classList.toggle('is-fullscreen', isFullscreen);
-    document.body.classList.toggle('customizer-fullscreen', isFullscreen);
+    document.body.classList.toggle('decal-mockup-editor-fullscreen', isFullscreen);
     if (fullscreenBtn) {
       fullscreenBtn.textContent = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen';
       fullscreenBtn.setAttribute('aria-pressed', String(isFullscreen));
     }
   }
 
-  async function enterCustomizerFullscreen() {
-    setCustomizerFullscreenState(true);
+  async function enterDecalMockupEditorFullscreen() {
+    setdecalmockupeditorFullscreenState(true);
     if (workspace?.requestFullscreen && document.fullscreenElement !== workspace) {
       try {
         await workspace.requestFullscreen();
       } catch {
-        setCustomizerFullscreenState(true);
+        setdecalmockupeditorFullscreenState(true);
       }
     }
   }
 
-  async function exitCustomizerFullscreen() {
+  async function exitDecalMockupEditorFullscreen() {
     if (document.fullscreenElement && document.exitFullscreen) {
       try {
         await document.exitFullscreen();
       } catch {
-        setCustomizerFullscreenState(false);
+        setdecalmockupeditorFullscreenState(false);
       }
       return;
     }
 
-    setCustomizerFullscreenState(false);
+    setdecalmockupeditorFullscreenState(false);
   }
 
   if (productName) productName.textContent = initialProduct?.name || 'Custom Decal Mockup';
@@ -807,12 +807,12 @@ async function initCustomizePage() {
 
   function renderEditorShapes() {
     shapeLayer.innerHTML = editorShapes.map((shape) => `
-      <div class="customizer-shape-object${shape.id === selectedEditorShapeId ? ' is-active' : ''}"
+      <div class="decal-mockup-editor-shape-object${shape.id === selectedEditorShapeId ? ' is-active' : ''}"
         data-shape-id="${shape.id}"
         style="width:${shape.size}px;height:${shape.size}px;transform:translate(-50%, -50%) translate(${shape.x}px, ${shape.y}px) rotate(${shape.rotate}deg);">
         <svg viewBox="0 0 100 100" aria-hidden="true">${shapeMarkup(shape)}</svg>
-        <button type="button" class="customizer-shape-rotate" aria-label="Rotate shape"></button>
-        <button type="button" class="customizer-shape-resize" aria-label="Resize shape"></button>
+        <button type="button" class="decal-mockup-editor-shape-rotate" aria-label="Rotate shape"></button>
+        <button type="button" class="decal-mockup-editor-shape-resize" aria-label="Resize shape"></button>
       </div>
     `).join('');
   }
@@ -960,7 +960,7 @@ async function initCustomizePage() {
 
   function updateDecalSelectionBounds() {
     const svg = decalLayer.querySelector('svg');
-    const image = decalLayer.querySelector('.customizer-decal-source');
+    const image = decalLayer.querySelector('.decal-mockup-editor-decal-source');
     if (image) {
       const measureImage = () => {
         try {
@@ -1055,7 +1055,7 @@ async function initCustomizePage() {
     const option = getActiveDecalOption();
     const strokeColor = option?.outlined ? '#050505' : fillColor;
     const svg = decalLayer.querySelector('svg');
-    const imageMask = decalLayer.querySelector('.customizer-decal-image');
+    const imageMask = decalLayer.querySelector('.decal-mockup-editor-decal-image');
 
     if (svg) applyInlineSvgColors(svg, fillColor, strokeColor);
     if (imageMask) imageMask.style.setProperty('background-color', fillColor);
@@ -1148,7 +1148,7 @@ async function initCustomizePage() {
     const shapes = getEditableShapes();
     shapes.forEach((shape, index) => {
       shape.dataset.shapeId = shape.dataset.shapeId || `shape-${index + 1}`;
-      shape.classList.add('customizer-editable-shape');
+      shape.classList.add('decal-mockup-editor-editable-shape');
     });
 
     if (resetHistory) {
@@ -1163,7 +1163,7 @@ async function initCustomizePage() {
     updateHistoryButtons();
   }
 
-  function getCustomizerSettings() {
+  function getDecalMockupEditorSettings() {
     const option = getActiveDecalOption();
     return {
       mode: 'Premade Decal Mockup',
@@ -1198,7 +1198,7 @@ async function initCustomizePage() {
 
   async function drawSvgLayer(ctx, layer, stageRect, scale) {
     const svg = layer.querySelector('svg');
-    const decalImage = layer.querySelector('.customizer-decal-source');
+    const decalImage = layer.querySelector('.decal-mockup-editor-decal-source');
     if (!svg && !decalImage) return;
 
     const image = decalImage
@@ -1304,7 +1304,7 @@ async function initCustomizePage() {
   }
 
   function updateVehicleImage() {
-    baseImage.src = uploadedVehicleUrl || vehicleViewSelect?.value || CUSTOMIZER_DEFAULT_VIEWS.side;
+    baseImage.src = uploadedVehicleUrl || vehicleViewSelect?.value || CUSTOMIZE_DEFAULT_VIEWS.side;
   }
 
   function updateTransforms() {
@@ -1378,33 +1378,33 @@ async function initCustomizePage() {
   });
 
   fullscreenBtn?.addEventListener('click', () => {
-    if (isCustomizerFullscreen()) {
-      exitCustomizerFullscreen();
+    if (isdecalmockupeditorFullscreen()) {
+      exitDecalMockupEditorFullscreen();
     } else {
-      enterCustomizerFullscreen();
+      enterDecalMockupEditorFullscreen();
     }
   });
 
   document.addEventListener('fullscreenchange', () => {
-    setCustomizerFullscreenState(document.fullscreenElement === workspace);
+    setdecalmockupeditorFullscreenState(document.fullscreenElement === workspace);
   });
 
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && isCustomizerFullscreen() && !document.fullscreenElement) {
-      setCustomizerFullscreenState(false);
+    if (event.key === 'Escape' && isdecalmockupeditorFullscreen() && !document.fullscreenElement) {
+      setdecalmockupeditorFullscreenState(false);
     }
   });
 
   downloadPreviewBtn?.addEventListener('click', async () => {
     const previewImage = await createPreviewImage(1200);
     if (!previewImage) return;
-    downloadFile('rmg-customizer-preview.png', previewImage);
+    downloadFile('rmg-decal-mockup-editor-preview.png', previewImage);
   });
 
   sharePreviewBtn?.addEventListener('click', async () => {
-    const settings = getCustomizerSettings();
+    const settings = getDecalMockupEditorSettings();
     const shareText = [
-      'RenegadeMade Graphix customizer preview',
+      'RenegadeMade Graphix decal-mockup-editor preview',
       `Mode: ${settings.mode}`,
       `Decal: ${settings.decalName}`,
       `Text: ${settings.text}`
@@ -1412,7 +1412,7 @@ async function initCustomizePage() {
 
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'RMG Customizer Preview', text: shareText });
+        await navigator.share({ title: 'RMG decal-mockup-editor Preview', text: shareText });
         return;
       } catch {
         return;
@@ -1486,7 +1486,7 @@ async function initCustomizePage() {
   });
 
   shapeLayer.addEventListener('pointerdown', (event) => {
-    const object = event.target.closest?.('.customizer-shape-object');
+    const object = event.target.closest?.('.decal-mockup-editor-shape-object');
     if (!object) return;
 
     event.preventDefault();
@@ -1499,7 +1499,7 @@ async function initCustomizePage() {
 
     shapeObjectDragState = {
       pointerId: event.pointerId,
-      mode: event.target.closest?.('.customizer-shape-rotate') ? 'rotate' : event.target.closest?.('.customizer-shape-resize') ? 'resize' : 'move',
+      mode: event.target.closest?.('.decal-mockup-editor-shape-rotate') ? 'rotate' : event.target.closest?.('.decal-mockup-editor-shape-resize') ? 'resize' : 'move',
       startClientX: event.clientX,
       startClientY: event.clientY,
       startX: selectedShape.x,
@@ -1622,10 +1622,10 @@ async function initCustomizePage() {
       return;
     }
 
-    const isResize = Boolean(event.target.closest?.('.customizer-resize-handle'));
-    const isResizeX = Boolean(event.target.closest?.('.customizer-resize-x-handle'));
-    const isResizeY = Boolean(event.target.closest?.('.customizer-resize-y-handle'));
-    const isRotate = Boolean(event.target.closest?.('.customizer-rotate-handle'));
+    const isResize = Boolean(event.target.closest?.('.decal-mockup-editor-resize-handle'));
+    const isResizeX = Boolean(event.target.closest?.('.decal-mockup-editor-resize-x-handle'));
+    const isResizeY = Boolean(event.target.closest?.('.decal-mockup-editor-resize-y-handle'));
+    const isRotate = Boolean(event.target.closest?.('.decal-mockup-editor-rotate-handle'));
     const stageRect = document.getElementById('customizeViewer')?.getBoundingClientRect();
     const layerRect = decalLayer.getBoundingClientRect();
     const centerX = layerRect.left + layerRect.width / 2;
@@ -1721,7 +1721,7 @@ async function initCustomizePage() {
 
   continueToCheckout.addEventListener('click', () => {
     const option = getActiveDecalOption();
-    const settings = getCustomizerSettings();
+    const settings = getDecalMockupEditorSettings();
     const customizationSummary = [
       `Mode: ${settings.mode}`,
       `Decal: ${settings.decalName}`,
@@ -1743,10 +1743,10 @@ async function initCustomizePage() {
 
     Promise.resolve(createPreviewImage(700)).then((previewImage) => {
       const checkoutData = {
-        source: 'customizer-tool',
-        productId: option?.id || 'customizer-decal',
-        name: `${settings.decalName} Customizer Mockup`,
-        title: `${settings.decalName} Customizer Mockup`,
+        source: 'decal-mockup-editor-tool',
+        productId: option?.id || 'decal-mockup-editor-decal',
+        name: `${settings.decalName} decal-mockup-editor Mockup`,
+        title: `${settings.decalName} decal-mockup-editor Mockup`,
         size: 'Custom',
         price: Number(option?.product?.price || 39.99),
         quantity: 1,

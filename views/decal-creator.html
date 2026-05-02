@@ -558,8 +558,8 @@
         <button class="btn" id="importImageBtn">Image</button>
         <button class="btn primary" id="saveBtn">Export SVG</button>
         <button class="btn" id="pngBtn">PNG</button>
-        <button class="btn primary" id="sendToCustomizerBtn">Send to Customizer</button>
-        <button class="btn" id="backToCustomizerBtn">Back to Customizer</button>
+        <button class="btn primary" id="sendToCustomizerBtn">Send to Decal Mockup Editor</button>
+        <button class="btn" id="backToCustomizerBtn">Back to Decal Mockup Editor</button>
       </div>
       <div class="sep"></div>
       <div class="action-group">
@@ -1316,7 +1316,7 @@
       }
       function backToCustomizer(){
         const user=currentUser();
-        if(user?.id && confirm('Save your current SVG decal design to your account before going back to the customizer?')) {
+        if(user?.id && confirm('Save your current SVG decal design to your account before going back to the decal-mockup-editor?')) {
           saveCurrentDesignToAccount();
         }
         window.location.href='/customize';

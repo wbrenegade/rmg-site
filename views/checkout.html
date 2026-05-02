@@ -220,7 +220,7 @@
           return;
         }
 
-        const previewItem = items.find(item => item.source === "customizer-tool" || item.source === "decal-preview-tool");
+        const previewItem = items.find(item => item.source === "decal-mockup-editor-tool" || item.source === "customizer-tool" || item.source === "decal-preview-tool");
         if (previewItem) renderPreviewContext(previewItem);
         else customEl.textContent = "";
 
@@ -296,7 +296,7 @@
           return;
         }
 
-        const previewItem = items.find(item => item.source === "customizer-tool" || item.source === "decal-preview-tool");
+        const previewItem = items.find(item => item.source === "decal-mockup-editor-tool" || item.source === "customizer-tool" || item.source === "decal-preview-tool");
         const customer = appendPreviewNotes(getCustomer(), previewItem);
         const button = form.querySelector("button[type='submit']");
         const originalText = button.textContent;
