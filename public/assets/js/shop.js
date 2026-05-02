@@ -179,23 +179,16 @@ function colorizeRacingStripeSvg(svgText, stripeColorHex, outlineColorHex) {
     .replace(/<\?xml[^>]*>\s*/i, "")
     .replace(/<!--[\s\S]*?-->\s*/g, "")
     .replace(/\s(width|height)="[^"]*"/g, "")
-    .replace(/<svg\b/, '<svg x="28" y="39" width="484" height="54" class="stripe-preview-svg" preserveAspectRatio="xMidYMid meet"')
+    .replace(/<svg\b/, '<svg class="stripe-preview-svg" preserveAspectRatio="xMidYMid meet"')
     .replace(/fill:\s*#[0-9a-fA-F]{3,8}/g, `fill:${stripeColorHex}`)
     .replace(/stroke:\s*#[0-9a-fA-F]{3,8}/g, `stroke:${outlineColorHex}`);
 }
 
-function renderRacingStripePreviewShell(contentMarkup, gradientId) {
+function renderRacingStripeAssetPreview(svgText, stripeColorHex, outlineColorHex) {
   return `
-    <svg viewBox="0 0 540 132" role="img" aria-label="Live stripe preview">
-      <defs>
-        <linearGradient id="${gradientId}" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#0f1520"/>
-          <stop offset="100%" stop-color="#1f2e39"/>
-        </linearGradient>
-      </defs>
-      <rect x="8" y="8" width="524" height="116" rx="10" fill="url(#${gradientId})" />
-      ${contentMarkup}
-    </svg>
+    <div class="stripe-preview-surface" role="img" aria-label="Live stripe preview">
+      ${colorizeRacingStripeSvg(svgText, stripeColorHex, outlineColorHex)}
+    </div>
   `;
 }
 
@@ -313,17 +306,18 @@ function renderStripeQuickLivePreview(container, options) {
     loadRacingStripePreviewSvg(options.previewSvgPath)
       .then((svgText) => {
         if (requestId !== previewRequestId) return;
-        previewCanvas.innerHTML = renderRacingStripePreviewShell(
-          colorizeRacingStripeSvg(svgText, stripeColorHex, outlineColorHex),
-          "stripeQuickBg"
-        );
+        previewCanvas.innerHTML = renderRacingStripeAssetPreview(svgText, stripeColorHex, outlineColorHex);
       })
       .catch(() => {
         if (requestId !== previewRequestId) return;
-        previewCanvas.innerHTML = renderRacingStripePreviewShell(
-          `<rect x="28" y="58" width="484" height="16" rx="2" fill="${stripeColorHex}" stroke="${outlineColorHex}" stroke-width="3" />`,
-          "stripeQuickBg"
-        );
+        previewCanvas.innerHTML = `
+          <div class="stripe-preview-surface" role="img" aria-label="Live stripe preview">
+            <svg class="stripe-preview-svg" viewBox="0 0 74.913506 8.0984497" preserveAspectRatio="xMidYMid meet">
+              <rect x="0.6" y="0.6" width="73.7" height="2.7" fill="${stripeColorHex}" stroke="${outlineColorHex}" stroke-width="1.2" />
+              <rect x="0.6" y="4.8" width="73.7" height="2.7" fill="${stripeColorHex}" stroke="${outlineColorHex}" stroke-width="1.2" />
+            </svg>
+          </div>
+        `;
       });
 
     const meta = [`Width: ${selectedWidth}`, `Color: ${selectedColor}`];

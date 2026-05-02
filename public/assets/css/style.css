@@ -1459,6 +1459,17 @@ body.decal-mockup-editor-fullscreen .section {
   width: 100%;
   height: auto;
 }
+.stripe-preview-surface {
+  display: grid;
+  min-height: 132px;
+  place-items: center;
+  padding: 24px;
+  background: linear-gradient(145deg, #0f1520, #1f2e39);
+}
+.stripe-preview-surface .stripe-preview-svg {
+  width: min(100%, 560px);
+  max-height: 96px;
+}
 .stripe-live-preview__meta {
   margin: 8px 0 0;
 }
