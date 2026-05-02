@@ -85,6 +85,42 @@ router.get("/products", listProducts);
 router.get("/premade-decals", (req, res) => {
 	res.json(listPremadeDecalFiles(premadeDecalDir).sort((a, b) => a.label.localeCompare(b.label)));
 });
+router.post("/svg-converter/convert", async (req, res) => {
+	const converterUrl = process.env.SVG_CONVERTER_URL || "http://127.0.0.1:8000/convert";
+	const contentType = req.headers["content-type"];
+
+	if (!contentType) {
+		res.status(400).json({ error: "Missing upload content type." });
+		return;
+	}
+
+	try {
+		const response = await fetch(converterUrl, {
+			method: "POST",
+			headers: { "content-type": contentType },
+			body: req,
+			duplex: "half",
+			signal: AbortSignal.timeout(120000),
+		});
+
+		const contentType = response.headers.get("content-type") || "application/octet-stream";
+		res.status(response.status).type(contentType);
+
+		if (!response.ok) {
+			const errorText = await response.text();
+			res.send(errorText || "Image to Decal conversion failed.");
+			return;
+		}
+
+		const svgText = await response.text();
+		res.send(svgText);
+	} catch (error) {
+		res.status(502).json({
+			error: "Image to Decal converter is unavailable. Start the converter backend on 127.0.0.1:8000, or set SVG_CONVERTER_URL to the converter service URL.",
+			detail: error.message,
+		});
+	}
+});
 router.get("/installers", listInstallers);
 router.get("/categories", listCategories);
 router.get("/vehicles/catalog", listVehicleCatalog);

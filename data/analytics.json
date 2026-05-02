@@ -10917,6 +10917,169 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "adee46ef-c243-401c-9b93-e43002fde539",
+      "type": "page_view",
+      "pathname": "/tools/decal-creator",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/tools",
+      "method": "GET",
+      "timestamp": "05/02/2026, 2:58:51 AM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "a0370188-bd8c-4272-b806-3a8712de20b4",
+      "type": "page_view",
+      "pathname": "/",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": null,
+      "method": "GET",
+      "timestamp": "05/02/2026, 3:01:13 AM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "52f7b750-b575-44e3-abf2-6bdba2867b11",
+      "type": "page_view",
+      "pathname": "/tools/svg-converter",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/",
+      "method": "GET",
+      "timestamp": "05/02/2026, 3:01:23 AM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "73d3ba22-c6dc-47ef-9fef-788ecd1dc716",
+      "type": "tool_event",
+      "pathname": "/tools/svg-converter",
+      "productId": null,
+      "productName": null,
+      "tool": "svg-converter",
+      "action": "file_selected",
+      "referrer": "https://renegademadegraphix.com/tools/svg-converter",
+      "method": "POST",
+      "timestamp": "05/02/2026, 3:01:30 AM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {
+        "fileType": "image/jpeg",
+        "extension": "jpg"
+      }
+    },
+    {
+      "id": "734c7a7d-b60f-43be-aab5-200263791221",
+      "type": "tool_event",
+      "pathname": "/tools/svg-converter",
+      "productId": null,
+      "productName": null,
+      "tool": "svg-converter",
+      "action": "convert_started",
+      "referrer": "https://renegademadegraphix.com/tools/svg-converter",
+      "method": "POST",
+      "timestamp": "05/02/2026, 3:01:42 AM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {
+        "preset": "vinyl",
+        "extension": "jpg"
+      }
+    },
+    {
+      "id": "27743f2a-689a-42c2-8678-5c7143f5399e",
+      "type": "tool_event",
+      "pathname": "/tools/svg-converter",
+      "productId": null,
+      "productName": null,
+      "tool": "svg-converter",
+      "action": "convert_failed",
+      "referrer": "https://renegademadegraphix.com/tools/svg-converter",
+      "method": "POST",
+      "timestamp": "05/02/2026, 3:01:47 AM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {
+        "preset": "vinyl",
+        "extension": "jpg"
+      }
+    },
+    {
+      "id": "495bf998-3ed5-4bda-b3d0-d5c7ce06d6a6",
+      "type": "page_view",
+      "pathname": "/product",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": null,
+      "method": "GET",
+      "timestamp": "05/02/2026, 3:03:38 AM",
+      "date": "2026-05-02",
+      "ip": "17.22.253.241",
+      "visitorKey": "8673dd7fe9e8d804",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15 (Applebot/0.1; +http://www.apple.com/go/applebot)",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }
