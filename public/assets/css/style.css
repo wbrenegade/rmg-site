@@ -1464,11 +1464,19 @@ body.decal-mockup-editor-fullscreen .section {
   min-height: 132px;
   place-items: center;
   padding: 24px;
-  background: linear-gradient(145deg, #0f1520, #1f2e39);
+  background:
+    linear-gradient(45deg, rgba(15, 23, 42, 0.06) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(15, 23, 42, 0.06) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(15, 23, 42, 0.06) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(15, 23, 42, 0.06) 75%),
+    #f7f9fc;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  background-size: 16px 16px;
 }
 .stripe-preview-surface .stripe-preview-svg {
   width: min(100%, 560px);
   max-height: 96px;
+  filter: drop-shadow(0 2px 8px rgba(15, 23, 42, 0.16));
 }
 .stripe-live-preview__meta {
   margin: 8px 0 0;
