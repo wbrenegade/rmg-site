@@ -281,8 +281,12 @@ function buildCustomizeUrl(product) {
   if (!product) return 'customize.html';
   const params = new URLSearchParams({ productId: product.id });
   const svgPath = product.svg_file_path || product.svgFilePath || product.stripeOptions?.previewSvgPath || product.previewSvgPath;
+  const customizerTool = String(product.customizer_tool ?? product.customizerTool ?? '').trim();
   if (product.customizable || product.custom) params.set('customizable', 'true');
   if (svgPath) params.set('svg', svgPath);
+  if (customizerTool && customizerTool.toLowerCase() !== 'none' && customizerTool.toLowerCase() !== 'inline') {
+    return `/tools/${encodeURIComponent(customizerTool)}?${params.toString()}`;
+  }
   return `customize.html?${params.toString()}`;
 }
 
@@ -290,6 +294,7 @@ window.buildCustomizeUrl = buildCustomizeUrl;
 
 function isRacingStripeProduct(product) {
   if (!product) return false;
+  if (String(product.subcategory || '').toLowerCase() === 'racing stripes') return true;
   if (String(product.subSubcategory || '').toLowerCase() === 'racing stripes') return true;
   const tags = Array.isArray(product.tags) ? product.tags : [];
   return tags.some(tag => String(tag || '').toLowerCase() === 'racing stripes');
@@ -305,16 +310,18 @@ function renderProductCard(product) {
   const isRacingStripe = isRacingStripeProduct(product);
   const productIdAttr = String(product.id || '').replace(/"/g, '&quot;');
   const productIdDataAttr = encodeURIComponent(String(product.id || ''));
+  const customizerTool = String(product.customizer_tool ?? product.customizerTool ?? '').trim().toLowerCase();
+  const hasInlineCustomizer = customizerTool === 'inline';
   const previewUrl = customizeUrl;
   const primaryAction = `<a href="${detailsUrl}" class="btn btn-outline">View Details</a>`;
   const isCustomizable = Boolean(product.customizable ?? product.custom);
   const secondaryAction = isCustomizable
     ? (isDecalProduct ? '' : `<a href="${customizeUrl}" class="btn">${customizeLabel}</a>`)
     : `<button class="btn" onclick="addToCart('${product.id}')">Add to Cart</button>`;
-  const previewAction = isDecalProduct
-    ? (isRacingStripe
+  const previewAction = isDecalProduct && isCustomizable
+    ? (hasInlineCustomizer || isRacingStripe
       ? `<a href="${previewUrl}" class="btn racing-stripe-customize-link" data-product-id="${productIdDataAttr}">Customize</a>`
-      : `<a href="${previewUrl}" class="btn btn-outline">Send To Decal Editor</a>`)
+      : `<a href="${previewUrl}" class="btn">Customize</a>`)
     : '';
   const detailsUrlAttr = String(detailsUrl).replace(/"/g, '&quot;');
   return `

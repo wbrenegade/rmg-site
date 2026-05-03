@@ -71,6 +71,7 @@ let currentRenderedProductsById = new Map();
 
 function isRacingStripeProduct(product) {
   if (!product) return false;
+  if (normalizeText(product.subcategory) === "racing stripes") return true;
   if (normalizeText(product.subSubcategory) === "racing stripes") return true;
   const tags = Array.isArray(product.tags) ? product.tags : [];
   return tags.some((tag) => normalizeText(tag) === "racing stripes");
@@ -1288,8 +1289,8 @@ async function initShop() {
 
   function matchesDecalFilter(product) {
     if (activeDecalTab === "Custom") {
-      return Boolean(product.customizable ?? product.custom) ||
-        normalizeText(product.subcategory) === "custom" ||
+      return normalizeText(product.subcategory) === "custom" ||
+        normalizeText(product.position) === "custom" ||
         normalizeText(product.subSubcategory) === "custom";
     }
 
@@ -1365,11 +1366,6 @@ async function initShop() {
 
       return true;
     });
-
-    if (category === "Decals" && activeDecalTab !== "Custom" && activeDecalFilter !== "all") {
-      const folderProducts = filtered.filter((product) => product.source === "decal-product-folder");
-      filtered = folderProducts;
-    }
 
     if (vehicleKits.length) {
       const kitProducts = vehicleKits.map(toDisplayProduct).filter((product) => {

@@ -51,6 +51,7 @@ function renderVehicleContextNote() {
 
 function isRacingStripeProduct(product) {
   if (!product) return false;
+  if (String(product.subcategory || '').toLowerCase() === 'racing stripes') return true;
   if (String(product.subSubcategory || '').toLowerCase() === 'racing stripes') return true;
   const tags = Array.isArray(product.tags) ? product.tags : [];
   return tags.some(tag => String(tag || '').toLowerCase() === 'racing stripes');
@@ -305,7 +306,7 @@ function getRacingStripeOptions(product) {
 }
 
 function renderRacingStripeOptions(product) {
-  if (!isRacingStripeProduct(product) || Boolean(product.customizable ?? product.custom)) return '';
+  if (!isRacingStripeProduct(product)) return '';
 
   const options = getRacingStripeOptions(product);
   if (!options.widths.length || !options.colors.length) return '';
@@ -353,7 +354,7 @@ function renderRacingStripeOptions(product) {
 }
 
 function getSelectedRacingStripeOptions(container, product) {
-  if (!isRacingStripeProduct(product) || Boolean(product.customizable ?? product.custom)) return null;
+  if (!isRacingStripeProduct(product)) return null;
 
   const options = getRacingStripeOptions(product);
   const widthValue = container.querySelector('#stripeWidthSelect')?.value?.trim();
@@ -444,6 +445,20 @@ function renderRacingStripeLivePreview(container, product) {
     });
 
     previewCanvas.innerHTML = renderRacingStripePreviewShell(geometryPreview, 'stripePreviewBg');
+    if (options.previewSvgPath) {
+      loadRacingStripePreviewSvg(options.previewSvgPath)
+        .then((svgText) => {
+          if (requestId !== previewRequestId) return;
+          previewCanvas.innerHTML = renderRacingStripePreviewShell(
+            colorizeRacingStripeSvg(svgText, stripeColorHex, outlineColorHex),
+            'stripePreviewBg'
+          );
+        })
+        .catch(() => {
+          if (requestId !== previewRequestId) return;
+          previewCanvas.innerHTML = renderRacingStripePreviewShell(geometryPreview, 'stripePreviewBg');
+        });
+    }
 
     const metaParts = [
       `Width: ${selectedWidth}`,
@@ -493,16 +508,15 @@ async function initProductPage() {
   const customizeUrl = typeof window.buildCustomizeUrl === 'function'
     ? window.buildCustomizeUrl(product)
     : (product.customizeUrl || `customize.html?productId=${encodeURIComponent(product.id)}`);
-  const optionsMarkup = isRacingStripe ? '' : renderRacingStripeOptions(product);
+  const optionsMarkup = isRacingStripe ? renderRacingStripeOptions(product) : '';
   const isCustomizable = Boolean(product.customizable ?? product.custom);
   const actions = isCustomizable
     ? `
-        <a class="btn" href="${customizeUrl}">Send To Decal Editor</a>
+        <a class="btn" href="${customizeUrl}">Customize</a>
         <a class="btn btn-outline" href="shop.html">Continue Shopping</a>
       `
     : `
         <button class="btn" id="productAddToCartBtn">Add to Cart</button>
-        <a class="btn btn-outline" href="${customizeUrl}">Send To Decal Editor</a>
       `;
 
   container.innerHTML = `
@@ -517,6 +531,13 @@ async function initProductPage() {
         <p class="price-xl">${formatCurrency(product.price)}</p>
         <p>${product.description}</p>
         ${optionsMarkup}
+        ${isRacingStripe ? `
+          <div class="stripe-live-preview">
+            <p class="stripe-live-preview__title">Live Preview</p>
+            <div class="stripe-live-preview__canvas" id="stripeLivePreviewCanvas"></div>
+            <p class="inline-note stripe-live-preview__meta" id="stripeLivePreviewMeta"></p>
+          </div>
+        ` : ''}
         ${renderVehicleContextNote()}
         <p class="inline-note">Use the decal editor to place this design on a vehicle mockup before checkout.</p>
         <div class="product-actions">
@@ -528,6 +549,10 @@ async function initProductPage() {
 
   if (related) {
     related.innerHTML = products.filter(item => item.id !== product.id).slice(0, 3).map(renderProductCard).join('');
+  }
+
+  if (isRacingStripe) {
+    renderRacingStripeLivePreview(container, product);
   }
 
   const addToCartButton = container.querySelector('#productAddToCartBtn');

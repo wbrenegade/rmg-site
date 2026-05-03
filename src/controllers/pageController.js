@@ -25,7 +25,9 @@ const pageRoutes = [
 const toolRoutes = [
   "svg-converter",
   "decal-creator",
+  "windshield-banner-creator",
   "windshield-banner-calculator",
+  "customize",
   "decal-idea-generator"
 ];
 

@@ -42,6 +42,14 @@ function normalizeSubSubcategory(value, fallback = null) {
   return text ? text : null;
 }
 
+function normalizeCustomizerTool(value, fallback = null) {
+  const raw = value === undefined ? fallback : value;
+  if (raw === null || raw === undefined) return null;
+  const text = String(raw).trim();
+  if (!text || text.toLowerCase() === "none" || text.toLowerCase() === "null") return null;
+  return text;
+}
+
 function titleCaseCategory(value) {
   const normalized = String(value || "").trim().toLowerCase();
   if (normalized === "decals") return "Decals";
@@ -73,6 +81,7 @@ function normalizeRawProduct(product = {}, index = 0) {
   const previewImagePath = product.preview_image_path || product.imagePath || "/assets/imgs/main.PNG";
   const svgFilePath = product.svg_file_path || product.svgFilePath || product.previewSvgPath || product.stripeOptions?.previewSvgPath || "";
   const cutFilePath = product.cut_file_path || product.cutFilePath || "";
+  const customizerTool = normalizeCustomizerTool(product.customizer_tool, product.customizerTool);
   const displayCategory = titleCaseCategory(rawCategory);
   const displaySubcategory = isDecal ? (position || jsonSubcategory) : jsonSubcategory;
   const displaySubSubcategory = isDecal ? (jsonSubcategory || null) : legacySubSubcategory;
@@ -96,10 +105,12 @@ function normalizeRawProduct(product = {}, index = 0) {
     preview_image_path: previewImagePath,
     svg_file_path: svgFilePath,
     cut_file_path: cutFilePath,
+    customizer_tool: customizerTool,
     imagePath: previewImagePath,
     imageLabel: product.imageLabel || name,
     svgFilePath,
     cutFilePath,
+    customizerTool,
     customizable,
     custom: customizable,
     slug: normalizeSlug(product.slug, name || id),
@@ -125,6 +136,7 @@ function toProductsJsonShape(product = {}) {
     preview_image_path: product.preview_image_path || normalized.preview_image_path || "/assets/imgs/main.PNG",
     svg_file_path: product.svg_file_path || normalized.svg_file_path || "",
     cut_file_path: product.cut_file_path || normalized.cut_file_path || "",
+    customizer_tool: normalizeCustomizerTool(product.customizer_tool, normalized.customizer_tool),
     customizable: normalizeBoolean(product.customizable, normalized.customizable)
   };
 }
@@ -145,6 +157,7 @@ function legacyProductToJsonShape(product = {}) {
     preview_image_path: product.preview_image_path || product.imagePath || "/assets/imgs/main.PNG",
     svg_file_path: product.svg_file_path || product.svgFilePath || product.previewSvgPath || product.stripeOptions?.previewSvgPath || "",
     cut_file_path: product.cut_file_path || product.cutFilePath || "",
+    customizer_tool: normalizeCustomizerTool(product.customizer_tool),
     customizable: normalizeBoolean(product.customizable, product.custom)
   };
 }
@@ -238,6 +251,7 @@ function updateProduct(id, payload) {
     preview_image_path: payload.preview_image_path ?? payload.imagePath ?? current.preview_image_path,
     svg_file_path: payload.svg_file_path ?? payload.svgFilePath ?? current.svg_file_path,
     cut_file_path: payload.cut_file_path ?? payload.cutFilePath ?? current.cut_file_path,
+    customizer_tool: normalizeCustomizerTool(payload.customizer_tool ?? payload.customizerTool, current.customizer_tool),
     customizable: payload.customizable ?? payload.custom ?? current.customizable
   };
 

@@ -111,6 +111,7 @@ function fillProductForm(product) {
   form.elements.price.value = product.price;
   form.elements.featured.value = String(Boolean(product.featured));
   form.elements.customizable.value = String(Boolean(product.customizable ?? product.custom));
+  form.elements.customizer_tool.value = product.customizer_tool ?? product.customizerTool ?? "";
   form.elements.tags.value = Array.isArray(product.tags) ? product.tags.join(", ") : "";
   form.elements.preview_image_path.value = product.preview_image_path || product.imagePath || "";
   form.elements.svg_file_path.value = product.svg_file_path || product.svgFilePath || "";
@@ -127,6 +128,13 @@ function resetProductForm() {
   form.elements.id.value = "";
   form.elements.featured.value = "false";
   form.elements.customizable.value = "false";
+  form.elements.customizer_tool.value = "";
+}
+
+function normalizeCustomizerTool(value) {
+  const text = String(value || "").trim();
+  if (!text || text.toLowerCase() === "none" || text.toLowerCase() === "null") return null;
+  return text;
 }
 
 function renderOrders(orders) {
@@ -374,6 +382,7 @@ function initCmsProductForm() {
       price: Number(data.price),
       featured: data.featured === "true",
       customizable: data.customizable === "true",
+      customizer_tool: normalizeCustomizerTool(data.customizer_tool),
       tags: String(data.tags || "")
         .split(",")
         .map((tag) => tag.trim())

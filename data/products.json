@@ -10,6 +10,7 @@
     "preview_image_path": "/assets/imgs/decals/products/windshield_banner.png",
     "svg_file_path": "",
     "cut_file_path": "",
+    "customizer_tool": "windshield-banner-creator",
     "customizable": true
   },
   {
@@ -23,6 +24,7 @@
     "preview_image_path": "/assets/imgs/decals/products/custom/custom-banner.png",
     "svg_file_path": "",
     "cut_file_path": "",
+    "customizer_tool": "windshield-banner-creator",
     "customizable": true
   },
   {
@@ -36,7 +38,8 @@
     "preview_image_path": "/assets/imgs/decals/products/rocker-panel-side__stripes/dual-stripes.png",
     "svg_file_path": "/assets/svg/racing-stripes/dual-stripes.svg",
     "cut_file_path": "",
-    "customizable": false
+    "customizer_tool": "inline",
+    "customizable": true
   },
   {
     "id": "rmg-rocker-stripe-dual-top-outlined",
@@ -49,7 +52,8 @@
     "preview_image_path": "/assets/imgs/decals/products/rocker-panel-side__stripes/dual-top-outlined-stripes.png",
     "svg_file_path": "/assets/svg/racing-stripes/dual-top-outlined-stripes.svg",
     "cut_file_path": "",
-    "customizable": false
+    "customizer_tool": "inline",
+    "customizable": true
   },
   {
     "id": "rmg-rocker-stripe-outlined-single",
@@ -62,7 +66,8 @@
     "preview_image_path": "/assets/imgs/decals/products/rocker-panel-side__stripes/single-outlined-stripe.png",
     "svg_file_path": "/assets/svg/racing-stripes/single-outlined-stripe.svg",
     "cut_file_path": "",
-    "customizable": false
+    "customizer_tool": "inline",
+    "customizable": true
   },
   {
     "id": "rmg-rocker-stripe-single",
@@ -75,7 +80,8 @@
     "preview_image_path": "/assets/imgs/decals/products/rocker-panel-side__stripes/single-stripe.png",
     "svg_file_path": "/assets/svg/racing-stripes/single-stripe.svg",
     "cut_file_path": "",
-    "customizable": false
+    "customizer_tool": "inline",
+    "customizable": true
   },
   {
     "id": "rmg-rocker-stripe-single-outlined",
@@ -88,7 +94,8 @@
     "preview_image_path": "/assets/imgs/decals/products/rocker-panel-side__stripes/single-outlined-stripe.png",
     "svg_file_path": "/assets/svg/racing-stripes/single-outlined-stripe.svg",
     "cut_file_path": "",
-    "customizable": false
+    "customizer_tool": "inline",
+    "customizable": true
   },
   {
     "id": "rmg-rocker-stripe-staggered",
@@ -101,7 +108,8 @@
     "preview_image_path": "/assets/imgs/decals/products/rocker-panel-side__stripes/staggered.png",
     "svg_file_path": "/assets/svg/racing-stripes/staggered-stripes.svg",
     "cut_file_path": "",
-    "customizable": false
+    "customizer_tool": "inline",
+    "customizable": true
   },
   {
     "id": "rmg-custom-sponsor-stack",
@@ -114,6 +122,7 @@
     "preview_image_path": "/assets/imgs/main.PNG",
     "svg_file_path": "",
     "cut_file_path": "",
+    "customizer_tool": "customize",
     "customizable": true
   },
   {
@@ -127,6 +136,7 @@
     "preview_image_path": "/assets/imgs/main.PNG",
     "svg_file_path": "/assets/svg/racing-stripes/single-stripe.svg",
     "cut_file_path": "",
+    "customizer_tool": "inline",
     "customizable": true
   },
   {
@@ -140,6 +150,7 @@
     "preview_image_path": "/assets/imgs/main.PNG",
     "svg_file_path": "",
     "cut_file_path": "",
+    "customizer_tool": "customize",
     "customizable": true
   },
   {
@@ -153,6 +164,7 @@
     "preview_image_path": "/assets/imgs/main.PNG",
     "svg_file_path": "",
     "cut_file_path": "",
+    "customizer_tool": "customize",
     "customizable": true
   },
   {
@@ -166,6 +178,7 @@
     "preview_image_path": "/assets/imgs/main.PNG",
     "svg_file_path": "",
     "cut_file_path": "",
+    "customizer_tool": "customize",
     "customizable": true
   },
   {
@@ -179,6 +192,7 @@
     "preview_image_path": "/assets/imgs/main.PNG",
     "svg_file_path": "",
     "cut_file_path": "",
+    "customizer_tool": null,
     "customizable": false
   },
   {
@@ -192,6 +206,7 @@
     "preview_image_path": "/assets/imgs/main.PNG",
     "svg_file_path": "",
     "cut_file_path": "",
+    "customizer_tool": null,
     "customizable": false
   },
   {
@@ -205,6 +220,7 @@
     "preview_image_path": "/assets/imgs/main.PNG",
     "svg_file_path": "",
     "cut_file_path": "",
+    "customizer_tool": "customize",
     "customizable": true
   }
 ]

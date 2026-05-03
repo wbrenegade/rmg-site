@@ -175,6 +175,7 @@ function productSearchText(product) {
 
 function isRacingStripeProduct(product) {
   if (!product) return false;
+  if (normalizeText(product.subcategory) === 'racing stripes') return true;
   if (normalizeText(product.subSubcategory) === 'racing stripes') return true;
   const tags = Array.isArray(product.tags) ? product.tags : [];
   return tags.some((tag) => normalizeText(tag) === 'racing stripes');
@@ -500,6 +501,7 @@ async function initCustomizePage() {
     : (window.PRODUCTS || []);
   const vehicleProduct = createVehicleKitFromCustomizeQuery();
   const productId = getCustomizeParam('productId');
+  const querySvgPath = getCustomizeParam('svg');
   const selectedProduct = vehicleProduct || (typeof window.findProductById === 'function' ? window.findProductById(productId) : null);
   const initialProduct = selectedProduct || null;
 
@@ -549,11 +551,28 @@ async function initCustomizePage() {
     productDecalOptions.filter((option) => option.id && !productOptionIds.has(option.id))
   );
 
+  if (querySvgPath && !premadeDecalOptions.some((option) => (option.path || option.svgPath) === querySvgPath)) {
+    const label = initialProduct?.name || titleCase(querySvgPath.split('/').pop() || 'Selected Decal');
+    premadeDecalOptions.unshift({
+      product: initialProduct || null,
+      id: `query-svg-${querySvgPath.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`,
+      label,
+      mode: initialProduct ? getProductMode(initialProduct) : 'Premade Decals',
+      svgPath: querySvgPath,
+      outlined: initialProduct ? isOutlinedProduct(initialProduct) : /outline|outlined/i.test(querySvgPath)
+    });
+  }
+
   if (selectedProduct && String(selectedProduct.category || '').toLowerCase() === 'decals') {
     const selectedOption = premadeDecalOptions.find((option) => option.id === selectedProduct.id);
     if (selectedOption) {
       activePremadeDecalId = selectedOption.id;
     }
+  }
+
+  if (!activePremadeDecalId && querySvgPath) {
+    const selectedSvgOption = premadeDecalOptions.find((option) => (option.path || option.svgPath) === querySvgPath);
+    if (selectedSvgOption) activePremadeDecalId = selectedSvgOption.id;
   }
 
   const editorDecalOption = getEditorDecalOption();
