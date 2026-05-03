@@ -181,11 +181,15 @@ async function loadRacingStripePreviewSvg(path) {
 }
 
 function colorizeRacingStripeSvg(svgText, stripeColorHex, outlineColorHex) {
-  return String(svgText || "")
+  const cleanedSvg = String(svgText || "")
     .replace(/<\?xml[^>]*>\s*/i, "")
-    .replace(/<!--[\s\S]*?-->\s*/g, "")
-    .replace(/\s(width|height)="[^"]*"/g, "")
-    .replace(/<svg\b/, '<svg class="stripe-preview-svg" preserveAspectRatio="xMidYMid meet"')
+    .replace(/<!--[\s\S]*?-->\s*/g, "");
+
+  return cleanedSvg
+    .replace(/<svg\b([^>]*)>/i, (svgTag, attributes) => {
+      const cleanedAttributes = attributes.replace(/\s(width|height)="[^"]*"/g, "");
+      return `<svg class="stripe-preview-svg" preserveAspectRatio="xMidYMid meet"${cleanedAttributes}>`;
+    })
     .replace(/fill:\s*#[0-9a-fA-F]{3,8}/g, `fill:${stripeColorHex}`)
     .replace(/stroke:\s*#[0-9a-fA-F]{3,8}/g, `stroke:${outlineColorHex}`);
 }

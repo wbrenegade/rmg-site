@@ -13683,6 +13683,97 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "abf6bcb5-c230-4e45-b5ea-4e05e1500fef",
+      "type": "page_view",
+      "pathname": "/shop",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/",
+      "method": "GET",
+      "timestamp": "05/03/2026, 8:34:37 AM",
+      "date": "2026-05-03",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "f3cd0b33-fc29-4d70-b5b7-7a86c183348c",
+      "type": "page_view",
+      "pathname": "/tools/windshield-banner-creator",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/shop",
+      "method": "GET",
+      "timestamp": "05/03/2026, 8:34:39 AM",
+      "date": "2026-05-03",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "5932eddd-c5c3-4c79-b631-ee5a4b682ad6",
+      "type": "page_view",
+      "pathname": "/product",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/shop",
+      "method": "GET",
+      "timestamp": "05/03/2026, 8:34:50 AM",
+      "date": "2026-05-03",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "6b2bd3c1-08f6-4991-9fe8-9861c5fddf38",
+      "type": "product_view",
+      "pathname": "/product",
+      "productId": "rmg-rocker-stripe-dual-top-outlined",
+      "productName": "Dual Top Outlined Rocker Stripe",
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/product?id=rmg-rocker-stripe-dual-top-outlined",
+      "method": "POST",
+      "timestamp": "05/03/2026, 8:34:51 AM",
+      "date": "2026-05-03",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {
+        "category": "Decals",
+        "subcategory": "Rocker Panel/Side"
+      }
     }
   ]
 }
