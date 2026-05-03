@@ -56,20 +56,6 @@
     "customizable": true
   },
   {
-    "id": "rmg-rocker-stripe-outlined-single",
-    "name": "Outlined Single Rocker Stripe",
-    "description": "Single rocker stripe with a clean outline border along the panel edge.",
-    "price": 54.99,
-    "category": "decals",
-    "subcategory": "Racing Stripes",
-    "position": "Rocker Panel/Side",
-    "preview_image_path": "/assets/imgs/decals/products/rocker-panel-side__stripes/single-outlined-stripe.png",
-    "svg_file_path": "/assets/svg/racing-stripes/single-outlined-stripe.svg",
-    "cut_file_path": "",
-    "customizer_tool": "inline",
-    "customizable": true
-  },
-  {
     "id": "rmg-rocker-stripe-single",
     "name": "Single Rocker Stripe",
     "description": "Classic single-line rocker panel stripe for a clean, aggressive look.",

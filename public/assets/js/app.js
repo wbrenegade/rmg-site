@@ -193,11 +193,19 @@ function normalizeCartOptions(options) {
   const stripeOutlineColors = Array.isArray(options.stripeOutlineColors)
     ? options.stripeOutlineColors.map(value => String(value || '').trim()).filter(Boolean)
     : [];
+  const stripeAccentStyles = Array.isArray(options.stripeAccentStyles)
+    ? options.stripeAccentStyles.map(value => String(value || '').trim()).filter(Boolean)
+    : [];
+  const stripeAccentSizes = Array.isArray(options.stripeAccentSizes)
+    ? options.stripeAccentSizes.map(value => String(value || '').trim()).filter(Boolean)
+    : [];
 
   if (stripeWidths.length) normalized.stripeWidths = stripeWidths;
   if (stripeColors.length) normalized.stripeColors = stripeColors;
   if (stripeSpacings.length) normalized.stripeSpacings = stripeSpacings;
   if (stripeOutlineColors.length) normalized.stripeOutlineColors = stripeOutlineColors;
+  if (stripeAccentStyles.length) normalized.stripeAccentStyles = stripeAccentStyles;
+  if (stripeAccentSizes.length) normalized.stripeAccentSizes = stripeAccentSizes;
 
   return Object.keys(normalized).length ? normalized : null;
 }

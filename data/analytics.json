@@ -13774,6 +13774,50 @@
         "category": "Decals",
         "subcategory": "Rocker Panel/Side"
       }
+    },
+    {
+      "id": "07e6913a-7e63-4577-b4e8-d84d4102aea5",
+      "type": "page_view",
+      "pathname": "/shop",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/",
+      "method": "GET",
+      "timestamp": "05/03/2026, 8:38:53 AM",
+      "date": "2026-05-03",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "3a38dee4-2de3-402d-9a51-a3b0eb390ecc",
+      "type": "page_view",
+      "pathname": "/shop",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/",
+      "method": "GET",
+      "timestamp": "05/03/2026, 8:51:22 AM",
+      "date": "2026-05-03",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }

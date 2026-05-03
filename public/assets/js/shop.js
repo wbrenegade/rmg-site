@@ -139,6 +139,26 @@ function inferTopStripe(product) {
   return searchable.includes("dual top outlined");
 }
 
+function getProductSearchText(product) {
+  return [
+    product?.name,
+    product?.slug,
+    product?.id,
+    product?.description,
+    ...(Array.isArray(product?.tags) ? product.tags : [])
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
+
+function inferAccentStyle(product) {
+  const searchable = getProductSearchText(product);
+  if (searchable.includes("top outlined")) return "Above";
+  if (searchable.includes("bottom outlined")) return "Below";
+  return "Both";
+}
+
 const RACING_STRIPE_PREVIEW_BASE = "/assets/svg/racing-stripes";
 const racingStripePreviewSvgCache = new Map();
 const productJsonRecordCache = new Map();
@@ -180,24 +200,117 @@ async function loadRacingStripePreviewSvg(path) {
   return racingStripePreviewSvgCache.get(path);
 }
 
-function colorizeRacingStripeSvg(svgText, stripeColorHex, outlineColorHex) {
+function getSvgAttribute(tag, name) {
+  const match = String(tag || "").match(new RegExp(`\\s${name}="([^"]*)"`, "i"));
+  return match ? match[1] : "";
+}
+
+function setSvgAttribute(tag, name, value) {
+  const attributePattern = new RegExp(`\\s${name}="[^"]*"`, "i");
+  if (attributePattern.test(tag)) {
+    return tag.replace(attributePattern, ` ${name}="${value}"`);
+  }
+
+  return tag.replace(/\/?>$/, ` ${name}="${value}"$&`);
+}
+
+function getAccentHeightValue(sizeLabel, fallbackHeight) {
+  const parsed = parseInchValue(sizeLabel, fallbackHeight);
+  if (String(sizeLabel || "").toLowerCase().includes("thin")) return 0.3;
+  if (String(sizeLabel || "").toLowerCase().includes("medium")) return 0.6;
+  if (String(sizeLabel || "").toLowerCase().includes("thick")) return 1;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallbackHeight;
+}
+
+function applyRacingStripeAccentOptions(svgText, accentColorHex, accentStyle, accentSize) {
+  const rectMatches = [...String(svgText || "").matchAll(/<rect\b[^>]*\/?>/gi)];
+  if (rectMatches.length < 2) return svgText;
+
+  const rects = rectMatches.map((match, index) => {
+    const tag = match[0];
+    const height = Number(getSvgAttribute(tag, "height"));
+    const y = Number(getSvgAttribute(tag, "y"));
+    const x = Number(getSvgAttribute(tag, "x"));
+    const width = Number(getSvgAttribute(tag, "width"));
+
+    return { tag, index, height, y, x, width };
+  }).filter((rect) => Number.isFinite(rect.height) && Number.isFinite(rect.y));
+
+  if (rects.length < 2) return svgText;
+
+  const maxHeight = Math.max(...rects.map((rect) => rect.height));
+  const mainRects = rects.filter((rect) => rect.height >= maxHeight * 0.65);
+  const accentRects = rects.filter((rect) => rect.height < maxHeight * 0.65);
+  if (!mainRects.length || !accentRects.length) return svgText;
+
+  const template = accentRects.reduce((widest, rect) => rect.width > widest.width ? rect : widest, accentRects[0]);
+  const minMainY = Math.min(...mainRects.map((rect) => rect.y));
+  const maxMainBottom = Math.max(...mainRects.map((rect) => rect.y + rect.height));
+  const fallbackGap = Math.max(0.45, template.height * 3.5);
+  const topAccent = accentRects.find((rect) => rect.y < minMainY);
+  const bottomAccent = accentRects.find((rect) => rect.y > maxMainBottom);
+  const topGap = topAccent ? minMainY - (topAccent.y + topAccent.height) : fallbackGap;
+  const bottomGap = bottomAccent ? bottomAccent.y - maxMainBottom : fallbackGap;
+  const accentHeight = getAccentHeightValue(accentSize, template.height);
+  const normalizedStyle = String(accentStyle || "Both").toLowerCase();
+  const useAbove = normalizedStyle === "above" || normalizedStyle === "both";
+  const useBelow = normalizedStyle === "below" || normalizedStyle === "both";
+
+  const buildAccentRect = (y, idSuffix) => {
+    let tag = template.tag;
+    tag = setSvgAttribute(tag, "id", `${getSvgAttribute(template.tag, "id") || "accent"}-${idSuffix}`);
+    tag = setSvgAttribute(tag, "height", accentHeight.toFixed(6).replace(/0+$/, "").replace(/\.$/, ""));
+    tag = setSvgAttribute(tag, "y", y.toFixed(6).replace(/0+$/, "").replace(/\.$/, ""));
+    return tag;
+  };
+
+  const accentTags = [];
+  if (useAbove) {
+    accentTags.push(buildAccentRect(minMainY - topGap - accentHeight, "above"));
+  }
+  if (useBelow) {
+    accentTags.push(buildAccentRect(maxMainBottom + bottomGap, "below"));
+  }
+
+  const accentIndexes = new Set(accentRects.map((rect) => rect.index));
+  let rectIndex = 0;
+  const withoutAccentRects = String(svgText).replace(/<rect\b[^>]*\/?>/gi, (tag) => {
+    const shouldRemove = accentIndexes.has(rectIndex);
+    rectIndex += 1;
+    return shouldRemove ? "" : tag;
+  });
+
+  const updatedSvg = withoutAccentRects.replace(/<\/g>/i, `${accentTags.join("")}</g>`);
+  return updatedSvg.replace(/(<rect\b(?=[^>]*(?:accent|above|below)[^>]*)[^>]*style="[^"]*)fill:\s*#[0-9a-fA-F]{3,8}/gi, `$1fill:${accentColorHex}`);
+}
+
+function colorizeRacingStripeSvg(svgText, stripeColorHex, outlineColorHex, accentOptions = {}) {
   const cleanedSvg = String(svgText || "")
     .replace(/<\?xml[^>]*>\s*/i, "")
     .replace(/<!--[\s\S]*?-->\s*/g, "");
 
-  return cleanedSvg
+  const colorizedSvg = cleanedSvg
     .replace(/<svg\b([^>]*)>/i, (svgTag, attributes) => {
       const cleanedAttributes = attributes.replace(/\s(width|height)="[^"]*"/g, "");
-      return `<svg class="stripe-preview-svg" preserveAspectRatio="xMidYMid meet"${cleanedAttributes}>`;
+      return `<svg class="stripe-preview-svg" preserveAspectRatio="xMidYMid meet" overflow="visible"${cleanedAttributes}>`;
     })
     .replace(/fill:\s*#[0-9a-fA-F]{3,8}/g, `fill:${stripeColorHex}`)
     .replace(/stroke:\s*#[0-9a-fA-F]{3,8}/g, `stroke:${outlineColorHex}`);
+
+  if (!accentOptions.enabled) return colorizedSvg;
+
+  return applyRacingStripeAccentOptions(
+    colorizedSvg,
+    accentOptions.colorHex || outlineColorHex,
+    accentOptions.style || "Both",
+    accentOptions.size || "Thin"
+  );
 }
 
-function renderRacingStripeAssetPreview(svgText, stripeColorHex, outlineColorHex) {
+function renderRacingStripeAssetPreview(svgText, stripeColorHex, outlineColorHex, accentOptions) {
   return `
     <div class="stripe-preview-surface" role="img" aria-label="Live stripe preview">
-      ${colorizeRacingStripeSvg(svgText, stripeColorHex, outlineColorHex)}
+      ${colorizeRacingStripeSvg(svgText, stripeColorHex, outlineColorHex, accentOptions)}
     </div>
   `;
 }
@@ -228,6 +341,7 @@ function getRacingStripeOptions(product) {
   const explicitOutlineColorValues = explicitOutlineColors.map((value) => String(value || "").trim()).filter(Boolean);
   const hasOutline = inferOutlinedStripe(product, explicitOutlineColorValues);
   const outlineColors = explicitOutlineColorValues.length ? explicitOutlineColorValues : fallbackOutlineColors;
+  const isOutlined = hasOutline || getProductSearchText(product).includes("outlined");
 
   return {
     widths,
@@ -235,8 +349,11 @@ function getRacingStripeOptions(product) {
     spacings,
     outlineColors,
     hasMultipleStripes: inferMultipleStripeLayout(product, widths),
-    hasOutline,
+    hasOutline: isOutlined,
     hasTopStripe: inferTopStripe(product),
+    accentStyles: ["Above", "Below", "Both"],
+    accentSizes: ["Thin", "Medium", "Thick"],
+    defaultAccentStyle: inferAccentStyle(product),
     previewSvgPath: getRacingStripePreviewSvgPath(product)
   };
 }
@@ -321,6 +438,8 @@ function renderStripeQuickLivePreview(container, options) {
   const colorSelect = container.querySelector("#quickStripeColorSelect");
   const spacingSelect = container.querySelector("#quickStripeSpacingSelect");
   const outlineColorSelect = container.querySelector("#quickStripeOutlineColorSelect");
+  const accentStyleSelect = container.querySelector("#quickStripeAccentStyleSelect");
+  const accentSizeSelect = container.querySelector("#quickStripeAccentSizeSelect");
 
   if (!(previewCanvas && previewMeta && widthSelect && colorSelect)) return;
   let previewRequestId = 0;
@@ -331,14 +450,22 @@ function renderStripeQuickLivePreview(container, options) {
     const selectedColor = colorSelect.value || options.colors[0] || "Gloss Black";
     const selectedSpacing = spacingSelect?.value || options.spacings[0] || "0.5 in";
     const selectedOutline = outlineColorSelect?.value || options.outlineColors[0] || "Gloss White";
+    const selectedAccentStyle = accentStyleSelect?.value || options.defaultAccentStyle || "Both";
+    const selectedAccentSize = accentSizeSelect?.value || options.accentSizes[0] || "Thin";
 
     const stripeColorHex = stripeColorToHex(selectedColor);
     const outlineColorHex = options.hasOutline ? stripeColorToHex(selectedOutline) : stripeColorHex;
+    const accentOptions = {
+      enabled: options.hasOutline,
+      colorHex: outlineColorHex,
+      style: selectedAccentStyle,
+      size: selectedAccentSize
+    };
 
     loadRacingStripePreviewSvg(options.previewSvgPath)
       .then((svgText) => {
         if (requestId !== previewRequestId) return;
-        previewCanvas.innerHTML = renderRacingStripeAssetPreview(svgText, stripeColorHex, outlineColorHex);
+        previewCanvas.innerHTML = renderRacingStripeAssetPreview(svgText, stripeColorHex, outlineColorHex, accentOptions);
       })
       .catch(() => {
         if (requestId !== previewRequestId) return;
@@ -355,10 +482,11 @@ function renderStripeQuickLivePreview(container, options) {
     const meta = [`Width: ${selectedWidth}`, `Color: ${selectedColor}`];
     if (options.hasMultipleStripes) meta.push(`Spacing: ${selectedSpacing}`);
     if (options.hasOutline) meta.push(`Outline: ${selectedOutline}`);
+    if (options.hasOutline) meta.push(`Accent: ${selectedAccentStyle} ${selectedAccentSize}`);
     previewMeta.textContent = meta.join(" • ");
   };
 
-  [widthSelect, colorSelect, spacingSelect, outlineColorSelect].forEach((input) => {
+  [widthSelect, colorSelect, spacingSelect, outlineColorSelect, accentStyleSelect, accentSizeSelect].forEach((input) => {
     if (!input) return;
     input.addEventListener("input", update);
     input.addEventListener("change", update);
@@ -386,9 +514,21 @@ function openStripeQuickModal(product) {
   const outlineMarkup = options.hasOutline && options.outlineColors.length
     ? `
       <label>
-        Outline Color
+        Accent Color
         <select id="quickStripeOutlineColorSelect" aria-label="Stripe outline color">
           ${options.outlineColors.map((color) => `<option value="${color}">${color}</option>`).join("")}
+        </select>
+      </label>
+      <label>
+        Accent Style
+        <select id="quickStripeAccentStyleSelect" aria-label="Stripe accent style">
+          ${options.accentStyles.map((style) => `<option value="${style}"${style === options.defaultAccentStyle ? " selected" : ""}>${style}</option>`).join("")}
+        </select>
+      </label>
+      <label>
+        Accent Size
+        <select id="quickStripeAccentSizeSelect" aria-label="Stripe accent size">
+          ${options.accentSizes.map((size) => `<option value="${size}">${size}</option>`).join("")}
         </select>
       </label>
     `
@@ -442,12 +582,20 @@ function openStripeQuickModal(product) {
     const outlineValue = options.hasOutline
       ? (body.querySelector("#quickStripeOutlineColorSelect")?.value?.trim() || "")
       : "";
+    const accentStyleValue = options.hasOutline
+      ? (body.querySelector("#quickStripeAccentStyleSelect")?.value?.trim() || "")
+      : "";
+    const accentSizeValue = options.hasOutline
+      ? (body.querySelector("#quickStripeAccentSizeSelect")?.value?.trim() || "")
+      : "";
 
     addToCart(product.id, 1, {
       stripeWidths: widthValue ? [widthValue] : [],
       stripeColors: colorValue ? [colorValue] : [],
       stripeSpacings: spacingValue ? [spacingValue] : [],
-      stripeOutlineColors: outlineValue ? [outlineValue] : []
+      stripeOutlineColors: outlineValue ? [outlineValue] : [],
+      stripeAccentStyles: accentStyleValue ? [accentStyleValue] : [],
+      stripeAccentSizes: accentSizeValue ? [accentSizeValue] : []
     });
     closeStripeQuickModal();
   });

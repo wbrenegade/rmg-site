@@ -22,12 +22,16 @@ function renderStripeOptionLines(item) {
   const colors = Array.isArray(options.stripeColors) ? options.stripeColors.filter(Boolean) : [];
   const spacings = Array.isArray(options.stripeSpacings) ? options.stripeSpacings.filter(Boolean) : [];
   const outlineColors = Array.isArray(options.stripeOutlineColors) ? options.stripeOutlineColors.filter(Boolean) : [];
+  const accentStyles = Array.isArray(options.stripeAccentStyles) ? options.stripeAccentStyles.filter(Boolean) : [];
+  const accentSizes = Array.isArray(options.stripeAccentSizes) ? options.stripeAccentSizes.filter(Boolean) : [];
   const lines = [];
 
   if (widths.length) lines.push(`Stripe Width: ${widths.join(', ')}`);
   if (colors.length) lines.push(`Stripe Color: ${colors.join(', ')}`);
   if (spacings.length) lines.push(`Stripe Spacing: ${spacings.join(', ')}`);
-  if (outlineColors.length) lines.push(`Outline Color: ${outlineColors.join(', ')}`);
+  if (outlineColors.length) lines.push(`Accent Color: ${outlineColors.join(', ')}`);
+  if (accentStyles.length) lines.push(`Accent Style: ${accentStyles.join(', ')}`);
+  if (accentSizes.length) lines.push(`Accent Size: ${accentSizes.join(', ')}`);
   if (!lines.length) return '';
 
   return `<p class="inline-note">${lines.join(' • ')}</p>`;

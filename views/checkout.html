@@ -151,10 +151,18 @@
         if (!options || typeof options !== "object") return "";
         const widths = Array.isArray(options.stripeWidths) ? options.stripeWidths.filter(Boolean) : [];
         const colors = Array.isArray(options.stripeColors) ? options.stripeColors.filter(Boolean) : [];
+        const spacings = Array.isArray(options.stripeSpacings) ? options.stripeSpacings.filter(Boolean) : [];
+        const outlineColors = Array.isArray(options.stripeOutlineColors) ? options.stripeOutlineColors.filter(Boolean) : [];
+        const accentStyles = Array.isArray(options.stripeAccentStyles) ? options.stripeAccentStyles.filter(Boolean) : [];
+        const accentSizes = Array.isArray(options.stripeAccentSizes) ? options.stripeAccentSizes.filter(Boolean) : [];
         const details = [];
 
         if (widths.length) details.push(`Stripe Width: ${widths.join(", ")}`);
         if (colors.length) details.push(`Stripe Color: ${colors.join(", ")}`);
+        if (spacings.length) details.push(`Stripe Spacing: ${spacings.join(", ")}`);
+        if (outlineColors.length) details.push(`Accent Color: ${outlineColors.join(", ")}`);
+        if (accentStyles.length) details.push(`Accent Style: ${accentStyles.join(", ")}`);
+        if (accentSizes.length) details.push(`Accent Size: ${accentSizes.join(", ")}`);
 
         return details.join(" | ");
       }
