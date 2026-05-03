@@ -12690,6 +12690,339 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "f97ab894-30e3-4ef0-aacc-c54dc445e2ec",
+      "type": "page_view",
+      "pathname": "/shop",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/",
+      "method": "GET",
+      "timestamp": "05/02/2026, 2:51:28 PM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "2cc6ef74-578a-45c8-8eea-7b1091777460",
+      "type": "page_view",
+      "pathname": "/product",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/shop",
+      "method": "GET",
+      "timestamp": "05/02/2026, 2:51:50 PM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "42109cee-d2d5-457e-958f-4aa4ea7e84de",
+      "type": "product_view",
+      "pathname": "/product",
+      "productId": "decal-rocker-panel-side-stripes-dual-top-outlined-stripes",
+      "productName": "Dual Top Outlined Stripes",
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/product?id=decal-rocker-panel-side-stripes-dual-top-outlined-stripes",
+      "method": "POST",
+      "timestamp": "05/02/2026, 2:51:51 PM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {
+        "category": "Decals",
+        "subcategory": "Rocker Panel/Side"
+      }
+    },
+    {
+      "id": "2a8342fc-176a-4550-9c93-9c0cf59f2576",
+      "type": "page_view",
+      "pathname": "/",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "http://renegademadegraphix.com/",
+      "method": "GET",
+      "timestamp": "05/02/2026, 4:44:37 PM",
+      "date": "2026-05-02",
+      "ip": "192.36.109.82",
+      "visitorKey": "7628c75239ee975e",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.3",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "485e9f0a-acdb-45a5-be8d-8aad9acc747f",
+      "type": "page_view",
+      "pathname": "/",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": null,
+      "method": "GET",
+      "timestamp": "05/02/2026, 6:51:30 PM",
+      "date": "2026-05-02",
+      "ip": "209.97.142.136",
+      "visitorKey": "a25d406645b7e7fa",
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "b18076b2-3d79-474f-8e76-5c1d5f575314",
+      "type": "page_view",
+      "pathname": "/shop",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": null,
+      "method": "GET",
+      "timestamp": "05/02/2026, 8:12:28 PM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "3841cc30782b59dc",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/601.2.4 (KHTML, like Gecko) Version/9.0.1 Safari/601.2.4 facebookexternalhit/1.1 Facebot Twitterbot/1.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "f805e601-38a7-420a-8e4b-040f2c69898e",
+      "type": "page_view",
+      "pathname": "/",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": null,
+      "method": "GET",
+      "timestamp": "05/02/2026, 9:15:29 PM",
+      "date": "2026-05-02",
+      "ip": "34.32.146.22",
+      "visitorKey": "d22354512d126a59",
+      "userAgent": "Scrapy/2.13.4 (+https://scrapy.org)",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "ee29ae0a-6f35-44aa-805f-988d81877b84",
+      "type": "page_view",
+      "pathname": "/login",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://antrean.logammulia.com/login",
+      "method": "GET",
+      "timestamp": "05/02/2026, 10:18:23 PM",
+      "date": "2026-05-02",
+      "ip": "180.242.131.53",
+      "visitorKey": "f32d40412e8ddd29",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "5fbf2630-490c-48d9-820d-2b02d0ce7581",
+      "type": "page_view",
+      "pathname": "/",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": null,
+      "method": "GET",
+      "timestamp": "05/02/2026, 10:55:50 PM",
+      "date": "2026-05-02",
+      "ip": "205.169.39.14",
+      "visitorKey": "1f508da19e57ae4a",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.5938.132 Safari/537.36",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "1059e5e4-f5f7-49f5-b6a3-41a2278e3718",
+      "type": "page_view",
+      "pathname": "/",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": null,
+      "method": "GET",
+      "timestamp": "05/02/2026, 11:23:28 PM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "cfd2cb90-aec8-4fc5-ade4-9fb727da7d4c",
+      "type": "page_view",
+      "pathname": "/tools/decal-creator",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/",
+      "method": "GET",
+      "timestamp": "05/02/2026, 11:23:45 PM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "abeb20ff-87d1-4ad0-bacd-87426a50eabf",
+      "type": "page_view",
+      "pathname": "/installers",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/",
+      "method": "GET",
+      "timestamp": "05/02/2026, 11:25:07 PM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "467f1fc7-df03-4520-92ce-787cb6fb8d39",
+      "type": "page_view",
+      "pathname": "/shop",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/installers",
+      "method": "GET",
+      "timestamp": "05/02/2026, 11:25:08 PM",
+      "date": "2026-05-02",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "877f512f-3eab-4942-bafe-d8ca1d5a1f03",
+      "type": "page_view",
+      "pathname": "/",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": null,
+      "method": "GET",
+      "timestamp": "05/03/2026, 12:13:15 AM",
+      "date": "2026-05-03",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "8ea1f23d-93a6-4587-a84a-a236706e3c25",
+      "type": "page_view",
+      "pathname": "/customize",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/",
+      "method": "GET",
+      "timestamp": "05/03/2026, 12:19:08 AM",
+      "date": "2026-05-03",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
     }
   ]
 }

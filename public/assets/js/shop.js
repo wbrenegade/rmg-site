@@ -142,6 +142,10 @@ const RACING_STRIPE_PREVIEW_BASE = "/assets/svg/racing-stripes";
 const racingStripePreviewSvgCache = new Map();
 
 function getRacingStripePreviewSvgPath(product) {
+  if (product?.svg_file_path || product?.svgFilePath) {
+    return product.svg_file_path || product.svgFilePath;
+  }
+
   if (product?.stripeOptions?.previewSvgPath) {
     return product.stripeOptions.previewSvgPath;
   }
@@ -599,6 +603,10 @@ function getLegacyDecalImagePath(product) {
 }
 
 function getProductImage(product) {
+  if (product.preview_image_path) {
+    return product.preview_image_path;
+  }
+
   const legacyPath = getLegacyDecalImagePath(product);
   if (legacyPath) return legacyPath;
 
@@ -1280,7 +1288,7 @@ async function initShop() {
 
   function matchesDecalFilter(product) {
     if (activeDecalTab === "Custom") {
-      return Boolean(product.custom) ||
+      return Boolean(product.customizable ?? product.custom) ||
         normalizeText(product.subcategory) === "custom" ||
         normalizeText(product.subSubcategory) === "custom";
     }

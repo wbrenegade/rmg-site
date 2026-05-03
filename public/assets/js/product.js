@@ -124,6 +124,10 @@ const RACING_STRIPE_PREVIEW_BASE = '/assets/imgs/previews/racing-stripes';
 const racingStripePreviewSvgCache = new Map();
 
 function getRacingStripePreviewSvgPath(product) {
+  if (product?.svg_file_path || product?.svgFilePath) {
+    return product.svg_file_path || product.svgFilePath;
+  }
+
   if (product?.stripeOptions?.previewSvgPath) {
     return product.stripeOptions.previewSvgPath;
   }
@@ -301,7 +305,7 @@ function getRacingStripeOptions(product) {
 }
 
 function renderRacingStripeOptions(product) {
-  if (!isRacingStripeProduct(product) || product.custom) return '';
+  if (!isRacingStripeProduct(product) || Boolean(product.customizable ?? product.custom)) return '';
 
   const options = getRacingStripeOptions(product);
   if (!options.widths.length || !options.colors.length) return '';
@@ -349,7 +353,7 @@ function renderRacingStripeOptions(product) {
 }
 
 function getSelectedRacingStripeOptions(container, product) {
-  if (!isRacingStripeProduct(product) || product.custom) return null;
+  if (!isRacingStripeProduct(product) || Boolean(product.customizable ?? product.custom)) return null;
 
   const options = getRacingStripeOptions(product);
   const widthValue = container.querySelector('#stripeWidthSelect')?.value?.trim();
@@ -470,7 +474,10 @@ async function initProductPage() {
 
   const vehicleKitProduct = createVehicleKitFromQuery();
   const id = getQueryParam('id');
-  const product = vehicleKitProduct || findProductById(id) || PRODUCTS[0];
+  const products = typeof window.getProductsList === 'function'
+    ? window.getProductsList()
+    : (Array.isArray(window.PRODUCTS) ? window.PRODUCTS : (typeof PRODUCTS !== 'undefined' ? PRODUCTS : []));
+  const product = vehicleKitProduct || findProductById(id) || products[0];
 
   if (vehicleKitProduct?.selectedVehicle && typeof window.setSelectedVehicle === 'function') {
     window.setSelectedVehicle(vehicleKitProduct.selectedVehicle);
@@ -480,14 +487,15 @@ async function initProductPage() {
     window.RMGAnalytics.trackProductView(product);
   }
 
-  const imagePath = product.imagePath || '/assets/imgs/main.PNG';
+  const imagePath = product.preview_image_path || product.imagePath || '/assets/imgs/main.PNG';
   const imageAlt = product.imageLabel || product.name || 'Product preview';
   const isRacingStripe = isRacingStripeProduct(product);
   const customizeUrl = typeof window.buildCustomizeUrl === 'function'
     ? window.buildCustomizeUrl(product)
     : (product.customizeUrl || `customize.html?productId=${encodeURIComponent(product.id)}`);
   const optionsMarkup = isRacingStripe ? '' : renderRacingStripeOptions(product);
-  const actions = product.custom
+  const isCustomizable = Boolean(product.customizable ?? product.custom);
+  const actions = isCustomizable
     ? `
         <a class="btn" href="${customizeUrl}">Send To Decal Editor</a>
         <a class="btn btn-outline" href="shop.html">Continue Shopping</a>
@@ -519,7 +527,7 @@ async function initProductPage() {
   `;
 
   if (related) {
-    related.innerHTML = PRODUCTS.filter(item => item.id !== product.id).slice(0, 3).map(renderProductCard).join('');
+    related.innerHTML = products.filter(item => item.id !== product.id).slice(0, 3).map(renderProductCard).join('');
   }
 
   const addToCartButton = container.querySelector('#productAddToCartBtn');

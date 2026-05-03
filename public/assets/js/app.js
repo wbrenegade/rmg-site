@@ -7,7 +7,7 @@ const STORAGE_KEYS = {
   selectedVehicle: 'rmg_selected_vehicle'
 };
 
-let productsCache = [];
+let productsCache = Array.isArray(window.PRODUCTS) ? window.PRODUCTS : [];
 let productsLoadPromise = null;
 
 async function requestJson(url, options = {}) {
@@ -215,7 +215,7 @@ function buildCartItemKey(productId, options) {
 }
 
 function findProductById(id) {
-  return getProductsList().find(product => product.id === id);
+  return getProductsList().find(product => String(product.id) === String(id));
 }
 
 function getSelectedVehicle() {
@@ -280,6 +280,9 @@ function calculateCartTotals() {
 function buildCustomizeUrl(product) {
   if (!product) return 'customize.html';
   const params = new URLSearchParams({ productId: product.id });
+  const svgPath = product.svg_file_path || product.svgFilePath || product.stripeOptions?.previewSvgPath || product.previewSvgPath;
+  if (product.customizable || product.custom) params.set('customizable', 'true');
+  if (svgPath) params.set('svg', svgPath);
   return `customize.html?${params.toString()}`;
 }
 
@@ -293,7 +296,7 @@ function isRacingStripeProduct(product) {
 }
 
 function renderProductCard(product) {
-  const imagePath = product.imagePath || '/assets/imgs/main.PNG';
+  const imagePath = product.preview_image_path || product.imagePath || '/assets/imgs/main.PNG';
   const imageAlt = product.imageLabel || product.name || 'Product preview';
   const detailsUrl = product.productUrl || `product.html?id=${product.id}`;
   const customizeUrl = buildCustomizeUrl(product);
@@ -304,7 +307,8 @@ function renderProductCard(product) {
   const productIdDataAttr = encodeURIComponent(String(product.id || ''));
   const previewUrl = customizeUrl;
   const primaryAction = `<a href="${detailsUrl}" class="btn btn-outline">View Details</a>`;
-  const secondaryAction = product.custom
+  const isCustomizable = Boolean(product.customizable ?? product.custom);
+  const secondaryAction = isCustomizable
     ? (isDecalProduct ? '' : `<a href="${customizeUrl}" class="btn">${customizeLabel}</a>`)
     : `<button class="btn" onclick="addToCart('${product.id}')">Add to Cart</button>`;
   const previewAction = isDecalProduct
@@ -314,7 +318,7 @@ function renderProductCard(product) {
     : '';
   const detailsUrlAttr = String(detailsUrl).replace(/"/g, '&quot;');
   return `
-    <article class="card product-card" data-product-id="${productIdAttr}" data-details-url="${detailsUrlAttr}" data-racing-stripe="${isRacingStripe ? 'true' : 'false'}" data-custom="${product.custom ? 'true' : 'false'}">
+    <article class="card product-card" data-product-id="${productIdAttr}" data-details-url="${detailsUrlAttr}" data-racing-stripe="${isRacingStripe ? 'true' : 'false'}" data-custom="${isCustomizable ? 'true' : 'false'}">
       <div class="product-media">
         <img src="${imagePath}" alt="${imageAlt}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
         <span class="media-fallback">${imageAlt}</span>

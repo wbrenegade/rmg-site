@@ -181,6 +181,10 @@ function isRacingStripeProduct(product) {
 }
 
 function getGraphicsSvgPath(product) {
+  if (product?.svg_file_path || product?.svgFilePath) {
+    return product.svg_file_path || product.svgFilePath;
+  }
+
   const explicitPath = product?.graphicOptions?.previewSvgPath || product?.previewSvgPath;
   if (explicitPath) return explicitPath;
 
@@ -198,6 +202,10 @@ function getProductMode(product) {
 }
 
 function getRacingStripeSvgPath(product) {
+  if (product?.svg_file_path || product?.svgFilePath) {
+    return product.svg_file_path || product.svgFilePath;
+  }
+
   const explicitPath = product?.stripeOptions?.previewSvgPath;
   if (explicitPath) return explicitPath;
 
@@ -344,7 +352,7 @@ function buildDecalOptions(products) {
       id: String(product.id || ''),
       label: product.name || product.imageLabel || 'Custom Decal',
       mode: getProductMode(product),
-      svgPath: isRacingStripeProduct(product) ? getRacingStripeSvgPath(product) : getGraphicsSvgPath(product),
+      svgPath: product.svg_file_path || product.svgFilePath || (isRacingStripeProduct(product) ? getRacingStripeSvgPath(product) : getGraphicsSvgPath(product)),
       outlined: isOutlinedProduct(product)
     }))
     .filter((option) => option.id);

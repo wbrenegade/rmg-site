@@ -1,4 +1,10 @@
-const { readDb, writeDb } = require("./dbModel");
+const fs = require("fs");
+const path = require("path");
+const { readDb } = require("./dbModel");
+
+const rootDir = path.join(__dirname, "..", "..");
+const dataDir = path.join(rootDir, "data");
+const productsFilePath = path.join(dataDir, "products.json");
 
 function normalizeProductId(name, explicitId) {
   const base = String(explicitId || name || "")
@@ -36,6 +42,141 @@ function normalizeSubSubcategory(value, fallback = null) {
   return text ? text : null;
 }
 
+function titleCaseCategory(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "decals") return "Decals";
+  if (normalized === "lettering") return "Lettering";
+  if (normalized === "wraps") return "Wraps";
+  if (normalized === "film kits") return "Film Kits";
+
+  return String(value || "")
+    .trim()
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function normalizeRawProduct(product = {}, index = 0) {
+  const id = normalizeProductId(product.name, product.id || `product-${index + 1}`);
+  const name = String(product.name || "Untitled Product").trim();
+  const rawCategory = String(product.category || "decals").trim().toLowerCase() || "decals";
+  const isDecal = rawCategory === "decals";
+  const legacySubSubcategory = normalizeSubSubcategory(product.subSubcategory);
+  const position = String(product.position || product.placement || (isDecal ? product.subcategory : "") || "").trim();
+  const jsonSubcategory = String(
+    product.subcategory ||
+    product.decalType ||
+    product.type ||
+    product.style ||
+    legacySubSubcategory ||
+    ""
+  ).trim();
+  const previewImagePath = product.preview_image_path || product.imagePath || "/assets/imgs/main.PNG";
+  const svgFilePath = product.svg_file_path || product.svgFilePath || product.previewSvgPath || product.stripeOptions?.previewSvgPath || "";
+  const cutFilePath = product.cut_file_path || product.cutFilePath || "";
+  const displayCategory = titleCaseCategory(rawCategory);
+  const displaySubcategory = isDecal ? (position || jsonSubcategory) : jsonSubcategory;
+  const displaySubSubcategory = isDecal ? (jsonSubcategory || null) : legacySubSubcategory;
+  const customizable = normalizeBoolean(product.customizable, product.custom);
+  const tags = normalizeTags(product.tags, displayCategory, displaySubcategory, displaySubSubcategory);
+
+  return {
+    id,
+    name,
+    description: String(product.description || ""),
+    price: Number(product.price || 0),
+    category: displayCategory,
+    category_key: rawCategory,
+    subcategory: displaySubcategory,
+    subSubcategory: displaySubSubcategory,
+    position,
+    placement: position,
+    decalType: displaySubSubcategory || jsonSubcategory,
+    type: displaySubSubcategory || jsonSubcategory,
+    style: displaySubSubcategory || jsonSubcategory,
+    preview_image_path: previewImagePath,
+    svg_file_path: svgFilePath,
+    cut_file_path: cutFilePath,
+    imagePath: previewImagePath,
+    imageLabel: product.imageLabel || name,
+    svgFilePath,
+    cutFilePath,
+    customizable,
+    custom: customizable,
+    slug: normalizeSlug(product.slug, name || id),
+    tags,
+    featured: normalizeBoolean(product.featured),
+    customizeUrl: product.customizeUrl,
+    customizeCtaLabel: product.customizeCtaLabel,
+    stripeOptions: product.stripeOptions,
+    graphicOptions: product.graphicOptions
+  };
+}
+
+function toProductsJsonShape(product = {}) {
+  const normalized = normalizeRawProduct(product);
+  return {
+    id: normalized.id,
+    name: normalized.name,
+    description: normalized.description,
+    price: normalized.price,
+    category: normalized.category_key || String(product.category || "decals").trim().toLowerCase() || "decals",
+    subcategory: String(product.subcategory || normalized.decalType || normalized.subSubcategory || "").trim(),
+    position: String(product.position || normalized.position || "").trim(),
+    preview_image_path: product.preview_image_path || normalized.preview_image_path || "/assets/imgs/main.PNG",
+    svg_file_path: product.svg_file_path || normalized.svg_file_path || "",
+    cut_file_path: product.cut_file_path || normalized.cut_file_path || "",
+    customizable: normalizeBoolean(product.customizable, normalized.customizable)
+  };
+}
+
+function legacyProductToJsonShape(product = {}) {
+  const rawCategory = String(product.category || "decals").trim().toLowerCase() || "decals";
+  const isDecal = rawCategory === "decals";
+  return {
+    id: normalizeProductId(product.name, product.id),
+    name: String(product.name || "Untitled Product").trim(),
+    description: String(product.description || ""),
+    price: Number(product.price || 0),
+    category: rawCategory,
+    subcategory: isDecal
+      ? String(product.subSubcategory || product.decalType || product.type || product.subcategory || "").trim()
+      : String(product.subcategory || "").trim(),
+    position: isDecal ? String(product.position || product.placement || product.subcategory || "").trim() : "",
+    preview_image_path: product.preview_image_path || product.imagePath || "/assets/imgs/main.PNG",
+    svg_file_path: product.svg_file_path || product.svgFilePath || product.previewSvgPath || product.stripeOptions?.previewSvgPath || "",
+    cut_file_path: product.cut_file_path || product.cutFilePath || "",
+    customizable: normalizeBoolean(product.customizable, product.custom)
+  };
+}
+
+function ensureProductsFile() {
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+
+  if (!fs.existsSync(productsFilePath)) {
+    const db = readDb();
+    const products = Array.isArray(db.products) ? db.products.map(legacyProductToJsonShape) : [];
+    fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2), "utf8");
+  }
+}
+
+function readProductsFile() {
+  ensureProductsFile();
+  try {
+    const raw = fs.readFileSync(productsFilePath, "utf8");
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeProductsFile(products) {
+  ensureProductsFile();
+  fs.writeFileSync(productsFilePath, JSON.stringify(products.map(toProductsJsonShape), null, 2), "utf8");
+}
+
 function normalizeTags(value, category, subcategory, subSubcategory, fallback = []) {
   let source = value;
 
@@ -64,8 +205,7 @@ function normalizeTags(value, category, subcategory, subSubcategory, fallback = 
 }
 
 function getAllProducts() {
-  const db = readDb();
-  return db.products;
+  return readProductsFile().map(normalizeRawProduct);
 }
 
 function getProductById(id) {
@@ -73,79 +213,47 @@ function getProductById(id) {
 }
 
 function createProduct(payload) {
-  const db = readDb();
-  const id = normalizeProductId(payload.name, payload.id);
-  const name = String(payload.name || "").trim();
-  const category = String(payload.category || "").trim();
-  const subcategory = String(payload.subcategory || "").trim();
-  const subSubcategory = normalizeSubSubcategory(payload.subSubcategory);
+  const products = readProductsFile();
+  const nextProduct = toProductsJsonShape(payload);
 
-  const nextProduct = {
-    id,
-    name,
-    slug: normalizeSlug(payload.slug, name || id),
-    category,
-    subcategory,
-    subSubcategory,
-    price: Number(payload.price),
-    tags: normalizeTags(payload.tags, category, subcategory, subSubcategory),
-    imagePath: payload.imagePath || "/assets/imgs/main.PNG",
-    imageLabel: payload.imageLabel || "Product Preview",
-    description: payload.description || "",
-    featured: normalizeBoolean(payload.featured),
-    custom: normalizeBoolean(payload.custom)
-  };
-
-  if (db.products.some((product) => product.id === nextProduct.id)) {
+  if (products.some((product) => product.id === nextProduct.id)) {
     throw new Error("A product with that id already exists.");
   }
 
-  db.products.push(nextProduct);
-  writeDb(db);
-  return nextProduct;
+  products.push(nextProduct);
+  writeProductsFile(products);
+  return normalizeRawProduct(nextProduct);
 }
 
 function updateProduct(id, payload) {
-  const db = readDb();
-  const target = db.products.find((product) => product.id === id);
+  const products = readProductsFile();
+  const index = products.findIndex((product) => product.id === id);
 
-  if (!target) return null;
+  if (index < 0) return null;
 
-  target.name = payload.name ?? target.name;
-  target.slug = payload.slug !== undefined
-    ? normalizeSlug(payload.slug, payload.name ?? target.name)
-    : normalizeSlug(target.slug, target.name);
-  target.category = payload.category ?? target.category;
-  target.subcategory = payload.subcategory ?? target.subcategory;
-  target.subSubcategory = payload.subSubcategory !== undefined
-    ? normalizeSubSubcategory(payload.subSubcategory, target.subSubcategory)
-    : normalizeSubSubcategory(target.subSubcategory);
-  target.price = payload.price !== undefined ? Number(payload.price) : target.price;
-  target.tags = normalizeTags(
-    payload.tags,
-    target.category,
-    target.subcategory,
-    target.subSubcategory,
-    Array.isArray(target.tags) ? target.tags : []
-  );
-  target.featured = payload.featured !== undefined ? normalizeBoolean(payload.featured) : normalizeBoolean(target.featured);
-  target.custom = payload.custom !== undefined ? normalizeBoolean(payload.custom) : normalizeBoolean(target.custom);
-  target.description = payload.description ?? target.description;
-  target.imagePath = payload.imagePath ?? target.imagePath;
-  target.imageLabel = payload.imageLabel ?? target.imageLabel;
+  const current = products[index];
+  const merged = {
+    ...current,
+    ...payload,
+    preview_image_path: payload.preview_image_path ?? payload.imagePath ?? current.preview_image_path,
+    svg_file_path: payload.svg_file_path ?? payload.svgFilePath ?? current.svg_file_path,
+    cut_file_path: payload.cut_file_path ?? payload.cutFilePath ?? current.cut_file_path,
+    customizable: payload.customizable ?? payload.custom ?? current.customizable
+  };
 
-  writeDb(db);
-  return target;
+  products[index] = toProductsJsonShape(merged);
+  writeProductsFile(products);
+  return normalizeRawProduct(products[index]);
 }
 
 function deleteProduct(id) {
-  const db = readDb();
-  const index = db.products.findIndex((product) => product.id === id);
+  const products = readProductsFile();
+  const index = products.findIndex((product) => product.id === id);
 
   if (index < 0) return false;
 
-  db.products.splice(index, 1);
-  writeDb(db);
+  products.splice(index, 1);
+  writeProductsFile(products);
   return true;
 }
 

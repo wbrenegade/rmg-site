@@ -49,8 +49,9 @@ function renderProductsTable(products) {
           <th>Name</th>
           <th>Category</th>
           <th>Subcategory</th>
+          <th>Position</th>
           <th>Price</th>
-          <th>Custom</th>
+          <th>Customizable</th>
           <th>Featured</th>
           <th>Actions</th>
         </tr>
@@ -60,9 +61,10 @@ function renderProductsTable(products) {
           <tr>
             <td>${product.name}</td>
             <td>${product.category}</td>
-            <td>${product.subcategory || ""}</td>
+            <td>${product.subSubcategory || product.decalType || product.subcategory || ""}</td>
+            <td>${product.position || product.placement || ""}</td>
             <td>${formatCurrency(product.price)}</td>
-            <td>${product.custom ? "Yes" : "No"}</td>
+            <td>${(product.customizable ?? product.custom) ? "Yes" : "No"}</td>
             <td>${product.featured ? "Yes" : "No"}</td>
             <td class="cms-actions-row">
               <button class="btn btn-outline" data-action="edit" data-id="${product.id}">Edit</button>
@@ -103,14 +105,16 @@ function fillProductForm(product) {
   form.elements.id.value = product.id;
   form.elements.name.value = product.name;
   form.elements.slug.value = product.slug || "";
-  form.elements.category.value = product.category;
-  form.elements.subcategory.value = product.subcategory || "";
-  form.elements.subSubcategory.value = product.subSubcategory || "";
+  form.elements.category.value = product.category_key || String(product.category || "").toLowerCase();
+  form.elements.subcategory.value = product.subSubcategory || product.decalType || product.subcategory || "";
+  form.elements.position.value = product.position || product.placement || "";
   form.elements.price.value = product.price;
   form.elements.featured.value = String(Boolean(product.featured));
-  form.elements.custom.value = String(Boolean(product.custom));
+  form.elements.customizable.value = String(Boolean(product.customizable ?? product.custom));
   form.elements.tags.value = Array.isArray(product.tags) ? product.tags.join(", ") : "";
-  form.elements.imagePath.value = product.imagePath || "";
+  form.elements.preview_image_path.value = product.preview_image_path || product.imagePath || "";
+  form.elements.svg_file_path.value = product.svg_file_path || product.svgFilePath || "";
+  form.elements.cut_file_path.value = product.cut_file_path || product.cutFilePath || "";
   form.elements.imageLabel.value = product.imageLabel || "";
   form.elements.description.value = product.description || "";
 }
@@ -122,7 +126,7 @@ function resetProductForm() {
   form.reset();
   form.elements.id.value = "";
   form.elements.featured.value = "false";
-  form.elements.custom.value = "false";
+  form.elements.customizable.value = "false";
 }
 
 function renderOrders(orders) {
@@ -366,15 +370,17 @@ function initCmsProductForm() {
       slug: data.slug,
       category: data.category,
       subcategory: data.subcategory,
-      subSubcategory: data.subSubcategory || null,
+      position: data.position,
       price: Number(data.price),
       featured: data.featured === "true",
-      custom: data.custom === "true",
+      customizable: data.customizable === "true",
       tags: String(data.tags || "")
         .split(",")
         .map((tag) => tag.trim())
         .filter(Boolean),
-      imagePath: data.imagePath,
+      preview_image_path: data.preview_image_path,
+      svg_file_path: data.svg_file_path,
+      cut_file_path: data.cut_file_path,
       imageLabel: data.imageLabel,
       description: data.description
     };

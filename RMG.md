@@ -130,3 +130,22 @@
   - Static
   - Slammed
   - Widebody
+
+## Product JSON Schema
+
+### DECALS
+'''json
+{
+  "id": string,
+  "name": string,
+  "description": string,
+  "price": number,
+  "category": "decals",
+  "subcategory": string,
+  "position": string,
+  "preview_image_path": string,
+  "svg_file_path": string,
+  "cut_file_path": string,
+  "customizable": boolean
+}
+'''

@@ -87,8 +87,8 @@
             <label>Subcategory
               <input type="text" name="subcategory" required />
             </label>
-            <label>Sub-Subcategory
-              <input type="text" name="subSubcategory" placeholder="Optional" />
+            <label>Position
+              <input type="text" name="position" placeholder="Hood, Fender, Rocker Panel/Side" />
             </label>
             <label>Price
               <input type="number" step="0.01" min="0" name="price" required />
@@ -99,8 +99,8 @@
                 <option value="true">Yes</option>
               </select>
             </label>
-            <label>Custom
-              <select name="custom">
+            <label>Customizable
+              <select name="customizable">
                 <option value="false">No</option>
                 <option value="true">Yes</option>
               </select>
@@ -111,8 +111,14 @@
             <label class="full-width">Image Label
               <input type="text" name="imageLabel" />
             </label>
-            <label class="full-width">Image Path
-              <input type="text" name="imagePath" placeholder="/assets/imgs/main.PNG" />
+            <label class="full-width">Preview Image Path
+              <input type="text" name="preview_image_path" placeholder="/assets/imgs/main.PNG" />
+            </label>
+            <label class="full-width">SVG File Path
+              <input type="text" name="svg_file_path" placeholder="/assets/svg/racing-stripes/dual-stripes.svg" />
+            </label>
+            <label class="full-width">Cut File Path
+              <input type="text" name="cut_file_path" placeholder="/assets/cut-files/example.svg" />
             </label>
             <label class="full-width">Short Description
               <textarea rows="3" name="description" required></textarea>
