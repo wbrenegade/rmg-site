@@ -69,6 +69,34 @@
     "customizer_tool": "inline",
     "customizable": true
   },
+   {
+    "id": "rmg-fender-flames",
+    "name": "Flames Decal",
+    "description": "Classic flames for he front fender giving the vehicle an aggressive look.",
+    "price": 49.99,
+    "category": "decals",
+    "subcategory": "Flames",
+    "position": "Fender",
+    "preview_image_path": "/assets/imgs/decals/products/fender__flames/flames.png",
+    "svg_file_path": "/assets/svg/flames/flames.svg",
+    "cut_file_path": "",
+    "customizer_tool": "inline",
+    "customizable": true
+  },
+  {
+    "id": "rmg-large-fender-flames",
+    "name": "Large Flames Decal",
+    "description": "Classic large flames for he front fender giving the vehicle an even more aggressive look.",
+    "price": 49.99,
+    "category": "decals",
+    "subcategory": "Flames",
+    "position": "Fender",
+    "preview_image_path": "/assets/imgs/decals/products/fender__flames/large-flames.png",
+    "svg_file_path": "/assets/svg/flames/large-flames.svg",
+    "cut_file_path": "",
+    "customizer_tool": "inline",
+    "customizable": true
+  },
   {
     "id": "rmg-rocker-stripe-single-outlined",
     "name": "Single Outlined Rocker Stripe",

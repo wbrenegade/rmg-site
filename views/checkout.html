@@ -155,6 +155,7 @@
         const outlineColors = Array.isArray(options.stripeOutlineColors) ? options.stripeOutlineColors.filter(Boolean) : [];
         const accentStyles = Array.isArray(options.stripeAccentStyles) ? options.stripeAccentStyles.filter(Boolean) : [];
         const accentSizes = Array.isArray(options.stripeAccentSizes) ? options.stripeAccentSizes.filter(Boolean) : [];
+        const flameColors = Array.isArray(options.flameColors) ? options.flameColors.filter(Boolean) : [];
         const details = [];
 
         if (widths.length) details.push(`Stripe Width: ${widths.join(", ")}`);
@@ -163,6 +164,7 @@
         if (outlineColors.length) details.push(`Accent Color: ${outlineColors.join(", ")}`);
         if (accentStyles.length) details.push(`Accent Style: ${accentStyles.join(", ")}`);
         if (accentSizes.length) details.push(`Accent Size: ${accentSizes.join(", ")}`);
+        if (flameColors.length) details.push(`Flame Color: ${flameColors.join(", ")}`);
 
         return details.join(" | ");
       }

@@ -15,6 +15,7 @@ function renderCheckoutSummary() {
     const outlineColors = Array.isArray(options.stripeOutlineColors) ? options.stripeOutlineColors.filter(Boolean) : [];
     const accentStyles = Array.isArray(options.stripeAccentStyles) ? options.stripeAccentStyles.filter(Boolean) : [];
     const accentSizes = Array.isArray(options.stripeAccentSizes) ? options.stripeAccentSizes.filter(Boolean) : [];
+    const flameColors = Array.isArray(options.flameColors) ? options.flameColors.filter(Boolean) : [];
     const lines = [];
 
     if (widths.length) lines.push(`Stripe Width: ${widths.join(', ')}`);
@@ -23,6 +24,7 @@ function renderCheckoutSummary() {
     if (outlineColors.length) lines.push(`Accent Color: ${outlineColors.join(', ')}`);
     if (accentStyles.length) lines.push(`Accent Style: ${accentStyles.join(', ')}`);
     if (accentSizes.length) lines.push(`Accent Size: ${accentSizes.join(', ')}`);
+    if (flameColors.length) lines.push(`Flame Color: ${flameColors.join(', ')}`);
 
     if (!lines.length) return '';
     return `<p class="inline-note">${lines.join(' • ')}</p>`;

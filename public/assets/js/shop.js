@@ -77,6 +77,11 @@ function isRacingStripeProduct(product) {
   return tags.some((tag) => normalizeText(tag) === "racing stripes");
 }
 
+function isFlameProduct(product) {
+  if (!product) return false;
+  return getProductSearchText(product).includes("flame");
+}
+
 function inferMultipleStripeLayout(product, widths) {
   if (typeof product?.stripeOptions?.hasMultipleStripes === "boolean") {
     return product.stripeOptions.hasMultipleStripes;
@@ -200,6 +205,18 @@ async function loadRacingStripePreviewSvg(path) {
   return racingStripePreviewSvgCache.get(path);
 }
 
+function getDecalColorOptions(product) {
+  const configuredColors = Array.isArray(product?.flameOptions?.colors)
+    ? product.flameOptions.colors
+    : Array.isArray(product?.decalOptions?.colors)
+      ? product.decalOptions.colors
+      : [];
+
+  return (configuredColors.length ? configuredColors : ["Gloss Black", "Matte Black", "Satin Charcoal", "Gloss White", "Race Red", "Nardo Gray"])
+    .map((value) => String(value || "").trim())
+    .filter(Boolean);
+}
+
 function getSvgAttribute(tag, name) {
   const match = String(tag || "").match(new RegExp(`\\s${name}="([^"]*)"`, "i"));
   return match ? match[1] : "";
@@ -311,6 +328,28 @@ function renderRacingStripeAssetPreview(svgText, stripeColorHex, outlineColorHex
   return `
     <div class="stripe-preview-surface" role="img" aria-label="Live stripe preview">
       ${colorizeRacingStripeSvg(svgText, stripeColorHex, outlineColorHex, accentOptions)}
+    </div>
+  `;
+}
+
+function colorizeDecalSvg(svgText, colorHex, className = "stripe-preview-svg") {
+  const cleanedSvg = String(svgText || "")
+    .replace(/<\?xml[^>]*>\s*/i, "")
+    .replace(/<!--[\s\S]*?-->\s*/g, "");
+
+  return cleanedSvg
+    .replace(/<svg\b([^>]*)>/i, (svgTag, attributes) => {
+      const cleanedAttributes = attributes.replace(/\s(width|height)="[^"]*"/g, "");
+      return `<svg class="${className}" preserveAspectRatio="xMidYMid meet" overflow="visible" fill="${colorHex}"${cleanedAttributes}>`;
+    })
+    .replace(/fill:\s*(?!none\b)#[0-9a-fA-F]{3,8}/g, `fill:${colorHex}`)
+    .replace(/\sfill="(?!none\b)[^"]*"/gi, ` fill="${colorHex}"`);
+}
+
+function renderDecalAssetPreview(svgText, colorHex, label = "Live decal preview") {
+  return `
+    <div class="stripe-preview-surface" role="img" aria-label="${label}">
+      ${colorizeDecalSvg(svgText, colorHex)}
     </div>
   `;
 }
@@ -604,12 +643,101 @@ function openStripeQuickModal(product) {
   document.body.classList.add("modal-open");
 }
 
+function renderFlameQuickLivePreview(container, options) {
+  const previewCanvas = container.querySelector("#flameQuickPreviewCanvas");
+  const previewMeta = container.querySelector("#flameQuickPreviewMeta");
+  const colorSelect = container.querySelector("#quickFlameColorSelect");
+
+  if (!(previewCanvas && previewMeta && colorSelect)) return;
+  let previewRequestId = 0;
+
+  const update = () => {
+    const requestId = ++previewRequestId;
+    const selectedColor = colorSelect.value || options.colors[0] || "Gloss Black";
+    const colorHex = stripeColorToHex(selectedColor);
+
+    loadRacingStripePreviewSvg(options.previewSvgPath)
+      .then((svgText) => {
+        if (requestId !== previewRequestId) return;
+        previewCanvas.innerHTML = renderDecalAssetPreview(svgText, colorHex, "Live flame preview");
+      })
+      .catch(() => {
+        if (requestId !== previewRequestId) return;
+        previewCanvas.innerHTML = `
+          <div class="stripe-preview-surface" role="img" aria-label="Live flame preview">
+            <svg class="stripe-preview-svg" viewBox="0 0 120 40" preserveAspectRatio="xMidYMid meet">
+              <path d="M4 29 C22 10 34 34 49 13 C60 0 70 24 86 10 C98 2 105 18 116 8 C108 26 91 35 68 33 C46 32 27 38 4 29 Z" fill="${colorHex}" />
+            </svg>
+          </div>
+        `;
+      });
+
+    previewMeta.textContent = `Color: ${selectedColor}`;
+  };
+
+  colorSelect.addEventListener("input", update);
+  colorSelect.addEventListener("change", update);
+  update();
+}
+
+function openFlameQuickModal(product) {
+  const { modal, body, title } = getStripeQuickModalElements();
+  if (!(modal && body && title)) return;
+
+  const options = {
+    colors: getDecalColorOptions(product),
+    previewSvgPath: product?.svg_file_path || product?.svgFilePath || product?.previewSvgPath || "/assets/svg/flames/flames.svg"
+  };
+
+  currentStripeQuickProduct = product;
+  title.textContent = product.name || "Flames Decal";
+  const fullProductUrl = product.productUrl || `/product?id=${encodeURIComponent(product.id)}`;
+
+  body.innerHTML = `
+    <div class="stripe-quick-grid">
+      <div class="product-option-grid">
+        <label>
+          Flame Color
+          <select id="quickFlameColorSelect" aria-label="Flame color">
+            ${options.colors.map((color) => `<option value="${color}">${color}</option>`).join("")}
+          </select>
+        </label>
+      </div>
+
+      <div class="stripe-live-preview stripe-live-preview--modal">
+        <p class="stripe-live-preview__title">Live Preview</p>
+        <div class="stripe-live-preview__canvas" id="flameQuickPreviewCanvas"></div>
+        <p class="inline-note stripe-live-preview__meta" id="flameQuickPreviewMeta"></p>
+      </div>
+    </div>
+
+    <div class="product-actions stripe-quick-actions">
+      <a class="btn btn-outline" href="${fullProductUrl}">Open Full Product</a>
+      <button type="button" class="btn" id="quickFlameAddToCartBtn">Add To Cart</button>
+    </div>
+  `;
+
+  renderFlameQuickLivePreview(body, options);
+
+  const addBtn = body.querySelector("#quickFlameAddToCartBtn");
+  addBtn?.addEventListener("click", () => {
+    const colorValue = body.querySelector("#quickFlameColorSelect")?.value?.trim() || "";
+    addToCart(product.id, 1, {
+      flameColors: colorValue ? [colorValue] : []
+    });
+    closeStripeQuickModal();
+  });
+
+  modal.removeAttribute("hidden");
+  document.body.classList.add("modal-open");
+}
+
 function initStripeQuickModalEvents(productsEl) {
   const { modal, closeBtn } = getStripeQuickModalElements();
   if (!productsEl || !modal) return;
 
   productsEl.addEventListener('click', async (event) => {
-    const customizeLink = event.target.closest('.racing-stripe-customize-link');
+    const customizeLink = event.target.closest('.quick-decal-customize-link, .racing-stripe-customize-link');
     if (!customizeLink) return;
 
     event.preventDefault();
@@ -622,8 +750,14 @@ function initStripeQuickModalEvents(productsEl) {
       ? { ...renderedProduct, ...productJsonRecord }
       : renderedProduct;
 
-    if (!product || !isRacingStripeProduct(product)) return;
-    openStripeQuickModal(product);
+    if (!product) return;
+    if (isRacingStripeProduct(product)) {
+      openStripeQuickModal(product);
+      return;
+    }
+    if (isFlameProduct(product)) {
+      openFlameQuickModal(product);
+    }
   });
 
   modal.addEventListener('click', (event) => {

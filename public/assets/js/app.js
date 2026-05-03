@@ -199,6 +199,9 @@ function normalizeCartOptions(options) {
   const stripeAccentSizes = Array.isArray(options.stripeAccentSizes)
     ? options.stripeAccentSizes.map(value => String(value || '').trim()).filter(Boolean)
     : [];
+  const flameColors = Array.isArray(options.flameColors)
+    ? options.flameColors.map(value => String(value || '').trim()).filter(Boolean)
+    : [];
 
   if (stripeWidths.length) normalized.stripeWidths = stripeWidths;
   if (stripeColors.length) normalized.stripeColors = stripeColors;
@@ -206,6 +209,7 @@ function normalizeCartOptions(options) {
   if (stripeOutlineColors.length) normalized.stripeOutlineColors = stripeOutlineColors;
   if (stripeAccentStyles.length) normalized.stripeAccentStyles = stripeAccentStyles;
   if (stripeAccentSizes.length) normalized.stripeAccentSizes = stripeAccentSizes;
+  if (flameColors.length) normalized.flameColors = flameColors;
 
   return Object.keys(normalized).length ? normalized : null;
 }
@@ -308,6 +312,23 @@ function isRacingStripeProduct(product) {
   return tags.some(tag => String(tag || '').toLowerCase() === 'racing stripes');
 }
 
+function isFlameProduct(product) {
+  if (!product) return false;
+  const searchable = [
+    product.name,
+    product.slug,
+    product.id,
+    product.subcategory,
+    product.subSubcategory,
+    product.decalType,
+    product.type,
+    product.style,
+    ...(Array.isArray(product.tags) ? product.tags : [])
+  ].filter(Boolean).join(' ').toLowerCase();
+
+  return searchable.includes('flame');
+}
+
 function renderProductCard(product) {
   const imagePath = product.preview_image_path || product.imagePath || '/assets/imgs/main.PNG';
   const imageAlt = product.imageLabel || product.name || 'Product preview';
@@ -316,6 +337,7 @@ function renderProductCard(product) {
   const customizeLabel = product.customizeCtaLabel || 'Customize';
   const isDecalProduct = String(product.category || '').toLowerCase() === 'decals';
   const isRacingStripe = isRacingStripeProduct(product);
+  const isFlame = isFlameProduct(product);
   const productIdAttr = String(product.id || '').replace(/"/g, '&quot;');
   const productIdDataAttr = encodeURIComponent(String(product.id || ''));
   const customizerTool = String(product.customizer_tool ?? product.customizerTool ?? '').trim().toLowerCase();
@@ -327,8 +349,8 @@ function renderProductCard(product) {
     ? (isDecalProduct ? '' : `<a href="${customizeUrl}" class="btn">${customizeLabel}</a>`)
     : `<button class="btn" onclick="addToCart('${product.id}')">Add to Cart</button>`;
   const previewAction = isDecalProduct && isCustomizable
-    ? (hasInlineCustomizer || isRacingStripe
-      ? `<a href="${previewUrl}" class="btn racing-stripe-customize-link" data-product-id="${productIdDataAttr}">Customize</a>`
+    ? (isRacingStripe || isFlame
+      ? `<a href="${previewUrl}" class="btn quick-decal-customize-link" data-product-id="${productIdDataAttr}">Customize</a>`
       : `<a href="${previewUrl}" class="btn">Customize</a>`)
     : '';
   const detailsUrlAttr = String(detailsUrl).replace(/"/g, '&quot;');
