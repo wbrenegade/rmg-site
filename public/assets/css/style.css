@@ -793,15 +793,17 @@ textarea { resize: vertical; }
 .tools-product-grid .product-card .product-media {
   display: block;
   padding: 0;
-  min-height: 0;
+  min-height: 0 !important;
+  height: auto !important;
   background: #0f1520;
 }
 
 .tools-product-grid .product-card .product-media img {
   display: block;
   width: 100%;
-  height: auto;
-  object-fit: contain;
+  height: auto !important;
+  max-height: none;
+  object-fit: contain !important;
 }
 
 .product-meta,
