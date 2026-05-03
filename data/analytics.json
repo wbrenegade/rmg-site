@@ -65,6 +65,125 @@
         "city": null
       },
       "payload": {}
+    },
+    {
+      "id": "3ae26d80-7456-45e0-a66d-bf2698ee5be6",
+      "type": "page_view",
+      "pathname": "/tools",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/shop",
+      "method": "GET",
+      "timestamp": "05/03/2026, 10:50:04 AM",
+      "date": "2026-05-03",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "57b8c4d6-b518-4029-975f-52f0ef12fadc",
+      "type": "page_view",
+      "pathname": "/tools/svg-converter",
+      "productId": null,
+      "productName": null,
+      "tool": null,
+      "action": null,
+      "referrer": "https://renegademadegraphix.com/tools",
+      "method": "GET",
+      "timestamp": "05/03/2026, 10:51:51 AM",
+      "date": "2026-05-03",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {}
+    },
+    {
+      "id": "717432eb-2d59-4949-86aa-90e165159f80",
+      "type": "tool_event",
+      "pathname": "/tools/svg-converter",
+      "productId": null,
+      "productName": null,
+      "tool": "svg-converter",
+      "action": "file_selected",
+      "referrer": "https://renegademadegraphix.com/tools/svg-converter",
+      "method": "POST",
+      "timestamp": "05/03/2026, 10:52:00 AM",
+      "date": "2026-05-03",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {
+        "fileType": "image/jpeg",
+        "extension": "jpg"
+      }
+    },
+    {
+      "id": "463e776d-5e74-4d66-865d-4c4c6e2a64b2",
+      "type": "tool_event",
+      "pathname": "/tools/svg-converter",
+      "productId": null,
+      "productName": null,
+      "tool": "svg-converter",
+      "action": "convert_started",
+      "referrer": "https://renegademadegraphix.com/tools/svg-converter",
+      "method": "POST",
+      "timestamp": "05/03/2026, 10:52:02 AM",
+      "date": "2026-05-03",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {
+        "preset": "vinyl",
+        "extension": "jpg"
+      }
+    },
+    {
+      "id": "ec5c53ff-d468-4ea6-a05a-b6ce656d9ba4",
+      "type": "tool_event",
+      "pathname": "/tools/svg-converter",
+      "productId": null,
+      "productName": null,
+      "tool": "svg-converter",
+      "action": "convert_completed",
+      "referrer": "https://renegademadegraphix.com/tools/svg-converter",
+      "method": "POST",
+      "timestamp": "05/03/2026, 10:52:10 AM",
+      "date": "2026-05-03",
+      "ip": "35.149.51.3",
+      "visitorKey": "de8d125ef67dd273",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "location": {
+        "country": null,
+        "region": null,
+        "city": null
+      },
+      "payload": {
+        "preset": "vinyl",
+        "extension": "jpg"
+      }
     }
   ]
 }
