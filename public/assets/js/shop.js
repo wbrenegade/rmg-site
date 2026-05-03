@@ -141,6 +141,7 @@ function inferTopStripe(product) {
 
 const RACING_STRIPE_PREVIEW_BASE = "/assets/svg/racing-stripes";
 const racingStripePreviewSvgCache = new Map();
+const productJsonRecordCache = new Map();
 
 function getRacingStripePreviewSvgPath(product) {
   if (product?.svg_file_path || product?.svgFilePath) {
@@ -234,6 +235,28 @@ function getRacingStripeOptions(product) {
     hasTopStripe: inferTopStripe(product),
     previewSvgPath: getRacingStripePreviewSvgPath(product)
   };
+}
+
+async function getProductJsonRecord(productId) {
+  const normalizedProductId = String(productId || "").trim();
+  if (!normalizedProductId) return null;
+
+  if (!productJsonRecordCache.has(normalizedProductId)) {
+    const productPromise = fetch("/api/products")
+      .then((response) => {
+        if (!response.ok) throw new Error("Unable to load products JSON.");
+        return response.json();
+      })
+      .then((products) => {
+        if (!Array.isArray(products)) return null;
+        return products.find((product) => String(product.id || "").trim() === normalizedProductId) || null;
+      })
+      .catch(() => null);
+
+    productJsonRecordCache.set(normalizedProductId, productPromise);
+  }
+
+  return productJsonRecordCache.get(normalizedProductId);
 }
 
 function parseInchValue(input, fallback) {
@@ -345,6 +368,7 @@ function openStripeQuickModal(product) {
   if (!(modal && body && title)) return;
 
   const options = getRacingStripeOptions(product);
+  options.previewSvgPath = product?.svg_file_path || product?.svgFilePath || options.previewSvgPath;
   const spacingMarkup = options.hasMultipleStripes && options.spacings.length
     ? `
       <label>
@@ -432,15 +456,19 @@ function initStripeQuickModalEvents(productsEl) {
   const { modal, closeBtn } = getStripeQuickModalElements();
   if (!productsEl || !modal) return;
 
-  productsEl.addEventListener('click', (event) => {
+  productsEl.addEventListener('click', async (event) => {
     const customizeLink = event.target.closest('.racing-stripe-customize-link');
     if (!customizeLink) return;
 
     event.preventDefault();
 
     const productId = decodeURIComponent(String(customizeLink.dataset.productId || '').trim());
-    const product = currentRenderedProductsById.get(productId)
+    const renderedProduct = currentRenderedProductsById.get(productId)
       || (typeof window.findProductById === 'function' ? window.findProductById(productId) : null);
+    const productJsonRecord = await getProductJsonRecord(productId);
+    const product = productJsonRecord
+      ? { ...renderedProduct, ...productJsonRecord }
+      : renderedProduct;
 
     if (!product || !isRacingStripeProduct(product)) return;
     openStripeQuickModal(product);
